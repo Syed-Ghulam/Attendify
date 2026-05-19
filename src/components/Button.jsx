@@ -1,7 +1,10 @@
-function Button(){
+function Button(props){
     return(
-        <button className="button">
-            Sign in
+        <button  
+        onClick={props.onClick} 
+        className={props.className} 
+        >
+            {props.text || props.children}
         </button>
     )
 }
