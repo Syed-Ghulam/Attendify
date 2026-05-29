@@ -12,8 +12,8 @@ function Header(props){
 
     const getInitials = (name) =>{
 
-        return name.split(" ")
-        .map((word) => word[0])
+        return name.split(" ") // ["Syed","Ghulam","Rasool"]
+        .map((word) => word[0]) // 1 -> "Syed"
         .join("")
         .toUpperCase();
     };

@@ -163,22 +163,9 @@ function NewWorkStation() {
                               required={true}
                               value={formData.workstationName}
                               onChange={handleChange}
+                              error = {errors.workstationName}
                               placeHolder="Enter workstation name"
-                              labelClassName="mb-[6px] block
-                              text-[13px] font-semibold text-[#2D2D5A]"
-                              className="h-[42px] w-full rounded-[4px]
-                              border border-[#D9DCEA]
-                              bg-white px-3 text-[14px]
-                              outline-none focus:border-[#5B52A3]"
                            />
-                           {
-                              errors.workstationName && (
-                                 <p className="mt-1 text-sm text-red-500">
-                                    {errors.workstationName}
-                                 </p>
-                              )
-                           }
-
                         </div>
 
                         {/* IP Address */}
@@ -193,21 +180,8 @@ function NewWorkStation() {
                               value={formData.ipAddress}
                               onChange={handleChange}
                               placeHolder="Enter IP address"
-                              labelClassName="mb-[6px] block
-                              text-[13px] font-semibold text-[#2D2D5A]"
-                              className="h-[42px] w-full rounded-[4px]
-                              border border-[#D9DCEA]
-                              bg-white px-3 text-[14px]
-                              outline-none focus:border-[#5B52A3]"
+                              error ={errors.ipAddress}
                            />
-
-                            {
-                              errors.ipAddress && (
-                                 <p className="mt-1 text-sm text-red-500">
-                                    {errors.ipAddress}
-                                 </p>
-                              )
-                           }
 
                         </div>
 
@@ -230,18 +204,12 @@ function NewWorkStation() {
                                     })
                                  }
                                  options={facilityOptions}
+                                 error = {errors.facility}
                                  className="h-[42px] w-full rounded-[4px]
                                  border border-[#D9DCEA]
                                  bg-white px-3 text-[14px]
                                  outline-none cursor-pointer"
                               />
-                                 {
-                                 errors.facility && (
-                                    <p className="mt-1 text-sm text-red-500">
-                                       {errors.facility}
-                                    </p>
-                                 )
-                                }
 
                            </div>
 
@@ -256,12 +224,6 @@ function NewWorkStation() {
                                  value={formData.code}
                                  onChange={handleChange}
                                  placeHolder="Enter code"
-                                 labelClassName="mb-[6px] block
-                                 text-[13px] font-semibold text-[#2D2D5A]"
-                                 className="h-[42px] w-full rounded-[4px]
-                                 border border-[#D9DCEA]
-                                 bg-white px-3 text-[14px]
-                                 outline-none focus:border-[#5B52A3]"
                               />
 
                            </div>
@@ -283,19 +245,12 @@ function NewWorkStation() {
                                  })
                               }
                               options={lineOptions}
+                              error = {errors.linenameNumber}
                               className="h-[42px] w-full rounded-[4px]
                               border border-[#D9DCEA]
                               bg-white px-3 text-[14px]
                               outline-none cursor-pointer"
                            />
-
-                            {
-                              errors.linenameNumber && (
-                                 <p className="mt-1 text-sm text-red-500">
-                                    {errors.linenameNumber}
-                                 </p>
-                              )
-                           }
 
                         </div>
 

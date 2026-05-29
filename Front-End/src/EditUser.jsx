@@ -1,7 +1,7 @@
 import Input from "./components/Input";
 import MultiSelect from "./components/MultiSelect";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams} from "react-router-dom";
 import DateInput from "./components/DateInput";
 import Select from "./components/Select";
 import Toggle from "./components/Toggle";
@@ -11,9 +11,10 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Back from './assets/icons/Back.svg';
 
-function NewUser() {
+function EditUser() {
 
   const navigate = useNavigate();
+  const {userId} = useParams();
   const [grpName, setGrpName] = useState([]);
   const [date, setDate] = useState("");
   const [gender, setGender] = useState("");
@@ -95,9 +96,9 @@ function NewUser() {
     console.log(payload)
     try{
       const response = await fetch(
-        "http://localhost:5000/users",
+        `http://localhost:5000/users/${userId}`,
         {
-          method:"POST",
+          method:"PUT",
 
           headers:{
             "Content-Type":"application/json"
@@ -107,7 +108,7 @@ function NewUser() {
       );
       const data = await response.json();
       console.log(data);
-      alert("User Created Successfully");
+      alert("User Updated Successfully");
     } catch(error){
       console.log(error);
       alert("Error creating user");
@@ -153,6 +154,35 @@ function NewUser() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
+
+  useEffect(() => {
+
+  fetch(`http://localhost:5000/users/${userId}`)
+    .then((res) => res.json())
+    .then((data) => {
+
+      setFormData({
+        userId: data.userId || "",
+        groupName: data.groupName
+          ? data.groupName.split(", ")
+          : [],
+        firstName: data.firstName || "",
+        lastName: data.lastName || "",
+        dob: data.dob ? data.dob.split("T")[0] : "",
+        gender: data.gender || "Male",
+        phone: data.phone || "",
+        email: data.email || "",
+        address: data.address || "",
+        status: data.status || "Inactive",
+        image: data.image || ""
+      });
+
+      setIsOn(data.status === "Active");
+
+    })
+    .catch((err) => console.log(err));
+
+}, [userId]);
 
   return (
 
@@ -211,7 +241,7 @@ function NewUser() {
                     text-[#1C1C4D]
                   "
                 >
-                  New User
+                  Edit User
                 </h2>
 
               </div>
@@ -239,6 +269,7 @@ function NewUser() {
                   placeHolder="Enter User ID"
                   error={errors.userId}
                 />
+
               </div>
 
 
@@ -256,9 +287,9 @@ function NewUser() {
                     });
                   }}
                   options={grpoptions}
-                  error={errors.groupName}
-                 
+                  error = {errors.groupName}
                 />
+
               </div>
 
 
@@ -286,6 +317,7 @@ function NewUser() {
                     required = {true}
                     error = {errors.firstName}
                   />
+
                 </div>
 
 
@@ -333,7 +365,7 @@ function NewUser() {
                       });
                     }}
                     options={genderOptions}
-                    error = {errors.gender}
+                    error = {errors.genderOptions}
                     labelClassName="
                       mb-[6px]
                       block
@@ -358,6 +390,7 @@ function NewUser() {
                   />
                 </div>
 
+
                 {/* PHONE */}
                 <div>
 
@@ -369,8 +402,9 @@ function NewUser() {
                     value={formData.phone}
                     onChange={handleChange}
                     required={true}
-                    error = {errors.phone}
+                    error ={errors.phone}
                   />
+
                 </div>
 
 
@@ -385,8 +419,9 @@ function NewUser() {
                     value={formData.email}
                     onChange={handleChange}
                     required={true}
-                    error ={errors.email}
+                    error = {errors.email}
                   />
+
                 </div>
 
 
@@ -512,7 +547,7 @@ function NewUser() {
             <div className="flex gap-4">
 
               <Button
-                text="Create"
+                text="Save"
                 onClick={handleSubmit}
                 className="
                   h-[42px]
@@ -554,4 +589,4 @@ function NewUser() {
   );
 }
 
-export default NewUser;
+export default EditUser;

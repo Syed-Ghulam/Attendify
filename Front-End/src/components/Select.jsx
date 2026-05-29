@@ -61,9 +61,15 @@ function Select(props){
                "
             />
 
+              {props.error && (
+                    <p className="mt-1 text-sm text-red-500">
+                        {props.error}
+                    </p>
+                )}
+
         </div>
 
     )
 }
 
-export default Select
+export default Select;

@@ -28,7 +28,13 @@ function MultiSelect(props){
 
          {/* LABEL */}
          <label
-            className={props.labelClassName}
+            className="
+                    mb-[6px]
+                    block
+                    text-[13px]
+                    font-semibold
+                    text-[#2D2D5A]
+                  "
          >
             {props.label}
             {props.required && (
@@ -110,6 +116,12 @@ function MultiSelect(props){
                </div>
             )
          }
+
+         {props.error && (
+            <p className="mt-1 text-sm text-red-500">
+               {props.error}
+            </p>
+         )}
 
         
 

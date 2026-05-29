@@ -104,6 +104,56 @@ const columns = [
  }
 ];
 
+const grpColumns = [
+   {
+      label:<button><img src={UnCheck}/></button>,
+      key:"checkBox"
+   },
+
+   {
+      label:"Group Name",
+      key:"groupName",
+   },
+
+    {
+      label:"Description",
+      key:"description",
+   },
+
+    {
+      label:"Created on",
+      key:"createdOn",
+   },
+
+    {
+      label:"Status",
+      key:"status",
+   },
+
+   {
+      label:"Action",
+      key:"action"
+   }
+];
+
+const grpData = [
+   {
+      checkBox: <button><img src={UnCheck} /></button>,
+      groupName: "Approver",
+      description: "Inspection of products and packing",
+      createdOn: "05/12/2024",
+      status: "Active",
+      action: <button><img src={More} /></button>
+   },
+   {
+      checkBox: <button><img src={UnCheck} /></button>,
+      groupName: "Operator",
+      description: "Assembly / Testing of Products",
+      createdOn: "03/12/2024",
+      status: "Active",
+      action: <button><img src={More} /></button>
+   }
+];
 useEffect(() => {
    fetch("http://localhost:5000/users")
    .then((res) => res.json())
@@ -128,9 +178,10 @@ useEffect(() => {
                <div className="relative">
                   <button
                      className="cursor-pointer"
-                     onClick={() =>
+                     onClick={() =>{
+                        console.log(openMenu)
                         setOpenMenu(openMenu === user.userId ? null : user.userId)
-                     }
+                     }}
                   >
                      <img src={More} />
                   </button>
@@ -223,50 +274,81 @@ const handleStatusOptions = (e) =>{
                        </div>
 
                        <div className="flex flex-wrap items-end gap-4">
-                        <Select
-                            labelClassName = "mb-2 block text-[14px] font-medium text-[#6E7191]"
-                            label="Gender"
-                            value={gender}
-                            onChange={handleGenderOptions}
-                            options = {genderOptions}
-                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[#D9DBE9]
-                            bg-white text-[15px] text-[#6E7191] outline-none appearance-none cursor-pointer"
-                            
-                        />
 
-                        <Select
-                            labelClassName = "mb-2 block text-[14px] font-medium text-[#6E7191]"
-                            label="Role Name"
-                            value={role}
-                            onChange={handleRoleOptions}
-                            options = {roleOptions}
-                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[#D9DBE9]
-                            bg-white text-[15px] text-[#6E7191] outline-none appearance-none cursor-pointer"
-                            
-                        />
+                           {activeTab === "Users" && (
+                              <>
+                                 <Select
+                                    labelClassName="mb-2 block text-[14px] font-medium text-[#6E7191]"
+                                    label="Gender"
+                                    value={gender}
+                                    onChange={handleGenderOptions}
+                                    options={genderOptions}
+                                    className="w-[124px] h-[42px] px-4 rounded-[20px]
+                                    border border-[#D9DBE9] bg-white text-[15px]
+                                    text-[#6E7191] outline-none cursor-pointer"
+                                 />
 
-                        <Select
-                            labelClassName = "mb-2 block text-[14px] font-medium text-[#6E7191]"
-                            label="Status"
-                            value={status}
-                            onChange={handleStatusOptions}
-                            options = {statusOptions}
-                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[#D9DBE9]
-                            bg-white text-[15px] text-[#6E7191] outline-none appearance-none cursor-pointer"
-                            
-                        />
+                                 <Select
+                                    labelClassName="mb-2 block text-[14px] font-medium text-[#6E7191]"
+                                    label="Role Name"
+                                    value={role}
+                                    onChange={handleRoleOptions}
+                                    options={roleOptions}
+                                    className="w-[124px] h-[42px] px-4 rounded-[20px]
+                                    border border-[#D9DBE9] bg-white text-[15px]
+                                    text-[#6E7191] outline-none cursor-pointer"
+                                 />
 
-                        <Button 
-                           text = "clear"
-                           className="h-[42px] px-7 rounded-[4px] border border-[#3F3D8F] text-[#3F3D8F]
-                           bg-[#D5D5EC] text-[15px] font-medium cursor-pointer"
-                        />
+                                 <Select
+                                    labelClassName="mb-2 block text-[14px] font-medium text-[#6E7191]"
+                                    label="Status"
+                                    value={status}
+                                    onChange={handleStatusOptions}
+                                    options={statusOptions}
+                                    className="w-[124px] h-[42px] px-4 rounded-[20px]
+                                    border border-[#D9DBE9] bg-white text-[15px]
+                                    text-[#6E7191] outline-none cursor-pointer"
+                                 />
+                              </>
+                           )}
 
-                         <Button 
-                           text = "Create New"
-                           onClick = {()=>navigate("/new-user")}
-                           className="h-[42px] px-6 bg-[#3F3F8D] text-white rounded-[8px] cursor-pointer"
-                        />
+                           {activeTab === "Groups" && (
+                              <Select
+                                 labelClassName="mb-2 block text-[14px] font-medium text-[#6E7191]"
+                                 label="Status"
+                                 value={status}
+                                 onChange={handleStatusOptions}
+                                 options={statusOptions}
+                                 className="w-[124px] h-[42px] px-4 rounded-[20px]
+                                 border border-[#D9DBE9] bg-white text-[15px]
+                                 text-[#6E7191] outline-none cursor-pointer"
+                              />
+                           )}
+
+                           <Button
+                              text="Clear"
+                              className="h-[42px] px-7 rounded-[4px]
+                              border border-[#3F3D8F]
+                              text-[#3F3D8F]
+                              bg-[#D5D5EC]
+                              text-[15px]
+                              font-medium
+                              cursor-pointer"
+                           />
+
+                           <Button
+                              text="Create New"
+                              onClick={() =>
+                                 navigate(
+                                    activeTab === "Users"
+                                       ? "/new-user"
+                                       : "/new-group"
+                                 )
+                              }
+                              className="h-[42px] px-6 bg-[#3F3F8D]
+                              text-white rounded-[8px] cursor-pointer"
+                           />
+
                         </div>
                     </div>
 
@@ -284,7 +366,11 @@ const handleStatusOptions = (e) =>{
 
                         {
                             activeTab === "Groups" && (
-                                <h2>Groups Content</h2>
+                                <Table 
+                                 
+                                columns={grpColumns}
+                                data={grpData}  
+                                />
                             )
                         }
                     </div>
