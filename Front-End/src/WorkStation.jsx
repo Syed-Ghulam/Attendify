@@ -37,7 +37,7 @@ function WorkStation(){
 
     const columns = [
         {
-            label:<button><img src={UnCheck} /></button>,
+            label:<button><img src={UnCheck} alt="checkbox"/></button>,
             key:"checkBox"
         },
 
@@ -93,7 +93,7 @@ function WorkStation(){
         .then((res)=> res.json())
         .then((data) =>{
             const formattedData = data.map((workStation) =>({
-                checkBox: <button type="checkBox"><img src={UnCheck} /></button>,
+                checkBox: <button type="checkBox"><img src={UnCheck} alt="checkbox"/></button>,
                 workstationName:workStation.workstationName,
                 code:workStation.code,
                 ipAddress:workStation.ipAddress,
@@ -105,12 +105,13 @@ function WorkStation(){
                 action: (
                     <div className="relative">
                         <button
+                            type="button"
                             className="cursor-pointer"
                             onClick={() =>
                                 setOpenMenu(openMenu === user.userId ? null : user.userId)
                             }
                         >
-                            <img src={More} />
+                            <img src={More} alt="more options"/>
                         </button>
                     
                         {
@@ -184,6 +185,7 @@ function WorkStation(){
                         <div className="mt-1 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
                           <div className="w-full lg:w-[260px]">
                             <SearchInput
+                               id="search"
                                placeHolder = "Search"
                                value={search}
                                onChange = {(e) =>
@@ -194,6 +196,7 @@ function WorkStation(){
 
                           <div className="flex flex-wrap items-end gap-4">
                             <Select
+                            id="line"
                             labelClassName = "mb-2 block text-[14px] font-medium text-[#6E7191]"
                             label="Line"
                             value={line}
@@ -205,6 +208,7 @@ function WorkStation(){
                             />
 
                             <Select
+                            id="facillity"
                             labelClassName = "mb-2 block text-[14px] font-medium text-[#6E7191]"
                             label="Facility"
                             value={facility}
@@ -216,6 +220,7 @@ function WorkStation(){
                             />
 
                             <Select
+                            id="status"
                             labelClassName = "mb-2 block text-[14px] font-medium text-[#6E7191]"
                             label="Status"
                             value={status}
@@ -233,6 +238,7 @@ function WorkStation(){
                             />
 
                             <Button 
+                                type="button"
                                 text = "Create New"
                                 onClick = {()=>navigate("/new-workstation")}
                                 className="h-[42px] px-6 bg-[#3F3F8D] text-white rounded-[8px] cursor-pointer"

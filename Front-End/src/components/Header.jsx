@@ -23,28 +23,27 @@ function Header(props){
                 h-[58px]
                 items-center
                 justify-between
-                bg-[#272757]
+                bg-[var(--color-secondary)]
                 px-5
             ">
         <div>
-           <img src={Title}>
-        </img>
+           <img src={Title} alt='Title' />
         </div>
 
         <div className='flex items-center gap-5'>
             <button className='relative cursor-pointer'>
-                <img src={Help}/>
+                <img src={Help} alt='help'/>
             </button>
 
             <button className='relative cursor-pointer'>
-                <img src={Notification} />
+                <img src={Notification} alt='notification' />
             </button>
 
             <div className="flex h-9 w-9 items-center justify-center overflow-hidden
-            rounded-full bg-[#D8D7F3] text-[12px] font-semibold text-[#25245D] flex-shrink-0">
+            rounded-full bg-[var(--color-avatar-bg)] text-[12px] font-semibold text-[var(--color-avatar-text)] flex-shrink-0">
                 {
                     user.profileImage ? (
-                        <img src={user.profileImage}
+                        <img src={user.profileImage} alt='Profile Image'
                             className='h-full w-full object-cover'/>) :(
                                 getInitials(user.name)
                             )
@@ -65,14 +64,14 @@ function Header(props){
         >
             {user.name} 
             <button className='cursor-pointer'>
-                <img src={ProfileIcon} />
+                <img src={ProfileIcon} alt='Profile Icon' />
             </button>
         </h4>
 
         <p
             className="
                 text-[10px]
-                text-[#C8C8E2]
+                text-[var(--color-header-muted)]
             "
         >
             {user.role}

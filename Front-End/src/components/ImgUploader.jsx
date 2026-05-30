@@ -1,23 +1,63 @@
+import { useState } from "react";
+import imgUpload from '../assets/icons/imgUpload.svg';
+
 function ImgUploader(props){
 
+   const[error, setError] = useState("");
+
+   const handleFileChange = (e) =>{
+      const file = e.target.files[0];
+
+      if(!file) return;
+
+      const allowedTypes = [
+         "image/jpeg",
+         "image/jpg",
+         "image/png"
+      ];
+   
+
+   if(!allowedTypes.includes(file.type)) {
+      setError("Only JPG , JPEG and PNG files are allowed");
+      return;
+   }
+
+   if(file.size > 1024 * 1024){
+      setError("Image size must be less than 1 MB");
+      return;
+   }
+
+   setError("");
+
+   props.onChange(file);
+   };
+   
    return(
       <div>
-       <label className={props.labelClassName}>
+       <label htmlFor="imageUpload"
+       className={props.labelClassName}>
         {props.label}
        </label>
 
          <label
             htmlFor="imageUpload"
-            className={` flex h-[92px] w-[280px] cursor-pointer
-                flex-col justify-center rounded-md border border-[#d8d2ff] bg-[#D5D5EC] px-4
-            `}
+           className="
+            flex h-[92px] w-[280px] cursor-pointer
+            flex-col justify-center rounded-md
+            border border-[var(--color-upload-border)]
+            bg-[var(--color-primary-light)]
+            px-4
+            "
          >
 
-            <p className="text-[15px] font-semibold text-[#272757]">
-               + Add Profile Image
-            </p>
+          <div className="flex items-center gap-2">
+            <img src={imgUpload} alt="uploadLogo" className="h-5 w-5" />
+            <span className="text-[15px] font-semibold text-[var(--color-secondary)]">
+               Add Profile Image
+            </span>
+          </div>
 
-            <span className="mt-2 text-[10px] text-[#8a8aa8]">
+            <span className="mt-2 text-[10px] text-[var(--color-upload-text)]">
                Image size should be less than 1MB, only .jpg, .jpeg,
                .png formats are allowed.
             </span>
@@ -27,13 +67,17 @@ function ImgUploader(props){
          <input
             id="imageUpload"
             type="file"
-            accept="image/*"
-            onChange={props.onChange}
+            accept=".jpg,.jpeg,.png"
+            onChange={handleFileChange}
             className="hidden"
          />
-
+          {error && (
+            <p className="mt-1 text-sm text-[var(--color-error)]">
+               {error}
+            </p>
+          )}
       </div>
    )
 }
 
-export default ImgUploader
+export default ImgUploader;

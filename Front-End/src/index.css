@@ -4,3 +4,47 @@ body{
   margin:0;
   font-family: Arial, Helvetica, sans-serif;
 }
+
+:root {
+  --color-background: #F4F5FB;
+  --color-primary: #3F3F8D;
+  --color-primary-outline: #4E46B4;
+  --color-primary-light: #D5D5EC;
+
+  --color-secondary:#272757;
+  --color-label:#2D2D5A;
+  --color-heading:#1C1C4D;
+
+  --color-border:#D9DBE9;
+  --color-border-light:#E5E7F2;
+
+  --color-focus:#5B52A3;
+
+  --color-text-muted:#6E7191;
+  --color-link:#0F5DE8;
+
+  --color-white:#FFFFFF;
+
+  --color-upload-border: #D8D2FF;
+  --color-upload-text: #8A8AA8;
+
+  --color-avatar-bg: #D8D7F3;
+  --color-avatar-text: #25245D;
+  --color-header-muted: #C8C8E2;
+
+  --color-error:#EF4444;
+
+  --color-chip-bg: #ECE9FF;
+  --color-chip-text: #4F46C8;
+
+  --color-search-focus: #6B5CFF;
+
+  --color-sidebar-active: #2F2A72;
+
+  --color-table-header-bg: #DFDFE7;
+  --color-table-footer-bg: #F5F6FA;
+
+  --color-table-text: #2B2E5B;
+
+  --color-success: #22C55E;
+}

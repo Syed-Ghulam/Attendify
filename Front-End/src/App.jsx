@@ -122,6 +122,7 @@ function App() {
           </div>
 
           <Button
+            type="submit"
             onClick = {handleLogin}
             text="Sign in"
             className="w-[80px] h-[40px] rounded-[4px] border-0 bg-[#4154F1] cursor-pointer text-white mb-[18px]"

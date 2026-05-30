@@ -6,6 +6,7 @@ function Toggle(props){
             {props.label}
         </label>
       <Button 
+        type={props.type}
         onClick = {props.onClick}
         className={`
                 w-16 h-8 rounded-full p-1 flex items-center transition-all duration-300 cursor-pointer

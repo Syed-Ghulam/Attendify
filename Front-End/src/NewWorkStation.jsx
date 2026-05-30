@@ -112,12 +112,13 @@ function NewWorkStation() {
                   <div className="flex items-center gap-3">
 
                      <Button
+                        type="button"
                         onClick={() => navigate("/workstation")}
                         className="mt-[18px] flex h-6 w-6 items-center
                         justify-center rounded-full cursor-pointer"
                      >
 
-                        <img src={Back} />
+                        <img src={Back} alt="Back Button" />
 
                      </Button>
 
@@ -194,6 +195,7 @@ function NewWorkStation() {
                            <div className="w-[280px]">
 
                               <Select
+                                 id="facility"
                                  label="Facility"
                                  required={true}
                                  value={formData.facility}
@@ -235,6 +237,7 @@ function NewWorkStation() {
                         <div className="mb-5 w-[510px]">
 
                            <Select
+                              id="linenameNumber"
                               label="Line Name / Number"
                               required={true}
                               value={formData.linenameNumber}
@@ -321,6 +324,7 @@ function NewWorkStation() {
                   >
 
                      <Button
+                        type="submit"
                         text="Create"
                         onClick ={handleSubmit}
                         className="h-[42px] w-[115px]
@@ -329,6 +333,7 @@ function NewWorkStation() {
                      />
 
                      <Button
+                        type="buton"
                         text="Cancel"
                         onClick={() => navigate("/workstation")}
                         className="h-[42px] w-[115px]

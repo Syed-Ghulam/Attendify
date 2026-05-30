@@ -30,7 +30,7 @@ function NewGroup(){
         setIsOn(newStatus);
     }
     return(
-        <div className="min-h-screen bg-[#F4F5FB]">
+        <div className="min-h-screen bg-[var(--color-background)]">
             <Header />
 
             <div className="flex ">
@@ -41,8 +41,8 @@ function NewGroup(){
                     <div 
                        className="
                         border-b
-                        border-[#E5E7F2]
-                        bg-[#F4F5FB]
+                        border-[var(--color-border-light)]
+                        bg-[var(--color-background)]
                         px-6
                         py-4
                         "
@@ -51,6 +51,7 @@ function NewGroup(){
                         <div className="flex gap-3">
 
                             <Button
+                               type="button"
                                className="
                                 mt-[22px]
                                 flex
@@ -60,7 +61,7 @@ function NewGroup(){
                                 cursor-pointer
                                 rounded-full"  
                             >
-                                <img src={Back}></img>
+                                <img src={Back} alt="Back Button" />
                             </Button>
 
                             <div>
@@ -73,7 +74,7 @@ function NewGroup(){
                                     text-[30px]
                                     font-bold
                                     leading-none
-                                    text-[#1C1C4D]
+                                    text-[var(--color-heading)]
                                 "
                                 >
                                     New Group
@@ -95,6 +96,7 @@ function NewGroup(){
 
                             <div>
                                 <Select
+                                id="role name"
                                   label = "Role Name"
                                   value ={roleName}
                                   required={true}
@@ -104,20 +106,20 @@ function NewGroup(){
                                         block
                                         text-[13px]
                                         font-semibold
-                                        text-[#2D2D5A]
+                                        text-[var(--color-label)]
                                         "
                                         className="
                                         h-[42px]
                                         w-full
                                         rounded-[4px]
                                         border
-                                        border-[#D9DCEA]
+                                        border-[var(--color-border)]
                                         bg-white
                                         px-3
                                         text-[14px]
                                         outline-none
                                         transition-all
-                                        focus:border-[#5B52A3]
+                                        focus:border-[var(--color-focus)]
                                         cursor-pointer
                                         " 
                                 />
@@ -138,53 +140,55 @@ function NewGroup(){
                                   onClick = {handleToggle} 
                                 />
 
-                                <p className="text-[14px] text-[#1c1C4D]">
+                                <p className="text-[14px] text-[var(--color-heading)]">
                                     {isOn? "Active" : "Inactive"}
                                 </p>
                             </div>
                         </div>
 
                         <div
-  className="
-    border-t
-    border-[#E5E7F2]
-    bg-white
-    px-6
-    py-5
-    mt-auto
-  "
->
-  <div className="flex gap-4">
+                            className="
+                                border-t
+                                border-[var(--color-border-light)]
+                                bg-white
+                                px-6
+                                py-5
+                                mt-auto
+                            "
+                            >
+                            <div className="flex gap-4">
 
-    <Button
-      text="Create"
-      className="
-        h-[42px]
-        w-[125px]
-        rounded-[4px]
-        bg-[#3F3F8D]
-        text-white
-        cursor-pointer
-      "
-    />
+                                <Button
+                                type="submit"
+                                text="Create"
+                                className="
+                                    h-[42px]
+                                    w-[125px]
+                                    rounded-[4px]
+                                    bg-[var(--color-primary)]
+                                    text-white
+                                    cursor-pointer
+                                "
+                                />
 
-    <Button
-      text="Cancel"
-      onClick={() => navigate("/users")}
-      className="
-        h-[42px]
-        w-[125px]
-        rounded-[4px]
-        border
-        border-[#3F3F8D]
-        bg-white
-        text-[#3F3F8D]
-        cursor-pointer
-      "
-    />
+                                <Button
+                                type="button"
+                                text="Cancel"
+                                onClick={() => navigate("/users")}
+                                className="
+                                    h-[42px]
+                                    w-[125px]
+                                    rounded-[4px]
+                                    border
+                                    border-[var(--color-primary)]
+                                    bg-white
+                                    text-[var(--color-primary)]
+                                    cursor-pointer
+                                "
+                                />
 
-  </div>
-</div>
+                            </div>
+                            </div>
                     </div>
                 </div>
             </div>

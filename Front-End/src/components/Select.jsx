@@ -7,13 +7,14 @@ function Select(props){
         <div className="relative">
 
             {/* Label */}
-            <label className={props.labelClassName}>
+            <label htmlFor={props.id}
+            className={props.labelClassName}>
 
                 {props.label}
 
                 {
                     props.required && (
-                        <span className="text-red-500">*</span>
+                        <span className="text-[var(--color-error)]">*</span>
                     )
                 }
 
@@ -21,6 +22,7 @@ function Select(props){
 
             {/* Select */}
             <select
+                id={props.id}
                 value={props.value}
                 onChange={props.onChange}
                 required={props.required}
@@ -62,7 +64,7 @@ function Select(props){
             />
 
               {props.error && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1 text-[var(--color-error)]">
                         {props.error}
                     </p>
                 )}

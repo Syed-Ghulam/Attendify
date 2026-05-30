@@ -6,6 +6,7 @@ function SearchInput(props){
       <div className="relative w-[260px]">
 
          <input
+            id={props.id}
             type="text"
             placeholder={props.placeHolder}
             value={props.value}
@@ -15,14 +16,14 @@ function SearchInput(props){
                w-full
                rounded-md
                border
-               border-[#d7d7e8]
-               bg-white
+               border-[var(--color-border)]
+               bg-[var(--color-white)]
                pl-4
                pr-10
                text-sm
                outline-none
                placeholder:text-gray-400
-               focus:border-[#6b5cff]
+               focus:border-[var(--color-search-focus)]
             "
          />
 
@@ -36,7 +37,7 @@ function SearchInput(props){
                top-1/2
                -translate-y-1/2
                text-xl
-               text-[#1c1c4d]
+               text-[var(--color-heading)]
             "
          >
             ⌕

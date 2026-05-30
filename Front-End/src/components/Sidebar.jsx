@@ -67,7 +67,7 @@ function Sidebar() {
 
         <aside
             className="flex w-[72px] min-h-screen flex-col items-center gap-5
-                border-r border-[#E5E7F2] bg-white py-4 flex-shrink-0"
+                border-r border-[var(--color-border-light)] bg-[var(--color-white)] py-4 flex-shrink-0"
         >
 
             {
@@ -87,11 +87,11 @@ function Sidebar() {
                         onClick={() => handleClick(item)}
 
                         className={`flex h-10 w-10 items-center justify-center rounded-[6px] transition-all cursor-pointer
-                             ${isActive? "bg-[#2F2A72]" : "bg-transparent"}`}
+                             ${isActive? "bg-[var(--color-sidebar-active)]" : "bg-transparent"}`}
                     >
 
                         <img
-                            src={item.icon}
+                            src={item.icon} alt='icon'
                             className={`${isActive? "brightness-0 invert":""}`}
                           
                         />

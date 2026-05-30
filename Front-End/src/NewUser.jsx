@@ -69,13 +69,14 @@ function NewUser() {
   });
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = (file) => {
 
-    const file = e.target.files[0];
+    setImage(URL.createObjectURL(file));
 
-    if (file) {
-      setImage(URL.createObjectURL(file));
-    }
+    setFormData({
+      ...formData,
+      image: file.name
+    });
   };
 
   const handleChange = (e)=>{
@@ -156,7 +157,7 @@ function NewUser() {
 
   return (
 
-    <div className="min-h-screen bg-[#F4F5FB]">
+    <div className="min-h-screen bg-var(--color-background)">
 
       {/* HEADER */}
       <Header />
@@ -174,8 +175,8 @@ function NewUser() {
           <div
             className="
               border-b
-              border-[#E5E7F2]
-              bg-[#F4F5FB]
+              border-var(--color-border-light)
+              bg-var(--color-background)
               px-6
               py-4
             "
@@ -184,6 +185,7 @@ function NewUser() {
             <div className="flex gap-3">
 
               <Button
+                type="button"
                 onClick={()=>navigate("/users")}
                 className="
                   mt-[22px]
@@ -194,12 +196,12 @@ function NewUser() {
                   cursor-pointer
                   rounded-full" 
               >
-                <img src={Back} />
+                <img src={Back} alt="Back Button"/>
               </Button>
 
               <div>
 
-                <p className="text-[12px] text-[#8B8BA7]">
+                <p className="text-[12px] text-var(--color-text-muted)">
                   Manage Users /
                 </p>
 
@@ -208,7 +210,7 @@ function NewUser() {
                     text-[30px]
                     font-bold
                     leading-none
-                    text-[#1C1C4D]
+                    text-[var(--color-heading)]
                   "
                 >
                   New User
@@ -308,6 +310,7 @@ function NewUser() {
                 <div>
 
                   <DateInput
+                    id="date of birth"
                     label="Date of Birth"
                     value={formData.dob}
                     onChange={(e) => {
@@ -324,6 +327,7 @@ function NewUser() {
                 <div>
 
                   <Select
+                    id="gender"
                     label="Gender"
                     value={formData.gender}
                     required={true}
@@ -346,7 +350,7 @@ function NewUser() {
                       w-full
                       rounded-[4px]
                       border
-                      border-[#D9DCEA]
+                      border-var(--color-border)
                       bg-white
                       px-3
                       text-[14px]
@@ -408,7 +412,7 @@ function NewUser() {
                 {/* STATUS */}
                 <div>
 
-                  <p className="mb-[6px] text-[13px] font-semibold text-[#272757]">
+                  <p className="mb-[6px] text-[13px] font-semibold text-var(--color-secondary)">
                     Status
                   </p>
 
@@ -419,7 +423,7 @@ function NewUser() {
                       onClick={handleToggle}
                     />
 
-                    <p className="text-[14px] text-[#1C1C4D]">
+                    <p className="text-[14px] text-[var(--color-heading)]">
                       {isOn ? "Active" : "Inactive"}
                     </p>
 
@@ -441,7 +445,7 @@ function NewUser() {
                     block
                     text-[14px]
                     font-semibold
-                    text-[#272757]
+                    text-var(--color-secondary)
                   "
                   className="hidden"
                 />
@@ -459,7 +463,7 @@ function NewUser() {
                           w-[90px]
                           rounded-[6px]
                           border
-                          border-[#D9DCEA]
+                          border-var(--color-border)
                           object-cover
                         "
                       />
@@ -502,7 +506,7 @@ function NewUser() {
           <div
             className="
               border-t
-              border-[#E5E7F2]
+              border-var(--color-border-light)
               bg-white
               px-6
               py-4
@@ -512,13 +516,14 @@ function NewUser() {
             <div className="flex gap-4">
 
               <Button
+                type="submmit"
                 text="Create"
                 onClick={handleSubmit}
                 className="
                   h-[42px]
                   w-[120px]
                   rounded-[4px]
-                  bg-[#3F3F8D]
+                  bg-var(--color-primary)
                   text-[14px]
                   text-white
                   cursor-pointer
@@ -526,6 +531,7 @@ function NewUser() {
               />
 
               <Button
+                type="button"
                 text="Cancel"
                 onClick = {()=>navigate("/users")}
                 className="
@@ -533,11 +539,11 @@ function NewUser() {
                   w-[120px]
                   rounded-[4px]
                   border
-                  border-[#4E46B4]
+                  border-[var(--color-primary-outline)]
                   bg-white
                   text-[14px]
                   font-semibold
-                  text-[#4E46B4]
+                  text-[var(--color-primary-outline)]
                   cursor-pointer
                 "
               />

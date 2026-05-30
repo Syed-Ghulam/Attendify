@@ -44,7 +44,7 @@ const statusOptions = [
 
 const columns = [
  {
-    label:<button><img src={UnCheck}/></button>,
+    label:<button><img src={UnCheck} alt="checkbox"/></button>,
     key:"checkBox"
  },
 
@@ -106,7 +106,7 @@ const columns = [
 
 const grpColumns = [
    {
-      label:<button><img src={UnCheck}/></button>,
+      label:<button><img src={UnCheck} alt="checkbox"/></button>,
       key:"checkBox"
    },
 
@@ -138,20 +138,20 @@ const grpColumns = [
 
 const grpData = [
    {
-      checkBox: <button><img src={UnCheck} /></button>,
+      checkBox: <button><img src={UnCheck} alt="checkbox"/></button>,
       groupName: "Approver",
       description: "Inspection of products and packing",
       createdOn: "05/12/2024",
       status: "Active",
-      action: <button><img src={More} /></button>
+      action: <button><img src={More} alt="more options"/></button>
    },
    {
-      checkBox: <button><img src={UnCheck} /></button>,
+      checkBox: <button><img src={UnCheck} alt="checkbox"/></button>,
       groupName: "Operator",
       description: "Assembly / Testing of Products",
       createdOn: "03/12/2024",
       status: "Active",
-      action: <button><img src={More} /></button>
+      action: <button><img src={More} alt="more options"/></button>
    }
 ];
 useEffect(() => {
@@ -159,11 +159,11 @@ useEffect(() => {
    .then((res) => res.json())
    .then((data) => {
       const formattedData = data.map((user) => ({
-         checkBox: <button type="checkBox"><img src={UnCheck} /></button>,
-         profileImage:<img src={DummyImg} />,
+         checkBox: <button type="checkBox"><img src={UnCheck} alt="checkbox"/></button>,
+         profileImage:<img src={DummyImg} alt="Profile Image"/>,
          userId: user.userId,
          userName:(
-            <span className="text-[#0F5DE8]">
+            <span className="text-[var(--color-link)]">
                 {user.firstName} {user.lastName}
             </span>
          ),
@@ -177,28 +177,29 @@ useEffect(() => {
          action: (
                <div className="relative">
                   <button
+                     type="button"
                      className="cursor-pointer"
                      onClick={() =>{
                         console.log(openMenu)
                         setOpenMenu(openMenu === user.userId ? null : user.userId)
                      }}
                   >
-                     <img src={More} />
+                     <img src={More} alt="More options" />
                   </button>
 
                   {
                      openMenu === user.userId && (
                         <div
-                           className="absolute right-0 mt-2 w-[120px] bg-white border border-[#E5E7F2]
+                           className="absolute right-0 mt-2 w-[120px] bg-white border border-[var(--color-border-light)]
                            rounded-[8px] shadow-lg z-50"
                         >
-                           <p className="px-4 py-2 hover:bg-[#F4F5FB] cursor-pointer"
+                           <p className="px-4 py-2 hover:bg-[var(--color-background)] cursor-pointer"
                               
                            >
                               View
                            </p>
 
-                           <p className="px-4 py-2 hover:bg-[#F4F5FB] cursor-pointer"
+                           <p className="px-4 py-2 hover:bg-[var(--color-background)] cursor-pointer"
                               
                            >
                               Edit
@@ -232,7 +233,7 @@ const handleStatusOptions = (e) =>{
 }
     return(
         <>
-        <div className="min-h-screen bg-[#F4F5FB]">
+        <div className="min-h-screen bg-[var(--color-background)]">
 
             <Header />
 
@@ -240,12 +241,12 @@ const handleStatusOptions = (e) =>{
 
             <Sidebar />
 
-            <div className="flex-1 bg-[#F4F5FB]">
+            <div className="flex-1 bg-[var(--color-background)]">
 
                 {/* Heading*/}
 
                 <div className="px-6 pt-6">
-                    <h2 className="text-[28px] font-bold text-[#272757]">
+                    <h2 className="text-[28px] font-bold text-[var(--color-secondary)]">
                         Manage Users
                     </h2>
                 </div>
@@ -265,6 +266,7 @@ const handleStatusOptions = (e) =>{
                     <div className="mt-1 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 ">
                       <div className="w-full lg:w-[260px]">
                         <SearchInput
+                           id ="search"
                             placeHolder="Search"
                             value={search}
                             onChange={(e) =>
@@ -278,65 +280,71 @@ const handleStatusOptions = (e) =>{
                            {activeTab === "Users" && (
                               <>
                                  <Select
-                                    labelClassName="mb-2 block text-[14px] font-medium text-[#6E7191]"
+                                    id="gender"
+                                    labelClassName="mb-2 block text-[14px] font-medium text-[var(--color-text-muted)]"
                                     label="Gender"
                                     value={gender}
                                     onChange={handleGenderOptions}
                                     options={genderOptions}
                                     className="w-[124px] h-[42px] px-4 rounded-[20px]
-                                    border border-[#D9DBE9] bg-white text-[15px]
-                                    text-[#6E7191] outline-none cursor-pointer"
+                                    border border-[var(--color-border)] bg-white text-[15px]
+                                   text-[var(--color-text-muted)] outline-none cursor-pointer"
                                  />
 
                                  <Select
-                                    labelClassName="mb-2 block text-[14px] font-medium text-[#6E7191]"
+                                    id="role name"
+                                    labelClassName="mb-2 block text-[14px] font-medium text-[var(--color-text-muted)]"
                                     label="Role Name"
                                     value={role}
                                     onChange={handleRoleOptions}
                                     options={roleOptions}
                                     className="w-[124px] h-[42px] px-4 rounded-[20px]
-                                    border border-[#D9DBE9] bg-white text-[15px]
-                                    text-[#6E7191] outline-none cursor-pointer"
+                                    border border-[var(--color-border)] bg-white text-[15px]
+                                    text-[var(--color-text-muted)] outline-none cursor-pointer"
                                  />
 
                                  <Select
-                                    labelClassName="mb-2 block text-[14px] font-medium text-[#6E7191]"
+                                    id="status"
+                                    labelClassName="mb-2 block text-[14px] font-medium text-[var(--color-text-muted)]"
                                     label="Status"
                                     value={status}
                                     onChange={handleStatusOptions}
                                     options={statusOptions}
                                     className="w-[124px] h-[42px] px-4 rounded-[20px]
-                                    border border-[#D9DBE9] bg-white text-[15px]
-                                    text-[#6E7191] outline-none cursor-pointer"
+                                    border border-[var(--color-border)] bg-white text-[15px]
+                                    text-[var(--color-text-muted)] outline-none cursor-pointer"
                                  />
                               </>
                            )}
 
                            {activeTab === "Groups" && (
                               <Select
-                                 labelClassName="mb-2 block text-[14px] font-medium text-[#6E7191]"
+                                 id="status"
+                                 labelClassName="mb-2 block text-[14px] font-medium text-[var(--color-text-muted)]"
                                  label="Status"
                                  value={status}
                                  onChange={handleStatusOptions}
                                  options={statusOptions}
                                  className="w-[124px] h-[42px] px-4 rounded-[20px]
-                                 border border-[#D9DBE9] bg-white text-[15px]
-                                 text-[#6E7191] outline-none cursor-pointer"
+                                 border border-[var(--color-border)] bg-white text-[15px]
+                                 text-[var(--color-text-muted)] outline-none cursor-pointer"
                               />
                            )}
 
                            <Button
+                              type="reset"
                               text="Clear"
                               className="h-[42px] px-7 rounded-[4px]
-                              border border-[#3F3D8F]
-                              text-[#3F3D8F]
-                              bg-[#D5D5EC]
+                              border border-[var(--color-primary)]
+                              text-[var(--color-primary)]
+                              bg-[var(--color-primary-light)]
                               text-[15px]
                               font-medium
                               cursor-pointer"
                            />
 
                            <Button
+                              type="button"
                               text="Create New"
                               onClick={() =>
                                  navigate(
@@ -345,7 +353,7 @@ const handleStatusOptions = (e) =>{
                                        : "/new-group"
                                  )
                               }
-                              className="h-[42px] px-6 bg-[#3F3F8D]
+                              className="h-[42px] px-6 bg-[var(--color-primary)]
                               text-white rounded-[8px] cursor-pointer"
                            />
 
