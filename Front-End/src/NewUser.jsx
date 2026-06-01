@@ -157,7 +157,7 @@ function NewUser() {
 
   return (
 
-    <div className="min-h-screen bg-var(--color-background)">
+    <div className="min-h-screen bg-[var(--color-background)]">
 
       {/* HEADER */}
       <Header />
@@ -175,8 +175,8 @@ function NewUser() {
           <div
             className="
               border-b
-              border-var(--color-border-light)
-              bg-var(--color-background)
+              border-[var(--color-border-light)]
+              bg-[var(--color-background)]
               px-6
               py-4
             "
@@ -201,7 +201,7 @@ function NewUser() {
 
               <div>
 
-                <p className="text-[12px] text-var(--color-text-muted)">
+                <p className="text-[12px] text-[var(--color-text-muted)]">
                   Manage Users /
                 </p>
 
@@ -343,20 +343,20 @@ function NewUser() {
                       block
                       text-[13px]
                       font-semibold
-                      text-[#2D2D5A]
+                      text-[var(--color-label)]
                     "
                     className="
                       h-[42px]
                       w-full
                       rounded-[4px]
                       border
-                      border-var(--color-border)
+                      border-[var(--color-border)]
                       bg-white
                       px-3
                       text-[14px]
                       outline-none
                       transition-all
-                      focus:border-[#5B52A3]
+                      focus:border-[var(--color-focus)]
                       cursor-pointer
                     "
                   />
@@ -412,7 +412,7 @@ function NewUser() {
                 {/* STATUS */}
                 <div>
 
-                  <p className="mb-[6px] text-[13px] font-semibold text-var(--color-secondary)">
+                  <p className="mb-[6px] text-[13px] font-semibold text-[var(--color-secondary)]">
                     Status
                   </p>
 
@@ -422,11 +422,6 @@ function NewUser() {
                       isOn={isOn}
                       onClick={handleToggle}
                     />
-
-                    <p className="text-[14px] text-[var(--color-heading)]">
-                      {isOn ? "Active" : "Inactive"}
-                    </p>
-
                   </div>
 
                 </div>
@@ -445,7 +440,7 @@ function NewUser() {
                     block
                     text-[14px]
                     font-semibold
-                    text-var(--color-secondary)
+                    text-[var(--color-secondary)]
                   "
                   className="hidden"
                 />
@@ -463,7 +458,7 @@ function NewUser() {
                           w-[90px]
                           rounded-[6px]
                           border
-                          border-var(--color-border)
+                          border-[var(--color-border)]
                           object-cover
                         "
                       />
@@ -506,7 +501,7 @@ function NewUser() {
           <div
             className="
               border-t
-              border-var(--color-border-light)
+              border-[var(--color-border-light)]
               bg-white
               px-6
               py-4
@@ -523,7 +518,7 @@ function NewUser() {
                   h-[42px]
                   w-[120px]
                   rounded-[4px]
-                  bg-var(--color-primary)
+                  bg-[var(--color-primary)]
                   text-[14px]
                   text-white
                   cursor-pointer

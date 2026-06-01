@@ -41,7 +41,7 @@ function Sidebar() {
         {
             id: "users",
             icon: UserManagement,
-            path: "/users"
+            path: "/users",
         },
 
         {
@@ -55,6 +55,22 @@ function Sidebar() {
         }
 
     ];
+
+    const moduleRoutes = {
+        users:[
+            "/users",
+            "/new-user",
+            "/edit-user",
+            "/new-group",
+            "/edit-group"
+        ],
+
+        workstation: [
+            "/workstation",
+            "/new-workstation",
+            "/edit-workstation"
+        ]
+    };
 
     const handleClick = (item) => {
 
@@ -73,11 +89,11 @@ function Sidebar() {
             {
                 menuItems.map((item) => {
 
-                    const isActive = 
-                    location.pathname === item.path ||
-                    (item.id === "users" && location.pathname.startsWith("/new-user"))
-
-
+                   const isActive = moduleRoutes[item.id]
+                     ? moduleRoutes[item.id].some(route => 
+                        location.pathname.startsWith(route)
+                     )
+                     : location.pathname === item.path;
                     return(
 
                     <button

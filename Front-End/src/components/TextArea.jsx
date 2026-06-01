@@ -4,7 +4,7 @@ function TextArea(props) {
       <label
         htmlFor={props.id}
         className="
-        mt-[15px]
+          mt-[30px]
           mb-[6px]
           block
           text-[13px]
@@ -25,7 +25,7 @@ function TextArea(props) {
         onChange={props.onChange}
         placeholder={props.placeHolder}
        className="
-        h-[62px]
+        h-[75px]
         w-full
         rounded-[4px]
         border

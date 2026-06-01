@@ -12,8 +12,13 @@ import Toggle from "./components/Toggle";
 
 function NewGroup(){
     const navigate = useNavigate();
-    const [roleName, setRoleName] = useState();
-    const [isOn, setIsOn] = useState();
+    const [isOn, setIsOn] = useState(false);
+    const[formData, setFormData] = useState({
+        groupName:"",
+        roleName:"",
+        description:"",
+        status:"Inactive"
+    })
 
     const roleOptions = [
         "QC Operations",
@@ -21,14 +26,55 @@ function NewGroup(){
     ];
 
     const handleRoleChange = (e) =>{
-        setRoleName(e.target.value)
+        setFormData({
+            ...formData,roleName: e.target.value
+        });
     };
 
     const handleToggle = () => {
         const newStatus = !isOn;
 
         setIsOn(newStatus);
-    }
+
+        setFormData({
+            ...formData, status: newStatus? "Active":"Inactive"
+        });
+    };
+
+    const handleChange = (e)=>{
+        setFormData({
+            ...formData,[e.target.id]: e.target.value
+        });
+    };
+
+    const handleSubmit = async() => {
+
+        const payload = {
+            ...formData
+        }
+
+        try{
+            console.log("Payload: ",payload)
+            const response = await fetch(
+                "http://localhost:5000/groups",
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify(payload)
+                }
+            );
+
+            const data= await response.json();
+            console.log(data);
+            alert("Group Created Successfully");
+        } catch(error){
+            console.log(error);
+            alert("Error creating group");
+        }
+    };
     return(
         <div className="min-h-screen bg-[var(--color-background)]">
             <Header />
@@ -51,6 +97,7 @@ function NewGroup(){
                         <div className="flex gap-3">
 
                             <Button
+                               onClick = {() =>navigate("/users")}
                                type="button"
                                className="
                                 mt-[22px]
@@ -84,24 +131,28 @@ function NewGroup(){
                     </div>
 
                     <div className="flex flex-1 flex-col">
-                        <div className="w-[560px] px-6 py-5">
+                        <div className="w-[700px] px-6 py-5">
                             <div className="mb-6">
                                 <Input 
                                   id="groupName"
                                   label = "Group Name"
                                   type ="text"
+                                  placeHolder="Enter group name"
                                   required={true}
+                                  value={formData.groupName}
+                                  onChange={handleChange}
                                 />
                             </div>
 
                             <div>
                                 <Select
-                                id="role name"
+                                  id="role name"
                                   label = "Role Name"
-                                  value ={roleName}
+                                  value ={formData.roleName}
                                   required={true}
                                   options = {roleOptions}
-                                       labelClassName="
+                                  onChange={handleRoleChange}
+                                  labelClassName="
                                         mb-[6px]
                                         block
                                         text-[13px]
@@ -123,6 +174,7 @@ function NewGroup(){
                                         cursor-pointer
                                         " 
                                 />
+                              
                             </div>
 
                             <div>
@@ -130,6 +182,8 @@ function NewGroup(){
                                  id="description"
                                  label="Description"
                                  placeHolder="Write in details..."
+                                 value={formData.description}
+                                 onChange={handleChange}
                                  />
                             </div>
 
@@ -138,11 +192,15 @@ function NewGroup(){
                                   label = "Status"
                                   isOn={isOn}
                                   onClick = {handleToggle} 
+                                  labelClassName="
+                                        mt-[15px]
+                                        mb-[6px]
+                                        block
+                                        text-[13px]
+                                        font-semibold
+                                        text-[var(--color-label)]
+                                        "
                                 />
-
-                                <p className="text-[14px] text-[var(--color-heading)]">
-                                    {isOn? "Active" : "Inactive"}
-                                </p>
                             </div>
                         </div>
 
@@ -161,6 +219,7 @@ function NewGroup(){
                                 <Button
                                 type="submit"
                                 text="Create"
+                                onClick={handleSubmit}
                                 className="
                                     h-[42px]
                                     w-[125px]

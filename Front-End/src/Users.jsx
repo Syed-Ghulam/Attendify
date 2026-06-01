@@ -13,6 +13,8 @@ import DummyImg from './assets/icons/DummyImg.svg'
 
 function Users(){
 
+   
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("Users");
     const [search , setSearch] = useState("");
     const [gender , setGender] = useState("ALL");
@@ -20,7 +22,19 @@ function Users(){
     const [status, setStatus] = useState("Active");
     const [userData, setUserData] = useState([]);
     const [openMenu, setOpenMenu] = useState(null);
-    const navigate = useNavigate();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [recordsPerPage, setRecordsPerPage] = useState(5);
+    const [groupData, setGroupData] = useState([]);
+
+    const totalRecords = userData.length;
+    const totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+    const startIndex = (currentPage -1) * recordsPerPage;
+    const endIndex = startIndex + recordsPerPage;
+
+    const currentRecords = userData.slice(startIndex, endIndex);
+
+   
 
     const genderOptions = [
    "ALL",
@@ -136,83 +150,115 @@ const grpColumns = [
    }
 ];
 
-const grpData = [
-   {
-      checkBox: <button><img src={UnCheck} alt="checkbox"/></button>,
-      groupName: "Approver",
-      description: "Inspection of products and packing",
-      createdOn: "05/12/2024",
-      status: "Active",
-      action: <button><img src={More} alt="more options"/></button>
-   },
-   {
-      checkBox: <button><img src={UnCheck} alt="checkbox"/></button>,
-      groupName: "Operator",
-      description: "Assembly / Testing of Products",
-      createdOn: "03/12/2024",
-      status: "Active",
-      action: <button><img src={More} alt="more options"/></button>
-   }
-];
+
+
+const getTableData = () => {
+  return currentRecords.map((user) => ({
+    checkBox: (
+      <button>
+        <img src={UnCheck} alt="checkbox" />
+      </button>
+    ),
+
+    profileImage: (
+      <img src={DummyImg} alt="Profile" />
+    ),
+
+    userId: user.userId,
+
+    userName: (
+      <span className="text-[var(--color-link)]">
+        {user.firstName} {user.lastName}
+      </span>
+    ),
+
+    gender: user.gender,
+    phoneNo: user.phone,
+    email: user.email,
+    groupName: user.groupName,
+    roleName: "System Admin",
+    createdOn: new Date(user.createdAt).toLocaleDateString(),
+    status: user.status,
+
+    action: (
+      <div className="relative">
+        <button
+          onClick={() =>
+            setOpenMenu(
+              openMenu === user.userId
+                ? null
+                : user.userId
+            )
+          }
+          className="cursor-pointer"
+        >
+          <img src={More} alt="More" />
+        </button>
+
+        {openMenu === user.userId && (
+          <div
+            className="absolute top-0 right-10 w-[120px]
+            bg-white border border-[var(--color-border-light)] rounded-[8px]
+            shadow-lg z-50"
+          >
+
+            <p
+              className="px-4 py-2 cursor-pointer"
+              onClick={() =>
+                navigate(`/edit-user/${user.userId}`)
+              }
+            >
+              Edit
+            </p>
+          </div>
+        )}
+      </div>
+    )
+  }));
+};
+
+const getGroupTableData = () => {
+   return groupData.map((group) => ({
+      checkBox: (
+         <button>
+            <img src={UnCheck} alt="checkbox" />
+         </button>
+      ),
+
+      groupName: group.groupName,
+
+      description: group.description,
+
+      createdOn: new Date(group.createdAt).toLocaleDateString(),
+
+      status: group.status,
+
+      action: (
+         <button>
+            <img src={More} alt="more options" />
+         </button>
+      )
+   }));
+};
+
+
 useEffect(() => {
    fetch("http://localhost:5000/users")
    .then((res) => res.json())
    .then((data) => {
-      const formattedData = data.map((user) => ({
-         checkBox: <button type="checkBox"><img src={UnCheck} alt="checkbox"/></button>,
-         profileImage:<img src={DummyImg} alt="Profile Image"/>,
-         userId: user.userId,
-         userName:(
-            <span className="text-[var(--color-link)]">
-                {user.firstName} {user.lastName}
-            </span>
-         ),
-         gender: user.gender,
-         phoneNo: user.phone,
-         email:user.email,
-         groupName:user.groupName,
-         roleName:"System Admin",
-         createdOn: new Date(user.createdAt).toLocaleDateString(),
-         status:user.status,
-         action: (
-               <div className="relative">
-                  <button
-                     type="button"
-                     className="cursor-pointer"
-                     onClick={() =>{
-                        console.log(openMenu)
-                        setOpenMenu(openMenu === user.userId ? null : user.userId)
-                     }}
-                  >
-                     <img src={More} alt="More options" />
-                  </button>
+      setUserData(data);
+   })
+   .catch((err) =>{ 
+      console.log(err);
+   });
+},[]);
 
-                  {
-                     openMenu === user.userId && (
-                        <div
-                           className="absolute right-0 mt-2 w-[120px] bg-white border border-[var(--color-border-light)]
-                           rounded-[8px] shadow-lg z-50"
-                        >
-                           <p className="px-4 py-2 hover:bg-[var(--color-background)] cursor-pointer"
-                              
-                           >
-                              View
-                           </p>
-
-                           <p className="px-4 py-2 hover:bg-[var(--color-background)] cursor-pointer"
-                              
-                           >
-                              Edit
-                           </p>
-
-                        </div>
-                     )
-                  }
-               </div>
-            ),
-
-      }));
-      setUserData(formattedData);
+useEffect(() => {
+   fetch("http://localhost:5000/groups")
+   .then((res) => res.json())
+   .then((data) => {
+      
+      setGroupData(data);
    })
    .catch((err) =>{ 
       console.log(err);
@@ -230,7 +276,8 @@ const handleRoleOptions = (e) =>{
 
 const handleStatusOptions = (e) =>{
     setStatus(e.target.value)
-}
+};
+console.log("groupData", groupData);
     return(
         <>
         <div className="min-h-screen bg-[var(--color-background)]">
@@ -359,14 +406,20 @@ const handleStatusOptions = (e) =>{
 
                         </div>
                     </div>
-
+                       
                       <div className="mt-5 overflow-visible">
                         {
                             activeTab === "Users" && (
                                 <Table 
                                 
                                 columns = {columns}
-                                data = {userData}
+                                data = {getTableData()}
+                                currentPage={currentPage}
+                                setCurrentPage={setCurrentPage}
+                                totalPages={totalPages}
+                                recordsPerPage={recordsPerPage}
+                                setRecordsPerPage={setRecordsPerPage}
+                                totalRecords={totalRecords}
                                 />
                             
                             )
@@ -377,7 +430,7 @@ const handleStatusOptions = (e) =>{
                                 <Table 
                                  
                                 columns={grpColumns}
-                                data={grpData}  
+                                data={getGroupTableData()}  
                                 />
                             )
                         }
@@ -394,4 +447,5 @@ const handleStatusOptions = (e) =>{
         </>
     )
 }
+
 export default Users;

@@ -51,7 +51,7 @@ function ImgUploader(props){
          >
 
           <div className="flex items-center gap-2">
-            <img src={imgUpload} alt="uploadLogo" className="h-5 w-5" />
+            <img src={imgUpload} alt="uploadImage" className="h-5 w-5" />
             <span className="text-[15px] font-semibold text-[var(--color-secondary)]">
                Add Profile Image
             </span>

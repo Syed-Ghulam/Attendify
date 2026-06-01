@@ -1,6 +1,10 @@
+import Refresh from '../assets/icons/refresh.svg';
+import ArrowLeft from '../assets/icons/Arrow Left.svg';
+import ArrowRight from '../assets/icons/Arrow Right.svg';
 
-
-function Table({ columns, data }) {
+function Table({ columns, data, currentPage, setCurrentPage, totalPages, recordsPerPage ,
+    setRecordsPerPage, totalRecords
+ }) {
 
     return(
 
@@ -97,11 +101,11 @@ function Table({ columns, data }) {
             </div>
            {/* Table Footer */}
 
-<div
-className="h-[48px]
-px-4 border-t border-[var(--color-border-light)]
-bg-[var(--color-table-footer-bg)] flex items-center justify-between"
->
+            <div
+            className="h-[48px]
+            px-4 border-t border-[var(--color-border-light)]
+            bg-[var(--color-table-footer-bg)] flex items-center justify-between"
+            >
 
     {/* Left Side */}
     <div className="flex items-center gap-5">
@@ -109,12 +113,18 @@ bg-[var(--color-table-footer-bg)] flex items-center justify-between"
         {/* Pagination */}
         <div className="flex items-center gap-3">
 
-            <button className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
+            <button 
+             onClick={() => setCurrentPage(1)}
+             disabled={currentPage === 1}
+            className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
                 {"<<"}
             </button>
 
-            <button className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
-                {"<"}
+            <button 
+            onClick={() => setCurrentPage(currentPage -1)}
+            disabled = {currentPage === 1}
+            className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
+                <img src={ArrowLeft} alt="left arrow" />
             </button>
 
             {/* Active Page */}
@@ -124,14 +134,20 @@ bg-[var(--color-table-footer-bg)] flex items-center justify-between"
             text-[var(--color-white)] text-[12px]
             flex items-center justify-center"
             >
-                1
+                {currentPage}
             </button>
 
-            <button className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
-                {">"}
+            <button 
+            onClick={() => setCurrentPage(currentPage+1)}
+            disabled = {currentPage === totalPages}
+            className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
+                <img src={ArrowRight} alt="Right arrow" />
             </button>
 
-            <button className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
+            <button 
+            onClick={() => setCurrentPage(totalPages)}
+            disabled = {currentPage === totalPages}
+            className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
                 {">>"}
             </button>
 
@@ -141,6 +157,11 @@ bg-[var(--color-table-footer-bg)] flex items-center justify-between"
         <div className="flex items-center gap-2">
 
             <select
+            value={recordsPerPage}
+            onChange={(e) => {
+                setRecordsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+            }}
             className="h-[28px]
             px-2 border border-[var(--color-border-light)]
             rounded-[4px]
@@ -149,7 +170,11 @@ bg-[var(--color-table-footer-bg)] flex items-center justify-between"
             outline-none
             cursor-pointer"
             >
-                <option>25</option>
+                <option value={3}>3</option>
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
             </select>
 
             <span className="text-[13px] text-[var(--color-text-muted)]">
@@ -164,19 +189,24 @@ bg-[var(--color-table-footer-bg)] flex items-center justify-between"
     <div className="flex items-center gap-3">
 
         <span className="text-[13px] text-[var(--color-text-muted)]">
-            1 - 6 of 6 Records
+           {totalRecords === 0
+              ? "0 Records" : `${(currentPage -1) * recordsPerPage + 1}
+                 - ${Math.min(
+                          (currentPage -1) * recordsPerPage + data.length,
+                          totalRecords)}
+                          of ${totalRecords} Records`}
         </span>
 
         <button className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
-            ↻
+            <img src={Refresh} alt="refresh" />
         </button>
 
     </div>
 
 </div>
-        </div>
+</div>
 
-    )
+)
 }
 
 export default Table
