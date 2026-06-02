@@ -9,6 +9,7 @@ import Button from "./components/Button";
 import Table from "./components/Table";
 import UnCheck from "./assets/icons/Uncheck.svg";
 import More from "./assets/icons/more_vert.svg";
+import { API_URL } from "./config/api";
 
 function WorkStation(){
     
@@ -89,7 +90,7 @@ function WorkStation(){
     ];
 
     useEffect(()=>{
-        fetch("http://localhost:5000/workstation")
+        fetch(`${API_URL}/workstation`)
         .then((res)=> res.json())
         .then((data) =>{
             const formattedData = data.map((workStation) =>({

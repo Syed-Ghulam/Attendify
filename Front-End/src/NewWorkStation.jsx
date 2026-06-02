@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { API_URL } from "./config/api";
+import {toast} from "react-toastify";
 
 import Button from "./components/Button";
 import Header from "./components/Header";
@@ -8,6 +10,7 @@ import Input from "./components/Input";
 import Select from "./components/Select";
 
 import Back from "./assets/icons/Back.svg";
+
 
 function NewWorkStation() {
 
@@ -32,12 +35,41 @@ function NewWorkStation() {
       "Electrocardiograph"
    ];
 
+   const validateField = (name, value) => {
+   let error = "";
+
+   if (name === "workstationName" && !value.trim()) {
+      error = "Workstation Name is required";
+   }
+
+   if (name === "ipAddress" && !value.trim()) {
+      error = "IP Address is required";
+   }
+
+   if (name === "facility" && !value) {
+      error = "Facility is required";
+   }
+
+   if (name === "linenameNumber" && !value) {
+      error = "Line Name/Number is required";
+   }
+
+   return error;
+};
+
    const handleChange = (e) => {
 
-      setFormData({
-         ...formData,
-         [e.target.id]: e.target.value
-      });
+      const {id, value} = e.target;
+
+      setFormData((prev)=>({
+         ...prev,
+         [id]:value
+      }));
+
+      setErros((prev)=>({
+         ...prev,
+         [id]: validateField(id, value)
+      }));
    };
 
    const handleSubmit = async() => {
@@ -48,7 +80,7 @@ function NewWorkStation() {
 
       try{
          const response = await fetch(
-            "http://localhost:5000/workstation",
+            `${API_URL}/workstation`,
             {
                method:"POST",
                headers:{
@@ -59,10 +91,10 @@ function NewWorkStation() {
          );
          const data = await response.json();
          console.log(data);
-         alert("WorkStation Created Successfully");
+         toast.success("WorkStation Created Successfully");
       } catch(error){
          console.log(error);
-         alert("Error Creating WorkStation");
+         toast.error("Error Creating WorkStation");
       }
    };
 
@@ -199,12 +231,7 @@ function NewWorkStation() {
                                  label="Facility"
                                  required={true}
                                  value={formData.facility}
-                                 onChange={(e) =>
-                                    setFormData({
-                                       ...formData,
-                                       facility: e.target.value
-                                    })
-                                 }
+                                 onChange={handleChange}
                                  options={facilityOptions}
                                  error = {errors.facility}
                                  className="h-[42px] w-full rounded-[4px]
@@ -241,12 +268,7 @@ function NewWorkStation() {
                               label="Line Name / Number"
                               required={true}
                               value={formData.linenameNumber}
-                              onChange={(e) =>
-                                 setFormData({
-                                    ...formData,
-                                    linenameNumber: e.target.value
-                                 })
-                              }
+                              onChange={handleChange}
                               options={lineOptions}
                               error = {errors.linenameNumber}
                               className="h-[42px] w-full rounded-[4px]
@@ -327,20 +349,18 @@ function NewWorkStation() {
                         type="submit"
                         text="Create"
                         onClick ={handleSubmit}
-                        className="h-[42px] w-[115px]
-                        rounded-[4px] bg-[#3F3F8D]
-                        text-white cursor-pointer"
+                        className="w-[120px]
+                         bg-[#3F3F8D] text-white"
                      />
 
                      <Button
-                        type="buton"
+                        type="button"
                         text="Cancel"
                         onClick={() => navigate("/workstation")}
-                        className="h-[42px] w-[115px]
-                        rounded-[4px]
+                        className="w-[120px]
                         border border-[#3F3F8D]
                         bg-white text-[#3F3F8D]
-                        cursor-pointer"
+                     "
                      />
 
                   </div>

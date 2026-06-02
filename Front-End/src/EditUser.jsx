@@ -2,7 +2,6 @@ import Input from "./components/Input";
 import MultiSelect from "./components/MultiSelect";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams} from "react-router-dom";
-import DateInput from "./components/DateInput";
 import Select from "./components/Select";
 import Toggle from "./components/Toggle";
 import ImgUploader from "./components/ImgUploader";
@@ -10,6 +9,8 @@ import Button from "./components/Button";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Back from './assets/icons/Back.svg';
+import { API_URL } from "./config/api";
+import {toast} from "react-toastify";
 
 function EditUser() {
 
@@ -79,10 +80,58 @@ function EditUser() {
     }
   };
 
+  const validateField = (name, value) => {
+  let error = "";
+
+  if (name === "userId" && !value.trim()) {
+    error = "User ID is required";
+  }
+
+  if (name === "firstName" && !value.trim()) {
+    error = "First Name is required";
+  }
+
+  if (
+    name === "email" &&
+    value &&
+    (!value.includes("@") || !value.includes("."))
+  ) {
+    error = "Enter valid email";
+  }
+
+  if (name === "phone") {
+    if (!value.trim()) {
+      error = "Phone number is required";
+    } else if (!/^\d{10}$/.test(value)) {
+      error = "Phone number must be 10 digits";
+    }
+  }
+
+  if (name === "groupName" && value.length === 0) {
+    error = "Group Name is required";
+  }
+
+  if (name === "gender" && !value) {
+    error = "Gender is required";
+  }
+
+  return error;
+};
+
+  const updateField = (field, value) =>{
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [field] : validateField(field, value)
+    }));
+  };
+
   const handleChange = (e)=>{
-    setFormData({
-      ...formData,[e.target.id]: e.target.value
-    });
+      updateField(e.target.id, e.target.value);
   };
 
   const handleSubmit = async() => {
@@ -96,7 +145,7 @@ function EditUser() {
     console.log(payload)
     try{
       const response = await fetch(
-        `http://localhost:5000/users/${userId}`,
+      `${API_URL}/users/${userId}`,
         {
           method:"PUT",
 
@@ -108,10 +157,10 @@ function EditUser() {
       );
       const data = await response.json();
       console.log(data);
-      alert("User Updated Successfully");
+      toast.success("User Updated Successfully");
     } catch(error){
       console.log(error);
-      alert("Error creating user");
+      toast.error("Error creating user");
     }
   };
 
@@ -157,7 +206,7 @@ function EditUser() {
 
   useEffect(() => {
 
-  fetch(`http://localhost:5000/users/${userId}`)
+  fetch(`${API_URL}/users/${userId}`)
     .then((res) => res.json())
     .then((data) => {
 
@@ -282,11 +331,9 @@ function EditUser() {
                   multiple={true}
                   value={formData.groupName}
                   required={true}
-                  onChange={(values) => {
-                    setFormData({
-                      ...formData, groupName:values
-                    });
-                  }}
+                  onChange={(values) => 
+                    updateField("groupName", values)
+                  }
                   options={grpoptions}
                   error = {errors.groupName}
                 />
@@ -340,7 +387,8 @@ function EditUser() {
                 {/* DOB */}
                 <div>
 
-                  <DateInput
+                  <Input
+                    type="date"
                     id="date of birth"
                     label="Date of Birth"
                     value={formData.dob}
@@ -362,13 +410,11 @@ function EditUser() {
                     label="Gender"
                     value={formData.gender}
                     required={true}
-                    onChange={(e)=>{
-                      setFormData({
-                        ...formData,gender:e.target.value
-                      });
-                    }}
+                    onChange={(e)=>
+                      updateField("gender", e.target.value) 
+                    }
                     options={genderOptions}
-                    error = {errors.genderOptions}
+                    error = {errors.gender}
                     labelClassName="
                       mb-[6px]
                       block
@@ -554,13 +600,9 @@ function EditUser() {
                 text="Save"
                 onClick={handleSubmit}
                 className="
-                  h-[42px]
                   w-[120px]
-                  rounded-[4px]
                   bg-[var(--color-primary)]
-                  text-[14px]
                   text-white
-                  cursor-pointer
                 "
               />
 
@@ -569,18 +611,15 @@ function EditUser() {
                 text="Cancel"
                 onClick = {()=>navigate("/users")}
                 className="
-                  h-[42px]
                   w-[120px]
-                  rounded-[4px]
                   border
                   border-[var(--color-primary-outline)]
                   bg-white
-                  text-[14px]
-                  font-semibold
                   text-[var(--color-primary-outline)]
-                  cursor-pointer
                 "
               />
+
+              
 
             </div>
 

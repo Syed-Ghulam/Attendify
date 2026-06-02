@@ -8,11 +8,14 @@ import Select from "./components/Select";
 import { useState } from "react";
 import TextArea from './components/TextArea';
 import Toggle from "./components/Toggle";
+import { API_URL } from "./config/api";
+import {toast} from "react-toastify";
 
 
 function NewGroup(){
     const navigate = useNavigate();
     const [isOn, setIsOn] = useState(false);
+    const [error, setErrors] = useState({});
     const[formData, setFormData] = useState({
         groupName:"",
         roleName:"",
@@ -25,10 +28,31 @@ function NewGroup(){
         "Technician",
     ];
 
+    const validateField = (name, value) => {
+    let error = "";
+
+    if (name === "groupName" && !value.trim()) {
+        error = "Group Name is required";
+    }
+
+    if (name === "roleName" && !value) {
+        error = "Role Name is required";
+    }
+
+    return error;
+};
+
     const handleRoleChange = (e) =>{
+        const value = e.target.value;
+
         setFormData({
-            ...formData,roleName: e.target.value
+            ...formData,roleName: value
         });
+
+        setErrors((prev) => ({
+            ...prev,
+            roleName: validateField("roleName",value)
+        }));
     };
 
     const handleToggle = () => {
@@ -42,12 +66,40 @@ function NewGroup(){
     };
 
     const handleChange = (e)=>{
+
+        const {id, value} = e.target;
+
         setFormData({
-            ...formData,[e.target.id]: e.target.value
+            ...formData,[id]: value
         });
+
+        setErrors((prev) => ({
+            ...prev,
+            [id]: validateField(id, value)
+        }));
     };
 
+    const validateForm = () => {
+    let newErrors = {};
+
+    if (!formData.groupName.trim()) {
+        newErrors.groupName = "Group Name is required";
+    }
+
+    if (!formData.roleName) {
+        newErrors.roleName = "Role Name is required";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+};
+
     const handleSubmit = async() => {
+
+        if(!validateForm()){
+            return;
+        }
 
         const payload = {
             ...formData
@@ -56,7 +108,7 @@ function NewGroup(){
         try{
             console.log("Payload: ",payload)
             const response = await fetch(
-                "http://localhost:5000/groups",
+                `${API_URL}/groups`,
                 {
                     method:"POST",
 
@@ -69,10 +121,10 @@ function NewGroup(){
 
             const data= await response.json();
             console.log(data);
-            alert("Group Created Successfully");
+            toast.success("Group Created Successfully");
         } catch(error){
             console.log(error);
-            alert("Error creating group");
+            toast.error("Error creating group");
         }
     };
     return(
@@ -141,6 +193,7 @@ function NewGroup(){
                                   required={true}
                                   value={formData.groupName}
                                   onChange={handleChange}
+                                  error={error.groupName}
                                 />
                             </div>
 
@@ -152,6 +205,7 @@ function NewGroup(){
                                   required={true}
                                   options = {roleOptions}
                                   onChange={handleRoleChange}
+                                  error={error.roleName}
                                   labelClassName="
                                         mb-[6px]
                                         block
@@ -221,12 +275,9 @@ function NewGroup(){
                                 text="Create"
                                 onClick={handleSubmit}
                                 className="
-                                    h-[42px]
                                     w-[125px]
-                                    rounded-[4px]
                                     bg-[var(--color-primary)]
                                     text-white
-                                    cursor-pointer
                                 "
                                 />
 
@@ -235,14 +286,11 @@ function NewGroup(){
                                 text="Cancel"
                                 onClick={() => navigate("/users")}
                                 className="
-                                    h-[42px]
                                     w-[125px]
-                                    rounded-[4px]
                                     border
                                     border-[var(--color-primary)]
                                     bg-white
                                     text-[var(--color-primary)]
-                                    cursor-pointer
                                 "
                                 />
 

@@ -1,11 +1,5 @@
-import DashBoard from '../assets/icons/dashboard.svg';
-import WorkStation from '../assets/icons/workstation.svg';
-import ProductMaster from '../assets/icons/ProductMaster.svg';
-import MyOrders from '../assets/icons/MyOrders.svg';
-import UserManagement from '../assets/icons/UserManagement.svg';
-import TemperatureHistory from '../assets/icons/TemperatureHistory.svg';
-import NCMR from '../assets/icons/NCMR.svg';
-
+import Button from './Button';
+import { menuItems } from '../config/sidebarMenu';
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 
@@ -15,46 +9,6 @@ function Sidebar() {
 
     const location = useLocation();
 
-    const menuItems = [
-
-        {
-            id: "dashboard",
-            icon: DashBoard,
-        },
-
-        {
-            id: "workstation",
-            icon: WorkStation,
-            path:"/workstation"
-        },
-
-        {
-            id: "product",
-            icon: ProductMaster,
-        },
-
-        {
-            id: "orders",
-            icon: MyOrders,
-        },
-
-        {
-            id: "users",
-            icon: UserManagement,
-            path: "/users",
-        },
-
-        {
-            id: "temperature",
-            icon: TemperatureHistory,
-        },
-
-        {
-            id: "ncmr",
-            icon: NCMR,
-        }
-
-    ];
 
     const moduleRoutes = {
         users:[
@@ -96,13 +50,13 @@ function Sidebar() {
                      : location.pathname === item.path;
                     return(
 
-                    <button
-
+                    <Button
+                        type="button"
                         key={item.id}
 
                         onClick={() => handleClick(item)}
 
-                        className={`flex h-10 w-10 items-center justify-center rounded-[6px] transition-all cursor-pointer
+                        className={`flex px-0 w-10 items-center justify-center transition-all
                              ${isActive? "bg-[var(--color-sidebar-active)]" : "bg-transparent"}`}
                     >
 
@@ -112,7 +66,7 @@ function Sidebar() {
                           
                         />
 
-                    </button>
+                    </Button>
                     )
                     
                 })

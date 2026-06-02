@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "./config/api";
 import Tabs from "./components/Tabs";
 import SearchInput from './components/SearchInput' 
 import Header from './components/Header'
@@ -25,16 +26,6 @@ function Users(){
     const [currentPage, setCurrentPage] = useState(1);
     const [recordsPerPage, setRecordsPerPage] = useState(5);
     const [groupData, setGroupData] = useState([]);
-
-    const totalRecords = userData.length;
-    const totalPages = Math.ceil(totalRecords / recordsPerPage);
-
-    const startIndex = (currentPage -1) * recordsPerPage;
-    const endIndex = startIndex + recordsPerPage;
-
-    const currentRecords = userData.slice(startIndex, endIndex);
-
-   
 
     const genderOptions = [
    "ALL",
@@ -153,7 +144,7 @@ const grpColumns = [
 
 
 const getTableData = () => {
-  return currentRecords.map((user) => ({
+  return userData.map((user) => ({
     checkBox: (
       <button>
         <img src={UnCheck} alt="checkbox" />
@@ -167,7 +158,7 @@ const getTableData = () => {
     userId: user.userId,
 
     userName: (
-      <span className="text-[var(--color-link)]">
+      <span className="text-[var(--link)]">
         {user.firstName} {user.lastName}
       </span>
     ),
@@ -182,7 +173,7 @@ const getTableData = () => {
 
     action: (
       <div className="relative">
-        <button
+        <Button
           onClick={() =>
             setOpenMenu(
               openMenu === user.userId
@@ -193,12 +184,12 @@ const getTableData = () => {
           className="cursor-pointer"
         >
           <img src={More} alt="More" />
-        </button>
+        </Button>
 
         {openMenu === user.userId && (
           <div
             className="absolute top-0 right-10 w-[120px]
-            bg-white border border-[var(--color-border-light)] rounded-[8px]
+            bg-white border border-[var(--neutral-200)] rounded-[8px]
             shadow-lg z-50"
           >
 
@@ -243,7 +234,7 @@ const getGroupTableData = () => {
 
 
 useEffect(() => {
-   fetch("http://localhost:5000/users")
+   fetch(`${API_URL}/users`)
    .then((res) => res.json())
    .then((data) => {
       setUserData(data);
@@ -254,7 +245,7 @@ useEffect(() => {
 },[]);
 
 useEffect(() => {
-   fetch("http://localhost:5000/groups")
+   fetch(`${API_URL}/groups`)
    .then((res) => res.json())
    .then((data) => {
       
@@ -280,7 +271,7 @@ const handleStatusOptions = (e) =>{
 console.log("groupData", groupData);
     return(
         <>
-        <div className="min-h-screen bg-[var(--color-background)]">
+        <div className="min-h-screen bg-[var(--neutral-100)]">
 
             <Header />
 
@@ -288,12 +279,12 @@ console.log("groupData", groupData);
 
             <Sidebar />
 
-            <div className="flex-1 bg-[var(--color-background)]">
+            <div className="flex-1 bg-[var(--neutral-100)]">
 
                 {/* Heading*/}
 
                 <div className="px-6 pt-6">
-                    <h2 className="text-[28px] font-bold text-[var(--color-secondary)]">
+                    <h2 className="text-[28px] font-bold text-[var(--primary-900)]">
                         Manage Users
                     </h2>
                 </div>
@@ -328,38 +319,38 @@ console.log("groupData", groupData);
                               <>
                                  <Select
                                     id="gender"
-                                    labelClassName="mb-2 block text-[14px] font-medium text-[var(--color-text-muted)]"
+                                    labelClassName="mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
                                     label="Gender"
                                     value={gender}
                                     onChange={handleGenderOptions}
                                     options={genderOptions}
                                     className="w-[124px] h-[42px] px-4 rounded-[20px]
-                                    border border-[var(--color-border)] bg-white text-[15px]
-                                   text-[var(--color-text-muted)] outline-none cursor-pointer"
+                                    border border-[var(--neutral-300)] bg-white text-[15px]
+                                   text-[var(--neutral-500)] outline-none cursor-pointer"
                                  />
 
                                  <Select
                                     id="role name"
-                                    labelClassName="mb-2 block text-[14px] font-medium text-[var(--color-text-muted)]"
+                                    labelClassName="mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
                                     label="Role Name"
                                     value={role}
                                     onChange={handleRoleOptions}
                                     options={roleOptions}
                                     className="w-[124px] h-[42px] px-4 rounded-[20px]
-                                    border border-[var(--color-border)] bg-white text-[15px]
-                                    text-[var(--color-text-muted)] outline-none cursor-pointer"
+                                    border border-[var(--neutral-300)] bg-white text-[15px]
+                                    text-[var(--neutral-500)] outline-none cursor-pointer"
                                  />
 
                                  <Select
                                     id="status"
-                                    labelClassName="mb-2 block text-[14px] font-medium text-[var(--color-text-muted)]"
+                                    labelClassName="mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
                                     label="Status"
                                     value={status}
                                     onChange={handleStatusOptions}
                                     options={statusOptions}
                                     className="w-[124px] h-[42px] px-4 rounded-[20px]
-                                    border border-[var(--color-border)] bg-white text-[15px]
-                                    text-[var(--color-text-muted)] outline-none cursor-pointer"
+                                    border border-[var(--neutral-300)] bg-white text-[15px]
+                                    text-[var(--neutral-500)]outline-none cursor-pointer"
                                  />
                               </>
                            )}
@@ -367,27 +358,27 @@ console.log("groupData", groupData);
                            {activeTab === "Groups" && (
                               <Select
                                  id="status"
-                                 labelClassName="mb-2 block text-[14px] font-medium text-[var(--color-text-muted)]"
+                                 labelClassName="mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
                                  label="Status"
                                  value={status}
                                  onChange={handleStatusOptions}
                                  options={statusOptions}
                                  className="w-[124px] h-[42px] px-4 rounded-[20px]
-                                 border border-[var(--color-border)] bg-white text-[15px]
-                                 text-[var(--color-text-muted)] outline-none cursor-pointer"
+                                 border border-[var(--neutral-300)] bg-white text-[15px]
+                                 text-[var(--neutral-500)] outline-none cursor-pointer"
                               />
                            )}
 
                            <Button
                               type="reset"
                               text="Clear"
-                              className="h-[42px] px-7 rounded-[4px]
-                              border border-[var(--color-primary)]
-                              text-[var(--color-primary)]
-                              bg-[var(--color-primary-light)]
+                              className="px-7
+                              border border-[var(--primary-700)]
+                              text-[var(--primary-700)]
+                              bg-[var(--primary-100)]
                               text-[15px]
                               font-medium
-                              cursor-pointer"
+                            "
                            />
 
                            <Button
@@ -400,9 +391,11 @@ console.log("groupData", groupData);
                                        : "/new-group"
                                  )
                               }
-                              className="h-[42px] px-6 bg-[var(--color-primary)]
-                              text-white rounded-[8px] cursor-pointer"
+                              className=" px-6 bg-[var(--primary-700)]
+                              text-white rounded-[8px]"
                            />
+
+                           
 
                         </div>
                     </div>
@@ -414,12 +407,6 @@ console.log("groupData", groupData);
                                 
                                 columns = {columns}
                                 data = {getTableData()}
-                                currentPage={currentPage}
-                                setCurrentPage={setCurrentPage}
-                                totalPages={totalPages}
-                                recordsPerPage={recordsPerPage}
-                                setRecordsPerPage={setRecordsPerPage}
-                                totalRecords={totalRecords}
                                 />
                             
                             )

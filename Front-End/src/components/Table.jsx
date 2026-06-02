@@ -1,10 +1,20 @@
 import Refresh from '../assets/icons/refresh.svg';
 import ArrowLeft from '../assets/icons/Arrow Left.svg';
 import ArrowRight from '../assets/icons/Arrow Right.svg';
+import { useState } from 'react';
 
-function Table({ columns, data, currentPage, setCurrentPage, totalPages, recordsPerPage ,
-    setRecordsPerPage, totalRecords
- }) {
+function Table({columns, data}) {
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [recordsPerPage, setRecordsPerPage] = useState(5);
+
+    const totalRecords = data.length;
+    const totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+    const startIndex = (currentPage -1) * recordsPerPage;
+    const endIndex = startIndex + recordsPerPage;
+
+    const paginatedData = data.slice(startIndex, endIndex);
 
     return(
 
@@ -42,7 +52,7 @@ function Table({ columns, data, currentPage, setCurrentPage, totalPages, records
                 <tbody>
 
                     {
-                        data.map((row, rowIndex) => (
+                        paginatedData.map((row, rowIndex) => (
 
                             <tr
                                key={rowIndex}
@@ -192,7 +202,7 @@ function Table({ columns, data, currentPage, setCurrentPage, totalPages, records
            {totalRecords === 0
               ? "0 Records" : `${(currentPage -1) * recordsPerPage + 1}
                  - ${Math.min(
-                          (currentPage -1) * recordsPerPage + data.length,
+                          (currentPage -1) * recordsPerPage + paginatedData.length,
                           totalRecords)}
                           of ${totalRecords} Records`}
         </span>
@@ -209,4 +219,4 @@ function Table({ columns, data, currentPage, setCurrentPage, totalPages, records
 )
 }
 
-export default Table
+export default Table;

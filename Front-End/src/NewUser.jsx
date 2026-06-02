@@ -2,7 +2,7 @@ import Input from "./components/Input";
 import MultiSelect from "./components/MultiSelect";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DateInput from "./components/DateInput";
+import {toast} from "react-toastify";
 import Select from "./components/Select";
 import Toggle from "./components/Toggle";
 import ImgUploader from "./components/ImgUploader";
@@ -10,6 +10,7 @@ import Button from "./components/Button";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Back from './assets/icons/Back.svg';
+import { API_URL } from "./config/api";
 
 function NewUser() {
 
@@ -79,10 +80,48 @@ function NewUser() {
     });
   };
 
+  const validateField = (name, value) =>{
+    let error = "";
+
+    if(name === "userId" && !value.trim()){
+      error = "User ID is required";
+    }
+
+    if(name === "groupName" && value.length === 0) {
+      error = "Group Name is required";
+    }
+
+    if(name === "firstName" && !value.trim()){
+      error = "First Name is required";
+    }
+
+    if(name === "email" && value && (!value.includes("@") || !value.includes("."))){
+      error = "Enter valid Email";
+    }
+
+    if(name === "phone"){
+      if(!value.trim()){
+        error="Phone number is required";
+      } else if(!/^\d{10}$/.test(value)) {
+        error = "Phone number must be 10 digits";
+      }
+    }
+
+    return error;
+  }
+
   const handleChange = (e)=>{
+    const {id, value} = e.target;
+
     setFormData({
-      ...formData,[e.target.id]: e.target.value
+      ...formData,[id]: value
     });
+
+    const error = validateField(id, value);
+
+    setErrors((prev) => ({
+      ...prev,[id]: error
+    }))
   };
 
   const handleSubmit = async() => {
@@ -96,7 +135,7 @@ function NewUser() {
     console.log(payload)
     try{
       const response = await fetch(
-        "http://localhost:5000/users",
+        `${API_URL}/users`,
         {
           method:"POST",
 
@@ -108,10 +147,10 @@ function NewUser() {
       );
       const data = await response.json();
       console.log(data);
-      alert("User Created Successfully");
+      toast.success("User Created Successfully");
     } catch(error){
       console.log(error);
-      alert("Error creating user");
+      toast.error("Error creating user");
     }
   };
 
@@ -188,12 +227,11 @@ function NewUser() {
                 type="button"
                 onClick={()=>navigate("/users")}
                 className="
-                  mt-[22px]
+                  mt-[15px]
                   flex
                   h-6
                   w-6 
                   justify-center
-                  cursor-pointer
                   rounded-full" 
               >
                 <img src={Back} alt="Back Button"/>
@@ -256,6 +294,11 @@ function NewUser() {
                     setFormData({
                       ...formData, groupName:values
                     });
+
+                    setErrors((prev) => ({
+                      ...prev,
+                      groupName: validateField("groupName", values)
+                    }));
                   }}
                   options={grpoptions}
                   error={errors.groupName}
@@ -309,7 +352,8 @@ function NewUser() {
                 {/* DOB */}
                 <div>
 
-                  <DateInput
+                  <Input
+                    type = "date"
                     id="date of birth"
                     label="Date of Birth"
                     value={formData.dob}
@@ -515,13 +559,9 @@ function NewUser() {
                 text="Create"
                 onClick={handleSubmit}
                 className="
-                  h-[42px]
                   w-[120px]
-                  rounded-[4px]
                   bg-[var(--color-primary)]
-                  text-[14px]
                   text-white
-                  cursor-pointer
                 "
               />
 
@@ -530,16 +570,11 @@ function NewUser() {
                 text="Cancel"
                 onClick = {()=>navigate("/users")}
                 className="
-                  h-[42px]
                   w-[120px]
-                  rounded-[4px]
                   border
                   border-[var(--color-primary-outline)]
                   bg-white
-                  text-[14px]
-                  font-semibold
                   text-[var(--color-primary-outline)]
-                  cursor-pointer
                 "
               />
 

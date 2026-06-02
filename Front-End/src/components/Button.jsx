@@ -3,10 +3,11 @@ function Button(props){
         <button  
         type={props.type}
         onClick={props.onClick} 
-        className={props.className} 
+        className={`h-[42px] text-[14px] rounded-[4px] cursor-pointer 
+                   ${props.className || ""}`}
         >
             {props.text || props.children}
         </button>
     )
 }
-export default Button
+export default Button;

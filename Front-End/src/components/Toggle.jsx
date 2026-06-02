@@ -7,10 +7,10 @@ function Toggle(props){
         </label>
         <div className='flex items-center gap-3'>
       <Button 
-        type={props.type}
+        type="button"
         onClick = {props.onClick}
         className={`
-                w-16 h-8 rounded-full p-1 flex items-center transition-all duration-300 cursor-pointer
+                w-16 rounded-full p-1 flex items-center transition-all duration-300 cursor-pointer
                 ${props.isOn ? "bg-green-500 justify-end": "bg-gray-400 justify-start"}
             `}
         
@@ -26,4 +26,4 @@ function Toggle(props){
     )
 
 }
-export default Toggle
+export default Toggle;
