@@ -5,7 +5,7 @@ const sequelize = require("../config/db");
 const User = sequelize.define("User", {
 
     userId: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(20),
         unique:true,
         allowNull:false
     },
@@ -15,40 +15,58 @@ const User = sequelize.define("User", {
     },
 
     firstName: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
     },
 
     lastName: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
     },
 
     dob: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
     },
 
     gender: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM(
+            "Male", "Female","Other"
+        ),
+        allowNull: false
     },
 
     phone: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(15),
     },
 
     email: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
         unique:true,
         allowNull:false
     },
 
     address: {
+        type: DataTypes.TEXT,
+    },
+
+    isActive : {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+    },
+
+    image: {
         type: DataTypes.STRING,
     },
 
-    status: {
-        type: DataTypes.STRING,
+    isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     },
-    image: {
-        type: DataTypes.STRING,
+
+    createdBy:{
+        type:DataTypes.STRING(50)
+    },
+
+    updatedBy:{
+        type: DataTypes.STRING(50)
     }
 
 });
