@@ -118,16 +118,16 @@ function WorkStation(){
                         {
                             openMenu === workStation.workstationName && (
                                 <div
-                                className="absolute right-0 mt-2 w-[120px] bg-white border border-[#E5E7F2]
+                                className="absolute right-0 mt-2 w-[120px] bg-white border border-[var(--neutral-200)]
                                 rounded-[8px] shadow-lg z-50"
                                 >
-                                <p className="px-4 py-2 hover:bg-[#F4F5FB] cursor-pointer"
+                                <p className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer"
                                     
                                 >
                                     View
                                 </p>
                     
-                                <p className="px-4 py-2 hover:bg-[#F4F5FB] cursor-pointer"
+                                <p className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer"
                                     
                                 >
                                     Edit
@@ -161,14 +161,11 @@ function WorkStation(){
 
     return(
         <>
-        <div className="min-h-screen bg-[#F4F5FB]">
-            <Header />
-            <div className="flex">
-                <Sidebar />
+        
 
-                <div className="flex-1 bg-[#F4F5FB]">
+                <div className="flex-1 bg-[var(--neutral-100)]">
                     <div className="px-6 pt-6">
-                        <h2 className="text-[28px] font-bold text-[#272757]">
+                        <h2 className="text-[28px] font-bold text-[var(--primary-900)]">
                             Manage Workstation
                         </h2>
                     </div>
@@ -198,51 +195,51 @@ function WorkStation(){
                           <div className="flex flex-wrap items-end gap-4">
                             <Select
                             id="line"
-                            labelClassName = "mb-2 block text-[14px] font-medium text-[#6E7191]"
+                            labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
                             label="Line"
                             value={line}
                             onChange={handleLineOptions}
                             options = {lineOptions}
-                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[#D9DBE9]
-                            bg-white text-[15px] text-[#6E7191] outline-none appearance-none cursor-pointer"
+                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
+                            bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
                             
                             />
 
                             <Select
                             id="facillity"
-                            labelClassName = "mb-2 block text-[14px] font-medium text-[#6E7191]"
+                            labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
                             label="Facility"
                             value={facility}
                             onChange={handleFacilityOptions}
                             options = {facilityOptions}
-                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[#D9DBE9]
-                            bg-white text-[15px] text-[#6E7191] outline-none appearance-none cursor-pointer"
+                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
+                            bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
                             
                             />
 
                             <Select
                             id="status"
-                            labelClassName = "mb-2 block text-[14px] font-medium text-[#6E7191]"
+                            labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
                             label="Status"
                             value={status}
                             onChange={handleStatusOptions}
                             options = {statusOptions}
-                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[#D9DBE9]
-                            bg-white text-[15px] text-[#6E7191] outline-none appearance-none cursor-pointer"
+                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
+                            bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
                             
                             />
 
                             <Button 
                                 text = "clear"
-                                className="h-[42px] px-7 rounded-[4px] border border-[#3F3D8F] text-[#3F3D8F]
-                                bg-[#D5D5EC] text-[15px] font-medium cursor-pointer"
+                                className="h-[42px] px-7 rounded-[4px] border border-[var(--primary-700)] text-[var(--primary-700)]
+                                bg-[var(--primary-100)] text-[15px] font-medium cursor-pointer"
                             />
 
                             <Button 
                                 type="button"
                                 text = "Create New"
                                 onClick = {()=>navigate("/new-workstation")}
-                                className="h-[42px] px-6 bg-[#3F3F8D] text-white rounded-[8px] cursor-pointer"
+                                className="h-[42px] px-6 bg-[var(--primary-900)] text-white rounded-[8px] cursor-pointer"
                             />
                           </div>
                         </div>
@@ -271,8 +268,7 @@ function WorkStation(){
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+           
         </>
     )
 }

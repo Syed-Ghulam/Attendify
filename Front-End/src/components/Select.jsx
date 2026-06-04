@@ -14,7 +14,7 @@ function Select(props){
 
                 {
                     props.required && (
-                        <span className="text-[var(--color-error)]">*</span>
+                        <span className="text-[var(--error)]">*</span>
                     )
                 }
 
@@ -64,7 +64,7 @@ function Select(props){
             />
 
               {props.error && (
-                    <p className="mt-1 text-[var(--color-error)]">
+                    <p className="mt-1 text-[var(--error)]">
                         {props.error}
                     </p>
                 )}

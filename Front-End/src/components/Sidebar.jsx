@@ -36,8 +36,8 @@ function Sidebar() {
     return (
 
         <aside
-            className="flex w-[72px] min-h-screen flex-col items-center gap-5
-                border-r border-[var(--color-border-light)] bg-[var(--color-white)] py-4 flex-shrink-0"
+            className="flex w-[72px] flex-col items-center gap-5
+                border-r border-[var(--neutral-200)] bg-white py-4 flex-shrink-0"
         >
 
             {
@@ -57,7 +57,7 @@ function Sidebar() {
                         onClick={() => handleClick(item)}
 
                         className={`flex px-0 w-10 items-center justify-center transition-all
-                             ${isActive? "bg-[var(--color-sidebar-active)]" : "bg-transparent"}`}
+                             ${isActive? "bg-[var(--primary-900)]" : "bg-transparent"}`}
                     >
 
                         <img

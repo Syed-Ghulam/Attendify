@@ -22,6 +22,7 @@ body{
   --primary-700: var(--color-indigo-700);
   --primary-800: var(--color-indigo-800);
   --primary-900: var(--color-indigo-900);
+  --primary-950: var(--color-indigo-950);
 
   /* Neutral */
   --neutral-50: var(--color-slate-50);

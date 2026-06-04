@@ -11,14 +11,14 @@ function Toggle(props){
         onClick = {props.onClick}
         className={`
                 w-16 rounded-full p-1 flex items-center transition-all duration-300 cursor-pointer
-                ${props.isOn ? "bg-green-500 justify-end": "bg-gray-400 justify-start"}
+                ${props.isOn ? "bg-[var(--success)] justify-end": "bg-[var(--neutral-300)] justify-start"}
             `}
         
       >
     <div className="w-6 h-6 bg-white rounded-full"/>
         </Button>
 
-        <span className='text-[14px] text-[var(--color-heading)]'>
+        <span className='text-[14px] text-[var(--primary-900)]'>
            {props.isOn ? "Active" : "Inactive"}
         </span>
         </div>

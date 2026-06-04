@@ -18,13 +18,13 @@ function Table({columns, data}) {
 
     return(
 
-        <div className="relative overflow-visible rounded-[5px]
-        border border-[var(--color-border-light)] bg-[var(--color-white)]">
-          <div className="overflow-auto max-h-[500px]">
+        <div className="h-full flex flex-col rounded-[5px]
+            border border-[var(--neutral-200)] bg-white">
+          <div className="flex-1 overflow-auto">
             <table className="min-w-full border-collapse">
 
                 {/* Header */}
-                <thead className="sticky top-0 bg-[var(--color-table-header-bg)] z-10">
+                <thead className="sticky top-0 bg-[var(--neutral-200)] z-10">
 
                     <tr>
 
@@ -35,8 +35,8 @@ function Table({columns, data}) {
                                    key={index}
                                    className="px-4 py-4 text-left
                                    text-[13px] font-semibold
-                                   text-[var(--color-table-text)]
-                                   border-b border-[var(--color-border-light)]"
+                                   text-[var(--neutral-800)]
+                                   border-b border-[var(--neutral-200)]"
                                 >
                                     {column.label}
                                 </th>
@@ -49,14 +49,14 @@ function Table({columns, data}) {
                 </thead>
 
                 {/* Body */}
-                <tbody>
+                <tbody className='height-[1px]'>
 
                     {
                         paginatedData.map((row, rowIndex) => (
 
                             <tr
                                key={rowIndex}
-                               className="border-b border-[var(--color-border-light)]"
+                               className="border-b border-[var(--neutral-200)]"
                             >
 
                                 {
@@ -65,7 +65,7 @@ function Table({columns, data}) {
                                         <td
                                            key={colIndex}
                                            className="px-4 py-4 text-[14px]
-                                           text-[var(--color-table-text)]"
+                                           text-[var(--neutral-800)]"
                                         >
                                                 {
                                 column.key === "status" ? (
@@ -76,8 +76,8 @@ function Table({columns, data}) {
                                             className={`w-[8px] h-[8px] rounded-full
                                             ${
                                             row[column.key] === "Active"
-                                            ? "bg-[var(--color-success)]"
-                                            : "bg-[var(--color-error)]"
+                                            ? "bg-[var(--success)]"
+                                            : "bg-[var(--error)]"
                                             }`}
                                         >
 
@@ -113,8 +113,8 @@ function Table({columns, data}) {
 
             <div
             className="h-[48px]
-            px-4 border-t border-[var(--color-border-light)]
-            bg-[var(--color-table-footer-bg)] flex items-center justify-between"
+            px-4 border-t border-[var(--neutral-200)]
+            bg-[var(--neutral-100)] flex items-center justify-between"
             >
 
     {/* Left Side */}
@@ -126,22 +126,22 @@ function Table({columns, data}) {
             <button 
              onClick={() => setCurrentPage(1)}
              disabled={currentPage === 1}
-            className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
+            className="text-[var(--neutral-500)] text-[18px] cursor-pointer">
                 {"<<"}
             </button>
 
             <button 
             onClick={() => setCurrentPage(currentPage -1)}
             disabled = {currentPage === 1}
-            className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
+            className="text-[var(--neutral-500)] text-[18px] cursor-pointer">
                 <img src={ArrowLeft} alt="left arrow" />
             </button>
 
             {/* Active Page */}
             <button
             className="w-6 h-6 rounded-full
-            bg-[var(--color-table-text)]
-            text-[var(--color-white)] text-[12px]
+            bg-[var(--neutral-800)]
+            text-white text-[12px]
             flex items-center justify-center"
             >
                 {currentPage}
@@ -150,14 +150,14 @@ function Table({columns, data}) {
             <button 
             onClick={() => setCurrentPage(currentPage+1)}
             disabled = {currentPage === totalPages}
-            className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
+            className="text-[var(--neutral-500)] text-[18px] cursor-pointer">
                 <img src={ArrowRight} alt="Right arrow" />
             </button>
 
             <button 
             onClick={() => setCurrentPage(totalPages)}
             disabled = {currentPage === totalPages}
-            className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
+            className="text-[var(--neutral-500)] text-[18px] cursor-pointer">
                 {">>"}
             </button>
 
@@ -173,10 +173,10 @@ function Table({columns, data}) {
                 setCurrentPage(1);
             }}
             className="h-[28px]
-            px-2 border border-[var(--color-border-light)]
+            px-2 border border-[var(--neutral-200)]
             rounded-[4px]
             text-[13px]
-            text-[var(--color-table-text)]
+            text-[var(--neutral-800)]
             outline-none
             cursor-pointer"
             >
@@ -187,7 +187,7 @@ function Table({columns, data}) {
                 <option value={50}>50</option>
             </select>
 
-            <span className="text-[13px] text-[var(--color-text-muted)]">
+            <span className="text-[13px] text-[var(--neutral-500)]">
                 Records per page
             </span>
 
@@ -198,7 +198,7 @@ function Table({columns, data}) {
     {/* Right Side */}
     <div className="flex items-center gap-3">
 
-        <span className="text-[13px] text-[var(--color-text-muted)]">
+        <span className="text-[13px] text-[var(--neutral-500)]">
            {totalRecords === 0
               ? "0 Records" : `${(currentPage -1) * recordsPerPage + 1}
                  - ${Math.min(
@@ -207,7 +207,7 @@ function Table({columns, data}) {
                           of ${totalRecords} Records`}
         </span>
 
-        <button className="text-[var(--color-text-muted)] text-[18px] cursor-pointer">
+        <button className="text-[var(--neutral-500)] text-[18px] cursor-pointer">
             <img src={Refresh} alt="refresh" />
         </button>
 

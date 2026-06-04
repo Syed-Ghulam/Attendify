@@ -9,13 +9,13 @@ function TextArea(props) {
           block
           text-[13px]
           font-semibold
-          text-[var(--color-label)]
+          text-[var(--primary-900)]
         "
       >
         {props.label}
 
         {props.required && (
-          <span className="text-[var(--color-error)]">*</span>
+          <span className="text-[var(--error)]">*</span>
         )}
       </label>
 
@@ -29,15 +29,15 @@ function TextArea(props) {
         w-full
         rounded-[4px]
         border
-        border-[var(--color-border)]
-        bg-[var(--color-white)]
+        border-[var(--neutral-300)]
+        bg-white
         px-4
         py-3
         text-[14px]
         outline-none
         resize-none
         transition-all
-        focus:border-[var(--color-focus)]
+        focus:border-[var(--primary-500)]
         "
       />
     </>

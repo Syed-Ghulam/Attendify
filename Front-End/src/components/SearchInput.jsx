@@ -16,14 +16,14 @@ function SearchInput(props){
                w-full
                rounded-md
                border
-               border-[var(--color-border)]
-               bg-[var(--color-white)]
+               border-[var(--neutral-300)]
+               bg-white
                pl-4
                pr-10
                text-sm
                outline-none
                placeholder:text-gray-400
-               focus:border-[var(--color-search-focus)]
+               focus:border-[var(--primary-500)]
             "
          />
 
@@ -37,7 +37,7 @@ function SearchInput(props){
                top-1/2
                -translate-y-1/2
                text-xl
-               text-[var(--color-heading)]
+               text-[var(--primary-900)]
             "
          >
             ⌕

@@ -44,20 +44,20 @@ function ImgUploader(props){
            className="
             flex h-[92px] w-[280px] cursor-pointer
             flex-col justify-center rounded-md
-            border border-[var(--color-upload-border)]
-            bg-[var(--color-primary-light)]
+            border border-[var(--neutral-300)]
+            bg-[var(--primary-100)]
             px-4
             "
          >
 
           <div className="flex items-center gap-2">
             <img src={imgUpload} alt="uploadImage" className="h-5 w-5" />
-            <span className="text-[15px] font-semibold text-[var(--color-secondary)]">
+            <span className="text-[15px] font-semibold text-[var(--primary-900)]">
                Add Profile Image
             </span>
           </div>
 
-            <span className="mt-2 text-[10px] text-[var(--color-upload-text)]">
+            <span className="mt-2 text-[10px] text-[var(--neutral-500)]">
                Image size should be less than 1MB, only .jpg, .jpeg,
                .png formats are allowed.
             </span>
@@ -72,7 +72,7 @@ function ImgUploader(props){
             className="hidden"
          />
           {error && (
-            <p className="mt-1 text-sm text-[var(--color-error)]">
+            <p className="mt-1 text-sm text-[var(--error)]">
                {error}
             </p>
           )}

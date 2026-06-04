@@ -127,19 +127,13 @@ function NewWorkStation() {
 
    return (
 
-      <div className="min-h-screen bg-[#F4F5FB]">
-
-         <Header />
-
-         <div className="flex">
-
-            <Sidebar />
+      
 
             <div className="flex flex-1 flex-col">
 
                {/* Header Section */}
 
-               <div className="border-b border-[#E5E7F2] bg-[#F4F5FB] px-6 py-4">
+               <div className="border-b border-[var(--neutral-200)] bg-[var(--neutral-100)] px-6 py-4">
 
                   <div className="flex items-center gap-3">
 
@@ -156,11 +150,11 @@ function NewWorkStation() {
 
                      <div>
 
-                        <p className="text-[12px] text-[#8B8BA7]">
+                        <p className="text-[12px] text-[var(--neutral-500)]">
                            Manage Workstation /
                         </p>
 
-                        <h2 className="text-[30px] font-bold leading-none text-[#1C1C4D]">
+                        <h2 className="text-[30px] font-bold leading-none text-[var(--primary-900)]">
                            New WorkStation
                         </h2>
 
@@ -178,9 +172,9 @@ function NewWorkStation() {
 
                   <div
                      className="flex-1 rounded-t-[4px]
-                     border border-[#E5E7F2]
+                     border border-[var(--neutral-200)]
                      border-b-0
-                     bg-[#F7F8FC]"
+                     bg-[var(--neutral-50)]"
                   >
 
                      <div className="p-6">
@@ -235,7 +229,7 @@ function NewWorkStation() {
                                  options={facilityOptions}
                                  error = {errors.facility}
                                  className="h-[42px] w-full rounded-[4px]
-                                 border border-[#D9DCEA]
+                                 border border-[var(--neutral-300)]
                                  bg-white px-3 text-[14px]
                                  outline-none cursor-pointer"
                               />
@@ -272,7 +266,7 @@ function NewWorkStation() {
                               options={lineOptions}
                               error = {errors.linenameNumber}
                               className="h-[42px] w-full rounded-[4px]
-                              border border-[#D9DCEA]
+                              border border-[var(--neutral-300)]
                               bg-white px-3 text-[14px]
                               outline-none cursor-pointer"
                            />
@@ -284,7 +278,7 @@ function NewWorkStation() {
                         <div className="mt-6">
 
                            <p className="mb-2 text-[13px]
-                           font-semibold text-[#2D2D5A]">
+                           font-semibold text-[var(--primary-800)]">
 
                               Status
 
@@ -306,8 +300,8 @@ function NewWorkStation() {
                                  className={`relative h-5 w-10 rounded-full transition-all
                                  ${
                                     formData.status === "Active"
-                                       ? "bg-green-500"
-                                       : "bg-gray-300"
+                                       ? "bg-[var(--success)]"
+                                       : "bg-[var(--neutral-300)]"
                                  }`}
                               >
 
@@ -323,7 +317,7 @@ function NewWorkStation() {
 
                               </button>
 
-                              <span className="text-[14px] text-[#2D2D5A]">
+                              <span className="text-[14px] text-[var(--primary-800)]">
 
                                  {formData.status}
 
@@ -341,7 +335,7 @@ function NewWorkStation() {
 
                   <div
                      className="flex items-center gap-4
-                     border border-[#E5E7F2]
+                     border border-[var(--neutral-200)]
                      bg-white px-6 py-4"
                   >
 
@@ -350,7 +344,7 @@ function NewWorkStation() {
                         text="Create"
                         onClick ={handleSubmit}
                         className="w-[120px]
-                         bg-[#3F3F8D] text-white"
+                         bg-[var(--primary-900)] text-white"
                      />
 
                      <Button
@@ -358,8 +352,8 @@ function NewWorkStation() {
                         text="Cancel"
                         onClick={() => navigate("/workstation")}
                         className="w-[120px]
-                        border border-[#3F3F8D]
-                        bg-white text-[#3F3F8D]
+                        border border-[var(--primary-900)]
+                        bg-white text-[var(--primary-900)]
                      "
                      />
 
@@ -369,9 +363,6 @@ function NewWorkStation() {
 
             </div>
 
-         </div>
-
-      </div>
    );
 }
 

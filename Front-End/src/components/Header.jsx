@@ -23,7 +23,7 @@ function Header(props){
                 h-[58px]
                 items-center
                 justify-between
-                bg-[var(--color-secondary)]
+                bg-[var(--primary-950)]
                 px-5
             ">
         <div>
@@ -40,7 +40,7 @@ function Header(props){
             </button>
 
             <div className="flex h-9 w-9 items-center justify-center overflow-hidden
-            rounded-full bg-[var(--color-avatar-bg)] text-[12px] font-semibold text-[var(--color-avatar-text)] flex-shrink-0">
+            rounded-full bg-[var(--primary-100)] text-[12px] font-semibold text-[var(--primary-900)] flex-shrink-0">
                 {
                     user.profileImage ? (
                         <img src={user.profileImage} alt='Profile Image'
@@ -71,7 +71,7 @@ function Header(props){
         <p
             className="
                 text-[10px]
-                text-[var(--color-header-muted)]
+                text-[var(--neutral-300)]
             "
         >
             {user.role}

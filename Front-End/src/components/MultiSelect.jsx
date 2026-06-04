@@ -39,12 +39,12 @@ function MultiSelect(props) {
                block
                text-[13px]
                font-semibold
-               text-[var(--color-label)]
+               text-[var(--primary-900)]
             "
          >
             {props.label}
             {props.required && (
-               <span className="text-[var(--color-error)]">*</span>
+               <span className="text-[var(--error)]">*</span>
             )}
          </label>
 
@@ -58,8 +58,8 @@ function MultiSelect(props) {
                cursor-pointer
                rounded-md
                border
-               border-[var(--color-border)]
-               bg-[var(--color-white)]
+               border-[var(--neutral-300)]
+               bg-white
                px-3
                py-2
                pr-10
@@ -85,11 +85,11 @@ function MultiSelect(props) {
                         items-center
                         gap-2
                         rounded-md
-                        bg-[var(--color-chip-bg)]
+                        bg-[var(--primary-100)]
                         px-2
                         py-1
                         text-sm
-                        text-[var(--color-chip-text)]
+                        text-[var(--primary-700)]
                      "
                   >
                      <span>{item}</span>
@@ -100,7 +100,7 @@ function MultiSelect(props) {
                            e.stopPropagation();
                            removeOption(item);
                         }}
-                        className="text-xs font-bold text-[var(--color-chip-text)]"
+                        className="text-xs font-bold text-[var(--primary-700)]"
                      >
                         ✕
                      </button>
@@ -133,14 +133,14 @@ function MultiSelect(props) {
                   w-full
                   rounded-md
                   border
-                  border-[var(--color-border)]
-                  bg-[var(--color-white)]
+                  border-[var(--neutral-300)]
+                  bg-white
                   shadow-md
                "
             >
 
                {/* SEARCH */}
-               <div className="p-2 border-b border-[var(--color-border)]">
+               <div className="p-2 border-b border-[var(--neutral-300)]">
                   <SearchInput
                      value={searchTerm}
                      onChange={(e) =>
@@ -163,7 +163,7 @@ function MultiSelect(props) {
                               px-4
                               py-3
                               text-sm
-                              hover:bg-[var(--color-background)]
+                              hover:bg-[var(--neutral-100)]
                            "
                         >
                            {item}
@@ -181,7 +181,7 @@ function MultiSelect(props) {
 
          {/* ERROR */}
          {props.error && (
-            <p className="mt-1 text-sm text-[var(--color-error)]">
+            <p className="mt-1 text-sm text-[var(--error)]">
                {props.error}
             </p>
          )}

@@ -20,7 +20,7 @@ function NewGroup(){
         groupName:"",
         roleName:"",
         description:"",
-        status:"Inactive"
+        isActive: false
     })
 
     const roleOptions = [
@@ -61,7 +61,7 @@ function NewGroup(){
         setIsOn(newStatus);
 
         setFormData({
-            ...formData, status: newStatus? "Active":"Inactive"
+            ...formData, isActive: newStatus
         });
     };
 
@@ -128,19 +128,15 @@ function NewGroup(){
         }
     };
     return(
-        <div className="min-h-screen bg-[var(--color-background)]">
-            <Header />
+       
 
-            <div className="flex ">
-                <Sidebar />
-
-                <div className="flex flex-1 flex-col">
+                <div className="h-full flex flex-1 flex-col bg-[var(--neutral-100)] overflow-hidden">
 
                     <div 
                        className="
                         border-b
-                        border-[var(--color-border-light)]
-                        bg-[var(--color-background)]
+                        border-[var(--neutral-200)]
+                        bg-[var(--neutral-100)]
                         px-6
                         py-4
                         "
@@ -164,7 +160,7 @@ function NewGroup(){
                             </Button>
 
                             <div>
-                                <p>
+                                <p className="text-[12px] text-[var(--neutral-500)]">
                                     Manage Users /
                                 </p>
 
@@ -173,7 +169,7 @@ function NewGroup(){
                                     text-[30px]
                                     font-bold
                                     leading-none
-                                    text-[var(--color-heading)]
+                                    text-[var(--primary-900)]
                                 "
                                 >
                                     New Group
@@ -182,8 +178,8 @@ function NewGroup(){
                         </div>
                     </div>
 
-                    <div className="flex flex-1 flex-col">
-                        <div className="w-[700px] px-6 py-5">
+                    <div className="flex flex-1 flex-col overflow-auto">
+                        <div className="w-full max-w-[1150px] px-6 py-5">
                             <div className="mb-6">
                                 <Input 
                                   id="groupName"
@@ -211,20 +207,20 @@ function NewGroup(){
                                         block
                                         text-[13px]
                                         font-semibold
-                                        text-[var(--color-label)]
+                                        text-[var(--primary-900)]
                                         "
                                         className="
                                         h-[42px]
                                         w-full
                                         rounded-[4px]
                                         border
-                                        border-[var(--color-border)]
+                                        border-[var(--neutral-300)]
                                         bg-white
                                         px-3
                                         text-[14px]
                                         outline-none
                                         transition-all
-                                        focus:border-[var(--color-focus)]
+                                        focus:border-[var(--primary-500)]
                                         cursor-pointer
                                         " 
                                 />
@@ -252,7 +248,7 @@ function NewGroup(){
                                         block
                                         text-[13px]
                                         font-semibold
-                                        text-[var(--color-label)]
+                                        text-[var(--primary-900)]
                                         "
                                 />
                             </div>
@@ -261,7 +257,7 @@ function NewGroup(){
                         <div
                             className="
                                 border-t
-                                border-[var(--color-border-light)]
+                                border-[var(--neutral-200)]
                                 bg-white
                                 px-6
                                 py-5
@@ -276,7 +272,7 @@ function NewGroup(){
                                 onClick={handleSubmit}
                                 className="
                                     w-[125px]
-                                    bg-[var(--color-primary)]
+                                    bg-[var(--primary-900)]
                                     text-white
                                 "
                                 />
@@ -288,9 +284,9 @@ function NewGroup(){
                                 className="
                                     w-[125px]
                                     border
-                                    border-[var(--color-primary)]
+                                    border-[var(--primary-900)]
                                     bg-white
-                                    text-[var(--color-primary)]
+                                    text-[var(--primary-900)]
                                 "
                                 />
 
@@ -298,8 +294,7 @@ function NewGroup(){
                             </div>
                     </div>
                 </div>
-            </div>
-        </div>
+         
     )
 }
 export default NewGroup;

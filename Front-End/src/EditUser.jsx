@@ -6,8 +6,6 @@ import Select from "./components/Select";
 import Toggle from "./components/Toggle";
 import ImgUploader from "./components/ImgUploader";
 import Button from "./components/Button";
-import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
 import Back from './assets/icons/Back.svg';
 import { API_URL } from "./config/api";
 import {toast} from "react-toastify";
@@ -31,7 +29,7 @@ function EditUser() {
   phone: "",
   email: "",
   address: "",
-  status: "Inactive",
+  isActive: false,
   image: ""  
 });
   const [errors, setErrors] = useState({});
@@ -67,7 +65,7 @@ function EditUser() {
 
     setFormData({
     ...formData,
-    status: newStatus ? "Active" : "Inactive"
+    isActive: newStatus
   });
   };
 
@@ -222,11 +220,11 @@ function EditUser() {
         phone: data.phone || "",
         email: data.email || "",
         address: data.address || "",
-        status: data.status || "Inactive",
+        isActive: data.isActive ?? false,
         image: data.image || ""
       });
 
-      setIsOn(data.status === "Active");
+      setIsOn(data.isActive);
 
     })
     .catch((err) => console.log(err));
@@ -234,27 +232,15 @@ function EditUser() {
 }, [userId]);
 
   return (
-
-    <div className="min-h-screen bg-[var(--color-background)]">
-
-      {/* HEADER */}
-      <Header />
-
-      {/* BODY */}
-      <div className="flex ">
-
-        {/* SIDEBAR */}
-        <Sidebar />
-
-        {/* CONTENT */}
-        <div className="flex flex-1 flex-col">
+        
+        <div className="h-full flex flex-1 flex-col bg-[var(--neutral-100)] overflow-hidden">
 
           {/* PAGE HEADER */}
           <div
             className="
               border-b
-              border-[var(--color-border-light)]
-              bg-[var(--color-background)]
+              border-[var(--neutral-200)]
+              bg-[var(--neutral-100)]
               px-6
               py-4
             "
@@ -279,7 +265,7 @@ function EditUser() {
 
               <div>
 
-                <p className="text-[12px] text-[var(--color-text-muted)]">
+                <p className="text-[12px] text-[var(--neutral-500)]">
                   Manage Users /
                 </p>
 
@@ -288,7 +274,7 @@ function EditUser() {
                     text-[30px]
                     font-bold
                     leading-none
-                    text-[var(--color-heading)]
+                    text-[var(--primary-900)]
                   "
                 >
                   Edit User
@@ -302,7 +288,7 @@ function EditUser() {
 
 
           {/* SCROLLABLE CONTENT */}
-          <div className="flex flex-1 flex-col">
+          <div className="flex flex-1 flex-col overflow-auto">
 
             <div className="w-full max-w-[1150px] px-6 py-5">
 
@@ -420,20 +406,20 @@ function EditUser() {
                       block
                       text-[13px]
                       font-semibold
-                      text-[var(--color-label)]
+                      text-[var(--primary-900)]
                     "
                     className="
                       h-[42px]
                       w-full
                       rounded-[4px]
                       border
-                      border-[var(--color-border)]
+                      border-[var(--neutral-300)]
                       bg-white
                       px-3
                       text-[14px]
                       outline-none
                       transition-all
-                      focus:border-[var(--color-focus)]
+                      focus:border-[var(--primary-500)]
                       cursor-pointer
                     "
                   />
@@ -492,7 +478,7 @@ function EditUser() {
                 {/* STATUS */}
                 <div>
 
-                  <p className="mb-[6px] text-[13px] font-semibold text-[var(--color-secondary)]">
+                  <p className="mb-[6px] text-[13px] font-semibold text-[var(--primary-900)]">
                     Status
                   </p>
 
@@ -503,9 +489,9 @@ function EditUser() {
                       onClick={handleToggle}
                     />
 
-                    <p className="text-[14px] text-[var(--color-heading)]">
+                    {/* <p className="text-[14px] text-[var(--primary-900)]">
                       {isOn ? "Active" : "Inactive"}
-                    </p>
+                    </p> */}
 
                   </div>
 
@@ -525,7 +511,7 @@ function EditUser() {
                     block
                     text-[14px]
                     font-semibold
-                    text-[var(--color-secondary)]
+                    text-[var(--primary-900)]
                   "
                   className="hidden"
                 />
@@ -543,7 +529,7 @@ function EditUser() {
                           w-[90px]
                           rounded-[6px]
                           border
-                          border-[var(--color-border)]
+                          border-[var(--neutral-300)]
                           object-cover
                         "
                       />
@@ -586,7 +572,7 @@ function EditUser() {
           <div
             className="
               border-t
-              border-[var(--color-border-light)]
+              border-[var(--neutral-200)]
               bg-white
               px-6
               py-4
@@ -601,7 +587,7 @@ function EditUser() {
                 onClick={handleSubmit}
                 className="
                   w-[120px]
-                  bg-[var(--color-primary)]
+                  bg-[var(--primary-900)]
                   text-white
                 "
               />
@@ -613,9 +599,9 @@ function EditUser() {
                 className="
                   w-[120px]
                   border
-                  border-[var(--color-primary-outline)]
+                  border-[var(--primary-900)]
                   bg-white
-                  text-[var(--color-primary-outline)]
+                  text-[var(--primary-900)]
                 "
               />
 
@@ -626,10 +612,6 @@ function EditUser() {
           </div>
 
         </div>
-
-      </div>
-
-    </div>
   );
 }
 

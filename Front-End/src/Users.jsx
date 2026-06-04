@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { API_URL } from "./config/api";
 import Tabs from "./components/Tabs";
 import SearchInput from './components/SearchInput' 
-import Header from './components/Header'
-import Sidebar from "./components/Sidebar";
 import Select from "./components/Select";
 import Button from "./components/Button";
 import  Table  from "./components/Table";
@@ -169,7 +167,7 @@ const getTableData = () => {
     groupName: user.groupName,
     roleName: "System Admin",
     createdOn: new Date(user.createdAt).toLocaleDateString(),
-    status: user.status,
+    status: user.isActive ? "Active": "Inactive",
 
     action: (
       <div className="relative">
@@ -222,7 +220,7 @@ const getGroupTableData = () => {
 
       createdOn: new Date(group.createdAt).toLocaleDateString(),
 
-      status: group.status,
+      status: group.isActive? "Active":"Inactive",
 
       action: (
          <button>
@@ -271,15 +269,7 @@ const handleStatusOptions = (e) =>{
 console.log("groupData", groupData);
     return(
         <>
-        <div className="min-h-screen bg-[var(--neutral-100)]">
-
-            <Header />
-
-            <div className="flex">
-
-            <Sidebar />
-
-            <div className="flex-1 bg-[var(--neutral-100)]">
+            <div className="flex-1 flex flex-col bg-[var(--neutral-100)] overflow-hidden ">
 
                 {/* Heading*/}
 
@@ -290,7 +280,7 @@ console.log("groupData", groupData);
                 </div>
         
             {/* Tabs Section */}
-            <div className="mt-6 px-6">
+            <div className="mt-3 px-6">
             <Tabs 
                tabs={["Users","Groups"]}
                activeTab = {activeTab}
@@ -299,7 +289,7 @@ console.log("groupData", groupData);
             </div>
 
              {/* Content */}
-                 <div className="px-6 p-5">
+                 <div className="px-6 p-4 flex flex-col flex-1 overflow-hidden">
 
                     <div className="mt-1 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 ">
                       <div className="w-full lg:w-[260px]">
@@ -350,7 +340,7 @@ console.log("groupData", groupData);
                                     options={statusOptions}
                                     className="w-[124px] h-[42px] px-4 rounded-[20px]
                                     border border-[var(--neutral-300)] bg-white text-[15px]
-                                    text-[var(--neutral-500)]outline-none cursor-pointer"
+                                    text-[var(--neutral-500)] outline-none cursor-pointer"
                                  />
                               </>
                            )}
@@ -391,16 +381,13 @@ console.log("groupData", groupData);
                                        : "/new-group"
                                  )
                               }
-                              className=" px-6 bg-[var(--primary-700)]
+                              className=" px-6 bg-[var(--primary-900)]
                               text-white rounded-[8px]"
                            />
-
-                           
-
                         </div>
                     </div>
                        
-                      <div className="mt-5 overflow-visible">
+                      <div className="mt-5 flex-1 overflow-hidden">
                         {
                             activeTab === "Users" && (
                                 <Table 
@@ -429,8 +416,7 @@ console.log("groupData", groupData);
 
         
         </div>
-        </div>
-        </div>
+        
         </>
     )
 }
