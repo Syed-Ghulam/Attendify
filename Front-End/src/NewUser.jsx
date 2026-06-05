@@ -213,7 +213,7 @@ function NewUser() {
                 type="button"
                 onClick={()=>navigate("/users")}
                 className="
-                  mt-[15px]
+                  mt-[22px]
                   flex
                   h-6
                   w-6 
@@ -233,7 +233,6 @@ function NewUser() {
                   className="
                     text-[30px]
                     font-bold
-                    leading-none
                     text-[var(--primary-900)]
                   "
                 >

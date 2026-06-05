@@ -9,7 +9,7 @@ function DashBoardLayout(){
             <div className="flex flex-1 overflow-hidden">
               <Sidebar />
 
-                <main className="flex-1 overflow-hidden">
+                <main className="flex-1 min-h-0 overflow-auto bg-[var(--neutral-100)]">
                     <Outlet />
                 </main>
             </div>

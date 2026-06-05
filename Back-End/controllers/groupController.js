@@ -35,6 +35,59 @@ const getGroups = async(req, res) =>{
     }
 };
 
+const getGroupById = async(req, res) =>{
+    try{
+
+        const group = await Group.findOne({
+            where: {
+                id:req.params.id,
+                isDeleted:false
+            }
+        });
+
+        if(!group) {
+            return res.status(404).json({
+                message: "Group not found"
+            });
+        }
+
+        res.status(200).json(group);
+    } catch(error){
+        res.status(500).json({
+            message: "Error fetching group",
+            error
+        });
+    }
+};
+
+const updateGroup = async (req, res) => {
+    try{
+    const group = await Group.findOne({
+        where: {
+            id: req.params.id,
+            isDeleted:false
+        }
+    });
+    if(!group) {
+        return res.status(404).json({
+            message:"Group not found"
+        });
+    }
+
+    await group.update({...req.body, updatedBy: "Admin"});
+
+    res.status(200).json({
+        message: "Group updated successfully",
+        group
+    });
+  } catch (error) {
+    res.status(500).json({
+        message: "Error updating group",
+        error
+    });
+  }
+};
+
 const deleteGroup = async (req, res) =>{
     try{
         const group = await Group.findOne({
@@ -68,5 +121,7 @@ const deleteGroup = async (req, res) =>{
 module.exports = {
     createGroup,
     getGroups,
+    getGroupById,
+    updateGroup,
     deleteGroup
 }

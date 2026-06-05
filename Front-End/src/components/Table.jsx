@@ -18,7 +18,7 @@ function Table({columns, data}) {
 
     return(
 
-        <div className="h-full flex flex-col rounded-[5px]
+        <div className="h-full min-h-0 flex flex-col rounded-[5px]
             border border-[var(--neutral-200)] bg-white">
           <div className="flex-1 overflow-auto">
             <table className="min-w-full border-collapse">
@@ -49,7 +49,7 @@ function Table({columns, data}) {
                 </thead>
 
                 {/* Body */}
-                <tbody className='height-[1px]'>
+                <tbody className='h-[1px]'>
 
                     {
                         paginatedData.map((row, rowIndex) => (
@@ -121,13 +121,15 @@ function Table({columns, data}) {
     <div className="flex items-center gap-5">
 
         {/* Pagination */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
 
             <button 
              onClick={() => setCurrentPage(1)}
              disabled={currentPage === 1}
-            className="text-[var(--neutral-500)] text-[18px] cursor-pointer">
-                {"<<"}
+             className="flex text-[var(--neutral-500)] text-[18px] cursor-pointer">
+                
+                <img src={ArrowLeft} alt="left arrow" /> <img src={ArrowLeft} alt="left arrow" className='-ml-3' />
+                
             </button>
 
             <button 
@@ -157,8 +159,8 @@ function Table({columns, data}) {
             <button 
             onClick={() => setCurrentPage(totalPages)}
             disabled = {currentPage === totalPages}
-            className="text-[var(--neutral-500)] text-[18px] cursor-pointer">
-                {">>"}
+            className="flex text-[var(--neutral-500)] text-[18px] cursor-pointer">
+                <img src={ArrowRight} alt="Right arrow" /> <img src={ArrowRight} alt="Right arrow" className='-ml-3'/>
             </button>
 
         </div>

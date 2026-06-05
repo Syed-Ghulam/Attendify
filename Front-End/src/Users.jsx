@@ -223,10 +223,39 @@ const getGroupTableData = () => {
       status: group.isActive? "Active":"Inactive",
 
       action: (
-         <button>
-            <img src={More} alt="more options" />
-         </button>
-      )
+      <div className="relative">
+        <Button
+          onClick={() =>
+            setOpenMenu(
+              openMenu === group.Id
+                ? null
+                : group.id
+            )
+          }
+          className="cursor-pointer"
+        >
+          <img src={More} alt="More" />
+        </Button>
+
+        {openMenu === group.id && (
+          <div
+            className="absolute top-0 right-10 w-[120px]
+            bg-white border border-[var(--neutral-200)] rounded-[8px]
+            shadow-lg z-50"
+          >
+
+            <p
+              className="px-4 py-2 cursor-pointer"
+              onClick={() =>
+                navigate(`/edit-group/${group.id}`)
+              }
+            >
+              Edit
+            </p>
+          </div>
+        )}
+      </div>
+    )
    }));
 };
 
@@ -266,10 +295,9 @@ const handleRoleOptions = (e) =>{
 const handleStatusOptions = (e) =>{
     setStatus(e.target.value)
 };
-console.log("groupData", groupData);
     return(
         <>
-            <div className="flex-1 flex flex-col bg-[var(--neutral-100)] overflow-hidden ">
+            <div className="flex-1 flex flex-col overflow-auto">
 
                 {/* Heading*/}
 
@@ -289,7 +317,7 @@ console.log("groupData", groupData);
             </div>
 
              {/* Content */}
-                 <div className="px-6 p-4 flex flex-col flex-1 overflow-hidden">
+                 <div className="px-6 p-4 flex flex-col flex-1 min-h-0 bg-[var(--neural-100)] ">
 
                     <div className="mt-1 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 ">
                       <div className="w-full lg:w-[260px]">
@@ -387,7 +415,7 @@ console.log("groupData", groupData);
                         </div>
                     </div>
                        
-                      <div className="mt-5 flex-1 overflow-hidden">
+                      <div className="mt-5 flex-1 overflow-auto">
                         {
                             activeTab === "Users" && (
                                 <Table 

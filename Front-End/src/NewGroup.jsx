@@ -168,7 +168,6 @@ function NewGroup(){
                                     className="
                                     text-[30px]
                                     font-bold
-                                    leading-none
                                     text-[var(--primary-900)]
                                 "
                                 >
