@@ -7,11 +7,8 @@ function MultiSelect(props) {
    const [searchTerm, setSearchTerm] = useState("");
 
    const handleSelect = (item) => {
-      if (props.value.includes(item)) {
-         return;
-      }
-
-      props.onChange([...props.value, item]);
+      props.onChange(item);
+      setShowOptions(false);
       setSearchTerm("");
    };
 
@@ -71,41 +68,15 @@ function MultiSelect(props) {
          >
             <div className="flex flex-wrap items-center gap-2">
 
-               {props.value.length === 0 && (
+               {!props.value && (
                   <p className="text-sm text-gray-400">
                      Select Group
                   </p>
                )}
 
-               {props.value.map((item, index) => (
-                  <div
-                     key={index}
-                     className="
-                        flex
-                        items-center
-                        gap-2
-                        rounded-md
-                        bg-[var(--primary-100)]
-                        px-2
-                        py-1
-                        text-sm
-                        text-[var(--primary-700)]
-                     "
-                  >
-                     <span>{item}</span>
-
-                     <button
-                        type="button"
-                        onClick={(e) => {
-                           e.stopPropagation();
-                           removeOption(item);
-                        }}
-                        className="text-xs font-bold text-[var(--primary-700)]"
-                     >
-                        ✕
-                     </button>
-                  </div>
-               ))}
+               {props.value && (
+                  <span>{props.value}</span>
+               )}
             </div>
 
             <img
@@ -140,7 +111,7 @@ function MultiSelect(props) {
             >
 
                {/* SEARCH */}
-               <div className="p-2 border-b border-[var(--neutral-300)]">
+               <div className="w-full p-2 border-b border-[var(--neutral-300)]">
                   <SearchInput
                      value={searchTerm}
                      onChange={(e) =>

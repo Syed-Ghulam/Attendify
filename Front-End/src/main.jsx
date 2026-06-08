@@ -8,6 +8,7 @@ import App from './App.jsx'
 import Users from './Users.jsx'
 import NewUser from './NewUser.jsx'
 import EditUser from './EditUser.jsx'
+import ViewUser from './ViewUser.jsx'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import WorkStation from './WorkStation.jsx'
 import NewWorkStation from './NewWorkStation.jsx'
@@ -15,6 +16,7 @@ import NewGroup from './NewGroup.jsx'
 import EditGroup from './EditGroup.jsx'
 import Header from './components/Header.jsx'
 import DashBoardLayout from './layout/DashBoardLayout.jsx'
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -24,10 +26,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path='/login' element={<App />} />
 
-        <Route element={<DashBoardLayout />}>
+        <Route element={<ProtectedRoute>
+                   <DashBoardLayout />
+          </ProtectedRoute>}>
         <Route path='/users' element={<Users />} />
         <Route path = '/new-user' element={<NewUser />} />
         <Route path = '/edit-user/:userId' element={<EditUser /> } />
+        <Route path='/view-user/:userId' element={<ViewUser />} />
         <Route path='/new-group' element={<NewGroup />} />
         <Route path='/edit-group/:id' element={<EditGroup />} />
         <Route path='/workstation' element={<WorkStation />} />
@@ -37,4 +42,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <ToastContainer />
   </BrowserRouter>
 
-)
+);

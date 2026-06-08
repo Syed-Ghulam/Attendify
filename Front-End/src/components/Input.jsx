@@ -22,6 +22,7 @@ function Input(props){
             value={props.value}
             required = {props.required}
             onChange={props.onChange}
+            readOnly={props.readOnly}
 
             className="
                       h-[42px]

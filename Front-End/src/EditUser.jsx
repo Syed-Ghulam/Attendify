@@ -1,5 +1,5 @@
 import Input from "./components/Input";
-import MultiSelect from "./components/MultiSelect";
+import SearchableSelect from "./components/SearchableSelect";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams} from "react-router-dom";
 import Select from "./components/Select";
@@ -21,7 +21,7 @@ function EditUser() {
   const [image, setImage] = useState(null);
   const [formData, setFormData] = useState({
   userId: "",
-  groupName: [],
+  groupName: "",
   firstName: "",
   lastName: "",
   dob: "",
@@ -85,9 +85,20 @@ function EditUser() {
     error = "User ID is required";
   }
 
-  if (name === "firstName" && !value.trim()) {
+  if(name === "firstName"){
+  if(!value.trim()){
     error = "First Name is required";
   }
+  else if(!/^[A-Za-z\s]+$/.test(value)){
+    error = "Enter valid First Name";
+  }
+ }
+
+ if(name === "lastName" && value.trim()){
+  if(!/^[A-Za-z\s]+$/.test(value)){
+    error = "Enter valid Last Name";
+  }
+}
 
   if (
     name === "email" &&
@@ -97,24 +108,42 @@ function EditUser() {
     error = "Enter valid email";
   }
 
-  if (name === "phone") {
-    if (!value.trim()) {
-      error = "Phone number is required";
-    } else if (!/^\d{10}$/.test(value)) {
-      error = "Phone number must be 10 digits";
+   if(name === "phone"){
+      if(!value.trim()){
+        error = "Phone Number is required";
+      }
+      else if(
+        !/^[6-9]\d{9}$/.test(value) || /(\d)\1{4,}/.test(value)){
+        error = "Enter valid Phone Number";
+      }
     }
-  }
 
-  if (name === "groupName" && value.length === 0) {
+  if (name === "groupName") {
+    console.log("Group Value:",value);
+    if(!value){
     error = "Group Name is required";
-  }
+  }}
 
   if (name === "gender" && !value) {
     error = "Gender is required";
   }
 
+  if(name === "dob" && value){
+  const dob = new Date(value);
+  const today = new Date();
+
+  const hundredYearsAgo = new Date();
+  hundredYearsAgo.setFullYear(today.getFullYear() - 100);
+
+  if(dob > today || dob < hundredYearsAgo){
+    error = "Enter valid Date of Birth";
+  }
+}
+
   return error;
 };
+
+
 
   const updateField = (field, value) =>{
     setFormData((prev) => ({
@@ -136,8 +165,10 @@ function EditUser() {
     if(!validateForm()){
       return;
     }
+    const loggedInUserId =localStorage.getItem("userId");
     const payload = {
-      ...formData, groupName:formData.groupName.join(", ")
+      ...formData,
+      updatedBy: loggedInUserId
     };
 
     console.log(payload)
@@ -171,8 +202,19 @@ function EditUser() {
     }
 
     //First Name
-    if(!formData.firstName.trim()){
+      if(!formData.firstName.trim()){
       newErrors.firstName = "First Name is required";
+    }
+    else if(!/^[A-Za-z\s]+$/.test(formData.firstName)){
+      newErrors.firstName = "Enter valid First Name";
+    }
+
+    //Last Name
+    if(
+      formData.lastName.trim() &&
+      !/^[A-Za-z\s]+$/.test(formData.lastName)
+    ){
+      newErrors.lastName = "Enter valid Last Name";
     }
 
     //Email
@@ -184,18 +226,32 @@ function EditUser() {
     if(!formData.phone.trim()){
       newErrors.phone = "Phone number is required";
     }
-    else if(!/^\d{10}$/.test(formData.phone)){
-      newErrors.phone = "Phone number must be 10 digits";
+    else if( !/^[6-9]\d{9}$/.test(formData.phone) ||/(\d)\1{4,}/.test(formData.phone)){
+      newErrors.phone = "Enter valid Phone Number";
     }
 
     //GroupName
-    if(formData.groupName.length===0){
+    if(!formData.groupName){
       newErrors.groupName = "Group Name is required";
     }
 
     //Gender
     if(!formData.gender){
       newErrors.gender = "Gender is required";
+    }
+
+    //Dob
+
+    if(formData.dob){
+      const dob = new Date(formData.dob);
+      const today = new Date();
+
+      const hundredYearsAgo = new Date();
+      hundredYearsAgo.setFullYear(today.getFullYear() - 100);
+
+      if(dob > today || dob < hundredYearsAgo){
+        newErrors.dob = "Enter valid Date of Birth";
+      }
     }
 
     setErrors(newErrors);
@@ -210,9 +266,7 @@ function EditUser() {
 
       setFormData({
         userId: data.userId || "",
-        groupName: data.groupName
-          ? data.groupName.split(", ")
-          : [],
+        groupName: data.groupName || "",
         firstName: data.firstName || "",
         lastName: data.lastName || "",
         dob: data.dob ? data.dob.split("T")[0] : "",
@@ -311,16 +365,40 @@ function EditUser() {
               {/* GROUP NAME */}
               <div className="mb-3">
 
-                <MultiSelect
+                <SearchableSelect
+                  id="groupName"
                   label="Group Name"
-                  multiple={true}
                   value={formData.groupName}
                   required={true}
-                  onChange={(values) => 
-                    updateField("groupName", values)
+                  onChange={(value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        groupName: value
+                      }))
                   }
                   options={grpoptions}
                   error = {errors.groupName}
+                  labelClassName="
+                      mb-[6px]
+                      block
+                      text-[13px]
+                      font-semibold
+                      text-[var(--primary-900)]
+                    "
+                    className="
+                      h-[42px]
+                      w-full
+                      rounded-[4px]
+                      border
+                      border-[var(--neutral-300)]
+                      bg-white
+                      px-3
+                      text-[14px]
+                      outline-none
+                      transition-all
+                      focus:border-[var(--primary-500)]
+                      cursor-pointer
+                    "
                 />
 
               </div>
@@ -364,6 +442,7 @@ function EditUser() {
                     placeHolder="Enter last name"
                     value={formData.lastName}
                     onChange={handleChange}
+                    error={errors.lastName}
                   />
 
                 </div>
@@ -374,14 +453,13 @@ function EditUser() {
 
                   <Input
                     type="date"
-                    id="date of birth"
+                    id="dob"
                     label="Date of Birth"
                     value={formData.dob}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,dob : e.target.value
-                      });
-                    }}
+                    onChange={(e) => 
+                      updateField("dob", e.target.value)
+                    }
+                    error={errors.dob}
                   />
 
                 </div>

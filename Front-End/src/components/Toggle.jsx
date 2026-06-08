@@ -8,9 +8,9 @@ function Toggle(props){
         <div className='flex items-center gap-3'>
       <Button 
         type="button"
-        onClick = {props.onClick}
+        onClick = {props.disabled ? undefined : props.onClick}
         className={`
-                w-16 rounded-full p-1 flex items-center transition-all duration-300 cursor-pointer
+                w-16 rounded-full p-1 flex items-center transition-all duration-300 ${props.disabled ? "cursor-not-allowed" : "cursor-pointer"}
                 ${props.isOn ? "bg-[var(--success)] justify-end": "bg-[var(--neutral-300)] justify-start"}
             `}
         

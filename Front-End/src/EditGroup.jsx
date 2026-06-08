@@ -123,7 +123,13 @@ function EditGroup (){
                 <div className="flex gap-3">
                     <Button
                         type="button"
-                        onClick={()=>navigate("/users")}
+                        onClick={() =>
+                            navigate("/users", {
+                                state: {
+                                activeTab: "Groups"
+                                }
+                            })
+                            }
                         className="
                         mt-[22px]
                         flex
@@ -260,7 +266,13 @@ function EditGroup (){
                                 <Button
                                 type="button"
                                 text="Cancel"
-                                onClick={() => navigate("/users")}
+                                onClick={() =>
+                                    navigate("/users", {
+                                        state: {
+                                        activeTab: "Groups"
+                                        }
+                                    })
+                                    }
                                 className="
                                     w-[125px]
                                     border

@@ -9,8 +9,7 @@ function Table({columns, data}) {
     const [recordsPerPage, setRecordsPerPage] = useState(5);
 
     const totalRecords = data.length;
-    const totalPages = Math.ceil(totalRecords / recordsPerPage);
-
+    const totalPages = Math.max(1, Math.ceil(totalRecords / recordsPerPage));
     const startIndex = (currentPage -1) * recordsPerPage;
     const endIndex = startIndex + recordsPerPage;
 
@@ -49,28 +48,29 @@ function Table({columns, data}) {
                 </thead>
 
                 {/* Body */}
-                <tbody className='h-[1px]'>
+              <tbody className='h-[1px]'>
 
                     {
+                        paginatedData.length > 0 ? (
                         paginatedData.map((row, rowIndex) => (
 
                             <tr
-                               key={rowIndex}
-                               className="border-b border-[var(--neutral-200)]"
+                            key={rowIndex}
+                            className="border-b border-[var(--neutral-200)]"
                             >
 
-                                {
-                                    columns.map((column, colIndex) => (
+                            {
+                                columns.map((column, colIndex) => (
 
-                                        <td
-                                           key={colIndex}
-                                           className="px-4 py-4 text-[14px]
-                                           text-[var(--neutral-800)]"
-                                        >
-                                                {
-                                column.key === "status" ? (
+                                <td
+                                    key={colIndex}
+                                    className="px-4 py-4 text-[14px]
+                                    text-[var(--neutral-800)]"
+                                >
+                                    {
+                                    column.key === "status" ? (
 
-                                    <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2">
 
                                         <div
                                             className={`w-[8px] h-[8px] rounded-full
@@ -79,33 +79,44 @@ function Table({columns, data}) {
                                             ? "bg-[var(--success)]"
                                             : "bg-[var(--error)]"
                                             }`}
-                                        >
-
-                                        </div>
+                                        />
 
                                         <span>
                                             {row[column.key]}
                                         </span>
 
-                                    </div>
+                                        </div>
 
-                                ) : (
+                                    ) : (
+                                        row[column.key]
+                                    )
+                                    }
+                                </td>
 
-                                    row[column.key]
-
-                                )
-                                }                                       
-                                        </td>
-
-                                    ))
-                                }
+                                ))
+                            }
 
                             </tr>
 
                         ))
+                        ) : (
+                        <tr>
+                            <td
+                            colSpan={columns.length}
+                            className="
+                                py-8
+                                text-center
+                                text-[14px]
+                                text-[var(--neutral-500)]
+                            "
+                            >
+                            No Data Found
+                            </td>
+                        </tr>
+                        )
                     }
 
-                </tbody>
+                    </tbody>
 
             </table>
             </div>

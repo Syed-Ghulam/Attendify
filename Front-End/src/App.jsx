@@ -2,6 +2,8 @@ import Input from './components/Input';
 import Button from './components/Button';
 import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
+import { API_URL } from './config/api';
+import { useEffect } from 'react';
 
 function App() {
 
@@ -11,6 +13,14 @@ function App() {
     password:""
   });
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if(token){
+      navigate("/users");
+    }
+  }, []);
   
   const handleChange = (e)=>{
     setFormData({
@@ -18,29 +28,50 @@ function App() {
     });
   };
 
-  const handleLogin = async ()=>{
-    try{
-      const response = await fetch("http://localhost:5000/users");
-      const users = await response.json();
-      const matchUser = users.find(
-        (user) =>
-          user.userId === formData.username
+  const handleLogin = async () => {
+  try {
+
+    const response = await fetch(
+      `${API_URL}/users/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: formData.username,
+          password: formData.password
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+
+      localStorage.setItem(
+        "token",
+        data.token
       );
 
-      // Default Password
-      const defaultPassword = "admin@123";
+      localStorage.setItem(
+        "userId",
+        data.userId
+      );
+      navigate("/users");
 
-      if(matchUser && formData.password === defaultPassword)
-      {
-        navigate("/users")
-      }
-      else{
-        setError("Invalid Username or Password")
-      }
-    } catch(err){
-      console.log(err);
+    } else {
+
+      setError(data.message);
+
     }
-  };
+
+  } catch (err) {
+
+    console.log(err);
+
+  }
+};
 
   return (
     <>

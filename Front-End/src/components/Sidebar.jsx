@@ -15,6 +15,7 @@ function Sidebar() {
             "/users",
             "/new-user",
             "/edit-user",
+            "/view-user",
             "/new-group",
             "/edit-group"
         ],

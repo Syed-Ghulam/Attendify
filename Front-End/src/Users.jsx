@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { API_URL } from "./config/api";
 import Tabs from "./components/Tabs";
 import SearchInput from './components/SearchInput' 
@@ -9,21 +9,26 @@ import  Table  from "./components/Table";
 import UnCheck from "./assets/icons/Uncheck.svg"
 import More from "./assets/icons/more_vert.svg";
 import DummyImg from './assets/icons/DummyImg.svg'
+import { toast } from "react-toastify";
 
 function Users(){
 
    
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState("Users");
+    const location = useLocation();
     const [search , setSearch] = useState("");
     const [gender , setGender] = useState("ALL");
     const [role , setRole] = useState("ALL");
-    const [status, setStatus] = useState("Active");
+    const [status, setStatus] = useState("ALL");
     const [userData, setUserData] = useState([]);
     const [openMenu, setOpenMenu] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [recordsPerPage, setRecordsPerPage] = useState(5);
     const [groupData, setGroupData] = useState([]);
+  
+    const [activeTab, setActiveTab] = useState(
+      location.state?.activeTab || "Users"
+    );
 
     const genderOptions = [
    "ALL",
@@ -34,9 +39,7 @@ function Users(){
 
 const roleOptions = [
    "ALL",
-   "Operator",
-   "Developer",
-   "Consultant"
+  "System Admin"
 ];
 
 const statusOptions = [
@@ -44,6 +47,11 @@ const statusOptions = [
    "Active",
    "Inactive"
 ];
+
+const hasFilters =
+  search ||
+  gender !== "ALL" ||
+  status !== "ALL";
 
 const columns = [
  {
@@ -139,10 +147,54 @@ const grpColumns = [
    }
 ];
 
+const filteredUsers = userData.filter((user) => {
+
+  const fullName =
+    `${user.firstName} ${user.lastName}`.toLowerCase();
+
+  const matchesSearch =
+    search === "" ||
+    user.userId.toLowerCase().includes(search.toLowerCase()) ||
+    fullName.includes(search.toLowerCase());
+
+  const matchesGender =
+    gender === "ALL" ||
+    user.gender === gender;
+
+  const matchesStatus =
+    status === "ALL" ||
+    (status === "Active" && user.isActive) ||
+    (status === "Inactive" && !user.isActive);
+
+  return (
+    matchesSearch &&
+    matchesGender &&
+    matchesStatus
+  );
+});
+
+const filteredGroups = groupData.filter((group) => {
+
+  const matchesSearch =
+    search === "" ||
+    group.groupName
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+  const matchesStatus =
+    status === "ALL" ||
+    (status === "Active" && group.isActive) ||
+    (status === "Inactive" && !group.isActive);
+
+  return (
+    matchesSearch &&
+    matchesStatus
+  );
+});
 
 
 const getTableData = () => {
-  return userData.map((user) => ({
+  return filteredUsers.map((user) => ({
     checkBox: (
       <button>
         <img src={UnCheck} alt="checkbox" />
@@ -185,29 +237,46 @@ const getTableData = () => {
         </Button>
 
         {openMenu === user.userId && (
-          <div
+       <div
             className="absolute top-0 right-10 w-[120px]
-            bg-white border border-[var(--neutral-200)] rounded-[8px]
-            shadow-lg z-50"
+            bg-white border border-[var(--neutral-200)]
+            rounded-[8px] shadow-lg z-50"
           >
+            <p
+              className="px-4 py-2 cursor-pointer hover:bg-[var(--neutral-100)]"
+              onClick={() =>
+                navigate(`/view-user/${user.userId}`)
+              }
+            >
+              View
+            </p>
 
             <p
-              className="px-4 py-2 cursor-pointer"
+              className="px-4 py-2 cursor-pointer hover:bg-[var(--neutral-100)]"
               onClick={() =>
                 navigate(`/edit-user/${user.userId}`)
               }
             >
               Edit
             </p>
+
+            <p
+              className="px-4 py-2 cursor-pointer hover:bg-[var(--neutral-100)]"
+              onClick={() =>
+                handleStatusToggle(user)
+              }
+            >
+              {user.isActive ? "Inactive" : "Active"}
+            </p>
           </div>
-        )}
+         )}
       </div>
     )
   }));
 };
 
 const getGroupTableData = () => {
-   return groupData.map((group) => ({
+   return filteredGroups.map((group) => ({
       checkBox: (
          <button>
             <img src={UnCheck} alt="checkbox" />
@@ -294,6 +363,49 @@ const handleRoleOptions = (e) =>{
 
 const handleStatusOptions = (e) =>{
     setStatus(e.target.value)
+};
+
+const handleStatusToggle = async (user) => {
+  try {
+    const response = await fetch(
+      `${API_URL}/users/${user.userId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          isActive: !user.isActive
+        })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed");
+    }
+
+    setUserData((prev) =>
+      prev.map((item) =>
+        item.userId === user.userId
+          ? {
+              ...item,
+              isActive: !item.isActive
+            }
+          : item
+      )
+    );
+
+     toast.success(
+      user.isActive
+        ? "User deactivated successfully"
+        : "User activated successfully"
+    );
+
+    setOpenMenu(null);
+
+  } catch (error) {
+    console.log(error);
+  }
 };
     return(
         <>
@@ -387,17 +499,25 @@ const handleStatusOptions = (e) =>{
                               />
                            )}
 
-                           <Button
-                              type="reset"
-                              text="Clear"
-                              className="px-7
-                              border border-[var(--primary-700)]
-                              text-[var(--primary-700)]
-                              bg-[var(--primary-100)]
-                              text-[15px]
-                              font-medium
-                            "
-                           />
+                           {hasFilters && (
+                              <Button
+                                 type="button"
+                                 text="Clear"
+                                 onClick={() => {
+                                    setSearch("");
+                                    setGender("ALL");
+                                    setStatus("ALL");
+                                 }}
+                                 className="
+                                    px-7
+                                    border border-[var(--primary-700)]
+                                    text-[var(--primary-700)]
+                                    bg-[var(--primary-100)]
+                                    text-[15px]
+                                    font-medium
+                                 "
+                              />
+                              )}
 
                            <Button
                               type="button"

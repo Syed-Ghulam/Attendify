@@ -26,6 +26,7 @@ function Select(props){
                 value={props.value}
                 onChange={props.onChange}
                 required={props.required}
+                disabled={props.disabled}
                 className={`
                 ${props.className}
                 appearance-none

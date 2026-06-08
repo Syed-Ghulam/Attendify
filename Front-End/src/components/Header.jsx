@@ -2,7 +2,20 @@ import Help from '../assets/icons/help.svg'
 import Notification from '../assets/icons/notification.svg'
 import Title from '../assets/icons/Mask group.svg'
 import ProfileIcon from '../assets/icons/Vector.svg'
+import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 function Header(props){
+
+    const navigate = useNavigate();
+
+    const [showMenu, setShowMenu] = useState(false);
+    
+    const handleLogout = () => {
+
+    localStorage.removeItem("token");
+
+    navigate("/login");
+    };
 
     const user = {
         name:"Syed Ghulam Rasool",
@@ -50,7 +63,7 @@ function Header(props){
                     
                 }
             </div>
-              <div className="leading-tight">
+              <div className="relative leading-tight">
 
         <h4
             className="
@@ -63,9 +76,45 @@ function Header(props){
             "
         >
             {user.name} 
-            <button className='cursor-pointer'>
+            <button className='cursor-pointer'
+                    onClick={() => setShowMenu(!showMenu)}>
                 <img src={ProfileIcon} alt='Profile Icon' />
             </button>
+
+                        {
+                showMenu && (
+                    <div
+                        className="
+                            absolute
+                            right-0
+                            top-8
+                            z-50
+                            min-w-[140px]
+                            rounded-md
+                            border
+                            border-[var(--neutral-200)]
+                            bg-white
+                            shadow-lg
+                        "
+                    >
+                        <button
+                            type="button"
+                            onClick={handleLogout}
+                            className="
+                                w-full
+                                px-4
+                                py-2
+                                text-left
+                                text-sm
+                                bg-[var(--primary-900)]
+                                cursor-pointer
+                            "
+                        >
+                            Logout
+                        </button>
+                    </div>
+                )
+            }
         </h4>
 
         <p

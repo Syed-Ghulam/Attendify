@@ -1,8 +1,21 @@
 const User = require("../models/User");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const createUser = async(req, res) =>{
     try{
-        const user = await User.create({...req.body , createdBy:"Admin", updatedBy:"Admin"});
+        const defaultPassword = "admin@123";
+
+        const hashedPassword = await bcrypt.hash(
+          defaultPassword,
+          10
+        );
+
+        const user = await User.create({
+          ...req.body,
+          password: hashedPassword,
+          
+        });
 
         res.status(201).json({
             message:"User created successfully",
@@ -70,7 +83,13 @@ const updateUser = async (req, res) => {
     }
   });
 
-  await user.update({...req.body, updatedBy: "Admin"});
+      if(!user){
+      return res.status(404).json({
+        message: "User not found"
+      });
+    }
+
+  await user.update({...req.body});
 
   res.json({
     message: "User updated successfully"
@@ -144,11 +163,56 @@ const restoreUser = async (req, res) =>{
   }
 };
 
+const login = async( req, res) => {
+    const {userId, password} = req.body;
+
+    const user = await User.findOne({
+      where: {
+        userId,
+        isDeleted:false
+      }
+    });
+
+    if(!user){
+      return res.status(401).json({
+        message:"Invalid User Id or Password"
+      });
+    }
+
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if(!isMatch){
+      return res.status(401).json({
+        message: "Invalid User ID or Password"
+      });
+    };
+
+    const token = jwt.sign(
+      {
+        userId: user.userId
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d"
+      }
+    );
+
+    return res.status(200).json({
+      message:"Login successful",
+      token,
+      userId: user.userId
+    });
+};
+
 module.exports = {
     createUser,
     getUsers,
     getUserByUserId,
     updateUser,
     deleteUser,
-    restoreUser
+    restoreUser,
+    login
 };

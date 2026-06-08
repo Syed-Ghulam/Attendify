@@ -10,11 +10,13 @@ import Input from "./components/Input";
 import Select from "./components/Select";
 
 import Back from "./assets/icons/Back.svg";
+import Toggle from "./components/Toggle";
 
 
 function NewWorkStation() {
 
    const navigate = useNavigate();
+   const [isOn, setIsOn] = useState(false);
 
    const [formData, setFormData] = useState({
       workstationName: "",
@@ -22,7 +24,7 @@ function NewWorkStation() {
       facility: "BPL Medical Technologies",
       code: "",
       linenameNumber: "Line 1",
-      status: "Active"
+      isActive: false
    });
 
    const [errors, setErros] = useState({});
@@ -34,6 +36,17 @@ function NewWorkStation() {
    const lineOptions = [
       "Electrocardiograph"
    ];
+
+   const handleToggle = () => {
+      const newStatus = !isOn;
+
+      setIsOn(newStatus);
+
+      setFormData({
+         ...formData,
+         isActive: newStatus
+      });
+   };
 
    const validateField = (name, value) => {
    let error = "";
@@ -228,6 +241,13 @@ function NewWorkStation() {
                                  onChange={handleChange}
                                  options={facilityOptions}
                                  error = {errors.facility}
+                                 labelClassName="
+                                       mb-[6px]
+                                       block
+                                       text-[13px]
+                                       font-semibold
+                                       text-[var(--primary-900)]
+                                    "
                                  className="h-[42px] w-full rounded-[4px]
                                  border border-[var(--neutral-300)]
                                  bg-white px-3 text-[14px]
@@ -265,6 +285,13 @@ function NewWorkStation() {
                               onChange={handleChange}
                               options={lineOptions}
                               error = {errors.linenameNumber}
+                              labelClassName="
+                                       mb-[6px]
+                                       block
+                                       text-[13px]
+                                       font-semibold
+                                       text-[var(--primary-900)]
+                                    "
                               className="h-[42px] w-full rounded-[4px]
                               border border-[var(--neutral-300)]
                               bg-white px-3 text-[14px]
@@ -281,25 +308,17 @@ function NewWorkStation() {
                            font-semibold text-[var(--primary-800)]">
 
                               Status
-
                            </p>
 
                            <div className="flex items-center gap-2">
 
-                              <button
+                              <Toggle
                                  type="button"
-                                 onClick={() =>
-                                    setFormData({
-                                       ...formData,
-                                       status:
-                                          formData.status === "Active"
-                                             ? "Inactive"
-                                             : "Active"
-                                    })
-                                 }
+                                 isOn={isOn}
+                                 onClick={handleToggle}
                                  className={`relative h-5 w-10 rounded-full transition-all
                                  ${
-                                    formData.status === "Active"
+                                    formData.isActive === "Active"
                                        ? "bg-[var(--success)]"
                                        : "bg-[var(--neutral-300)]"
                                  }`}
@@ -314,12 +333,11 @@ function NewWorkStation() {
                                           : "left-1"
                                     }`}
                                  />
-
-                              </button>
+                              </Toggle>
 
                               <span className="text-[14px] text-[var(--primary-800)]">
 
-                                 {formData.status}
+                                 {formData.isActive}
 
                               </span>
 

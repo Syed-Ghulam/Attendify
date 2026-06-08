@@ -3,7 +3,7 @@ function SearchInput(props){
 
    return(
 
-      <div className="relative w-[260px]">
+      <div className="relative w-full">
 
          <input
             id={props.id}

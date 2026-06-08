@@ -145,7 +145,13 @@ function NewGroup(){
                         <div className="flex gap-3">
 
                             <Button
-                               onClick = {() =>navigate("/users")}
+                               onClick={() =>
+                                    navigate("/users", {
+                                        state: {
+                                        activeTab: "Groups"
+                                        }
+                                    })
+                                    }
                                type="button"
                                className="
                                 mt-[22px]
@@ -279,7 +285,13 @@ function NewGroup(){
                                 <Button
                                 type="button"
                                 text="Cancel"
-                                onClick={() => navigate("/users")}
+                                onClick={() =>
+                                    navigate("/users", {
+                                        state: {
+                                        activeTab: "Groups"
+                                        }
+                                    })
+                                    }
                                 className="
                                     w-[125px]
                                     border
