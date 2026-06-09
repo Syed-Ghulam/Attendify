@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const userRoutes = require("./routes/userRoutes");
 const groupRoutes = require("./routes/groupRoutes");
 const workStationRoutes = require("./routes/workStationRoutes");

@@ -29,9 +29,22 @@ const WorkStation = sequelize.define("WorkStation", {
         allowNull: false
     },
 
-    status:{
-        type: DataTypes.STRING,
-        defaultValue: "Active"
+    isActive:{
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+    },
+
+    isDeleted:{
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+
+    createdBy:{
+        type: DataTypes.STRING(50)
+    },
+
+    updatedBy:{
+        type: DataTypes.STRING(50)
     }
 
 });

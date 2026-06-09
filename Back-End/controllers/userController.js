@@ -98,7 +98,6 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async(req, res) => {
 
-  console.log(req.params);
   try{
 
     const user = await User.findOne({
@@ -115,7 +114,8 @@ const deleteUser = async(req, res) => {
     }
 
     await user.update({
-      isDeleted: true
+      isDeleted: true,
+      updatedBy: req.body.updatedBy
     });
 
     res.status(200).json({

@@ -17,6 +17,7 @@ import EditGroup from './EditGroup.jsx'
 import Header from './components/Header.jsx'
 import DashBoardLayout from './layout/DashBoardLayout.jsx'
 import ProtectedRoute from "./routes/ProtectedRoute";
+import EditWorkStation from './EditWorkStation.jsx'
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -37,6 +38,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path='/edit-group/:id' element={<EditGroup />} />
         <Route path='/workstation' element={<WorkStation />} />
         <Route path='/new-workstation' element={<NewWorkStation />} />
+        <Route path='/edit-workstation/:id' element={<EditWorkStation/>} />
         </Route>
       </Routes>
       <ToastContainer />

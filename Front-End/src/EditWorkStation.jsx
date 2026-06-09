@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { API_URL } from "./config/api";
 import {toast} from "react-toastify";
 
@@ -13,9 +13,10 @@ import Back from "./assets/icons/Back.svg";
 import Toggle from "./components/Toggle";
 
 
-function NewWorkStation() {
+function EditWorkStation() {
 
    const navigate = useNavigate();
+   const { id } = useParams();
    const [isOn, setIsOn] = useState(false);
 
    const [formData, setFormData] = useState({
@@ -47,6 +48,28 @@ function NewWorkStation() {
          isActive: newStatus
       });
    };
+
+   useEffect(() => {
+   fetch(`${API_URL}/workstation/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+
+        console.log("WORKSTATION DATA:", data);
+
+         setFormData({
+            workstationName: data.workstationName || "",
+            ipAddress: data.ipAddress || "",
+            facility: data.facility || "",
+            code: data.code || "",
+            linenameNumber: data.linenameNumber || "",
+            isActive: data.isActive || false
+         });
+
+         setIsOn(data.isActive);
+
+      })
+      .catch((err) => console.log(err));
+}, [id]);
 
    const validateField = (name, value) => {
    let error = "";
@@ -85,7 +108,7 @@ function NewWorkStation() {
       }));
    };
 
-   const handleSubmit = async() => {
+   const handleUpdate = async() => {
       
       if(!validateForm()){
          return;
@@ -93,24 +116,23 @@ function NewWorkStation() {
 
       try{
          const response = await fetch(
-            `${API_URL}/workstation`,
+            `${API_URL}/workstation/${id}`,
             {
-               method:"POST",
+               method:"PUT",
                headers:{
                   "content-Type":"application/json"
                },
                body: JSON.stringify({...formData,
-                  createdBy: localStorage.getItem("userId"),
-                  updatedBy: localStorage.getItem("userId")
-            })
+                updatedBy: localStorage.getItem("userId")
+               })
             }
          );
          const data = await response.json();
          console.log(data);
-         toast.success("WorkStation Created Successfully");
+         toast.success("WorkStation Updated Successfully");
       } catch(error){
          console.log(error);
-         toast.error("Error Creating WorkStation");
+         toast.error("Error Updating WorkStation");
       }
    };
 
@@ -171,7 +193,7 @@ function NewWorkStation() {
                         </p>
 
                         <h2 className="text-[30px] font-bold leading-none text-[var(--primary-900)]">
-                           New WorkStation
+                           Edit WorkStation
                         </h2>
 
                      </div>
@@ -321,7 +343,7 @@ function NewWorkStation() {
                                  onClick={handleToggle}
                                  className={`relative h-5 w-10 rounded-full transition-all
                                  ${
-                                    formData.isActive
+                                    formData.isActive === "Active"
                                        ? "bg-[var(--success)]"
                                        : "bg-[var(--neutral-300)]"
                                  }`}
@@ -331,7 +353,7 @@ function NewWorkStation() {
                                     className={`absolute top-[2px]
                                     h-4 w-4 rounded-full bg-white transition-all
                                     ${
-                                       formData.isActive
+                                       formData.status === "Active"
                                           ? "left-5"
                                           : "left-1"
                                     }`}
@@ -362,8 +384,8 @@ function NewWorkStation() {
 
                      <Button
                         type="submit"
-                        text="Create"
-                        onClick ={handleSubmit}
+                        text="Save"
+                        onClick ={handleUpdate}
                         className="w-[120px]
                          bg-[var(--primary-900)] text-white"
                      />
@@ -387,4 +409,4 @@ function NewWorkStation() {
    );
 }
 
-export default NewWorkStation;
+export default EditWorkStation;

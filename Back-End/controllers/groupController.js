@@ -3,7 +3,8 @@ const Group = require("../models/Group");
 
 const createGroup = async(req, res) =>{
     try{
-        const group = await Group.create({...req.body, createdBy : "Admin", updatedBy:"Admin"});
+        console.log(req.body);
+        const group = await Group.create({...req.body});
 
         res.status(201).json({
             message:"Group created successfully",
@@ -74,7 +75,9 @@ const updateGroup = async (req, res) => {
         });
     }
 
-    await group.update({...req.body, updatedBy: "Admin"});
+    
+
+    await group.update({...req.body});
 
     res.status(200).json({
         message: "Group updated successfully",
@@ -104,7 +107,8 @@ const deleteGroup = async (req, res) =>{
         }
 
         await group.update({
-            isDeleted: true
+            isDeleted: true,
+            updatedBy: req.body.updatedBy
         });
 
         res.status(200).json({

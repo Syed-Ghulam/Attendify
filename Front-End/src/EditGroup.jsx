@@ -84,7 +84,7 @@ function EditGroup (){
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify({...formData, updatedBy: localStorage.getItem("userId")})
                 }
             );
 

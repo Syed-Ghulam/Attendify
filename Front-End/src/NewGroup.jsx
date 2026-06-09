@@ -102,7 +102,9 @@ function NewGroup(){
         }
 
         const payload = {
-            ...formData
+            ...formData,
+            createdBy: localStorage.getItem("userId"),
+            updatedBy: localStorage.getItem("userId")
         }
 
         try{

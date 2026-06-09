@@ -17,7 +17,11 @@ const createWorkStation = async (req, res) =>{
 
 const getWorkStation = async(req,res) =>{
     try{
-        const workstations = await WorkStation.findAll();
+        const workstations = await WorkStation.findAll({
+            where:{
+                isDeleted: false
+            }
+        });
 
         res.status(200).json(workstations);
 
@@ -29,7 +33,60 @@ const getWorkStation = async(req,res) =>{
     }
 };
 
+const getWorkStationById = async (req, res) => {
+    try {
+
+        const workstation = await WorkStation.findByPk(
+            req.params.id
+        );
+
+        if(!workstation){
+            return res.status(404).json({
+                message: "WorkStation not found"
+            });
+        }
+
+        res.status(200).json(workstation);
+
+    } catch(error){
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+const updateWorkStation = async (req, res) => {
+    try {
+
+        const workstation = await WorkStation.findByPk(
+            req.params.id
+        );
+
+        if(!workstation){
+            return res.status(404).json({
+                message: "WorkStation not found"
+            });
+        }
+
+        await workstation.update({
+            ...req.body
+        });
+
+        res.status(200).json({
+            message: "WorkStation updated successfully",
+            workstation
+        });
+
+    } catch(error){
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
 module.exports = {
     createWorkStation,
-    getWorkStation
+    getWorkStation,
+    getWorkStationById,
+    updateWorkStation
 }

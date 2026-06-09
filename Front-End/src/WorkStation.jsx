@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Tabs from "./components/Tabs";
+import ConfirmationModal from "./components/ConfirmationModal";
 import SearchInput from "./components/SearchInput";
 import Select from "./components/Select";
 import Button from "./components/Button";
@@ -21,6 +22,13 @@ function WorkStation(){
     const [status, setStatus] = useState("Active");
     const [workStationData, setWorkStationData] = useState([]);
     const [openMenu, setOpenMenu] = useState(null);
+
+    const [confirmModel, setConfirmModel] = useState({
+        isOpen: false,
+        title: "",
+        message: "",
+        onConfirm: null
+        });
 
     const lineOptions = [
         "ALL"
@@ -102,42 +110,8 @@ function WorkStation(){
                 lineNameNumber:workStation.linenameNumber,
                 linecode:"DCC PRODUCT LINE 1",
                 createdOn: new Date(workStation.createdAt).toLocaleDateString(),
-                status:workStation.status,
-                action: (
-                    <div className="relative">
-                        <button
-                            type="button"
-                            className="cursor-pointer"
-                            onClick={() =>
-                                setOpenMenu(openMenu === user.userId ? null : user.userId)
-                            }
-                        >
-                            <img src={More} alt="more options"/>
-                        </button>
-                    
-                        {
-                            openMenu === workStation.workstationName && (
-                                <div
-                                className="absolute right-0 mt-2 w-[120px] bg-white border border-[var(--neutral-200)]
-                                rounded-[8px] shadow-lg z-50"
-                                >
-                                <p className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer"
-                                    
-                                >
-                                    View
-                                </p>
-                    
-                                <p className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer"
-                                    
-                                >
-                                    Edit
-                                </p>
-                    
-                                </div>
-                            )
-                        }
-                    </div>
-                ),
+                status:workStation.isActive ? "Active" : "Inactive",
+                action:workStation
 
             }));
             setWorkStationData(formattedData)
@@ -158,6 +132,120 @@ function WorkStation(){
     const handleStatusOptions = (e)=>{
         setStatus(e.target.value);
     };
+
+    const updateWorkStationStatus = async (workStation) => {
+   try {
+
+      const response = await fetch(
+         `${API_URL}/workstation/${workStation.id}`,
+         {
+            method: "PUT",
+            headers: {
+               "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+               isActive: !workStation.isActive,
+               updatedBy: localStorage.getItem("userId")
+            })
+         }
+      );
+
+      if (!response.ok) {
+         throw new Error("Failed");
+      }
+
+      setWorkStationData((prev) =>
+         prev.map((item) =>
+            item.action.id === workStation.id
+               ? {
+                   ...item,
+                   status: !workStation.isActive
+                     ? "Active"
+                     : "Inactive",
+                   action: {
+                     ...item.action,
+                     isActive: !workStation.isActive,
+                     updatedBy: localStorage.getItem("userId")
+                   }
+                 }
+               : item
+         )
+      );
+
+      setOpenMenu(null);
+
+   } catch (error) {
+      console.log(error);
+   }
+};
+
+    const getWorkStationTableData = () => {
+   return workStationData.map((row) => ({
+      ...row,
+
+      action: (
+         <div className="relative">
+            <button
+               type="button"
+               className="cursor-pointer"
+               onClick={() =>
+                  setOpenMenu(
+                     openMenu === row.action.id
+                        ? null
+                        : row.action.id
+                  )
+               }
+            >
+               <img src={More} alt="more options" />
+            </button>
+
+            {
+               openMenu === row.action.id && (
+                  <div
+                     className="
+                        absolute right-full mr-2 top-0
+                        w-[120px]
+                        bg-white
+                        border border-[var(--neutral-200)]
+                        rounded-[8px]
+                        shadow-lg
+                        z-50
+                     "
+                  >
+                     <p
+                        className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer"
+                        onClick={() => {
+                           navigate(`/edit-workstation/${row.action.id}`);
+                           setOpenMenu(null);
+                        }}
+                     >
+                        Edit
+                     </p>
+
+                     <p
+                        className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer"
+                        onClick={() => {
+                            setConfirmModel({
+                                isOpen: true,
+                                title: row.action.isActive
+                                    ? "Deactivate WorkStation"
+                                    : "Activate WorkStation",
+                                message: row.action.isActive
+                                    ? "Are you sure you want to make this workstation inactive?"
+                                    : "Are you sure you want to make this workstation active?",
+                                onConfirm: () => updateWorkStationStatus(row.action)
+                            });
+                        }}
+                        >
+                        {row.action.isActive ? "Inactive" : "Active"}
+                        </p>
+                  </div>
+               )
+            }
+         </div>
+      )
+   }));
+};
 
     return(
         <>
@@ -249,7 +337,7 @@ function WorkStation(){
                                 activeTab === "Workstation" && (
                                     <Table 
                                       columns = {columns}
-                                      data = {workStationData}  
+                                      data = {getWorkStationTableData()}  
                                     />
                                 )
                             }
@@ -268,7 +356,28 @@ function WorkStation(){
                         </div>
                     </div>
                 </div>
-           
+            <ConfirmationModal
+              isOpen={confirmModel.isOpen}
+              title={confirmModel.title}
+              message={confirmModel.message}
+              onConfirm={() => {
+                confirmModel.onConfirm?.();
+                setConfirmModel({
+                  isOpen: false,
+                  title: "",
+                  message: "",
+                  onConfirm: null
+                });
+              }}
+              onCancel={() =>
+                setConfirmModel({
+                  isOpen: false,
+                  title: "",
+                  message: "",
+                  onConfirm: null
+                })
+              }
+            />
         </>
     )
 }

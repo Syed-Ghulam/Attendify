@@ -5,6 +5,7 @@ import Tabs from "./components/Tabs";
 import SearchInput from './components/SearchInput' 
 import Select from "./components/Select";
 import Button from "./components/Button";
+import ConfirmationModal from "./components/ConfirmationModal";
 import  Table  from "./components/Table";
 import UnCheck from "./assets/icons/Uncheck.svg"
 import More from "./assets/icons/more_vert.svg";
@@ -25,6 +26,12 @@ function Users(){
     const [currentPage, setCurrentPage] = useState(1);
     const [recordsPerPage, setRecordsPerPage] = useState(5);
     const [groupData, setGroupData] = useState([]);
+    const [confirmModel, setConfirmModel] = useState({
+      isOpen: false,
+      title: "",
+      message: "",
+      onConfirm: null
+    });
   
     const [activeTab, setActiveTab] = useState(
       location.state?.activeTab || "Users"
@@ -208,9 +215,19 @@ const getTableData = () => {
     userId: user.userId,
 
     userName: (
-      <span className="text-[var(--link)]">
+      <button
+        type="button"
+        onClick={() =>
+          navigate(`/view-user/${user.userId}`)
+        }
+        className="
+          text-[var(--link)]
+          cursor-pointer
+          
+        "
+      >
         {user.firstName} {user.lastName}
-      </span>
+      </button>
     ),
 
     gender: user.gender,
@@ -260,11 +277,34 @@ const getTableData = () => {
               Edit
             </p>
 
+             <p
+            className="px-4 py-2 cursor-pointer hover:bg-[var(--neutral-100)] text-red-600"
+            onClick={() => {
+              setConfirmModel({
+                isOpen: true,
+                title: "Delete User",
+                message: "Are you sure you want to delete this user?",
+                onConfirm: () => deleteUser(user)
+              });
+            }}
+          >
+            Delete
+          </p>
+
             <p
               className="px-4 py-2 cursor-pointer hover:bg-[var(--neutral-100)]"
-              onClick={() =>
-                handleStatusToggle(user)
-              }
+               onClick={() => {
+                  setConfirmModel({
+                    isOpen: true,
+                    title: user.isActive
+                      ? "Deactivate User"
+                      : "Activate User",
+                    message: user.isActive
+                      ? "Are you sure you want to make this user inactive?"
+                      : "Are you sure you want to make this user active?",
+                    onConfirm: () => updateUserStatus(user)
+                  });
+                }}
             >
               {user.isActive ? "Inactive" : "Active"}
             </p>
@@ -276,56 +316,103 @@ const getTableData = () => {
 };
 
 const getGroupTableData = () => {
-   return filteredGroups.map((group) => ({
-      checkBox: (
-         <button>
-            <img src={UnCheck} alt="checkbox" />
-         </button>
-      ),
 
-      groupName: group.groupName,
+  console.log(filteredGroups);
+  console.log("openMenu =", openMenu);
+  return filteredGroups.map((group) => ({
+    
+    checkBox: (
+      <button>
+        <img src={UnCheck} alt="checkbox" />
+      </button>
+    ),
 
-      description: group.description,
+    groupName: group.groupName,
+    description: group.description,
+    createdOn: new Date(group.createdAt).toLocaleDateString(),
+    status: group.isActive ? "Active" : "Inactive",
 
-      createdOn: new Date(group.createdAt).toLocaleDateString(),
-
-      status: group.isActive? "Active":"Inactive",
-
-      action: (
-      <div className="relative">
+    action: (
+      <div className="relative inline-block">
         <Button
-          onClick={() =>
+          onClick={(e) => {
+            e.stopPropagation();
+            const menuId = `group-${group.id}`;
+             console.log("Clicked", group.id);
+             console.log("Menu ID:", menuId);
             setOpenMenu(
-              openMenu === group.Id
-                ? null
-                : group.id
-            )
-          }
-          className="cursor-pointer"
+              openMenu === `group-${group.id}` 
+                ? null 
+                : `group-${group.id}`
+            );
+          }}
+          className="cursor-pointer p-2 hover:bg-gray-100 rounded"
         >
           <img src={More} alt="More" />
         </Button>
 
-        {openMenu === group.id && (
+        {openMenu === `group-${group.id}` && (
           <div
-            className="absolute top-0 right-10 w-[120px]
-            bg-white border border-[var(--neutral-200)] rounded-[8px]
-            shadow-lg z-50"
+            className="
+                absolute
+                top-0
+                right-10
+                w-[120px]
+                bg-white
+                border
+                border-[var(--neutral-200)]
+                rounded-[8px]
+                shadow-lg
+                z-50
+              "
+            onClick={(e) => e.stopPropagation()}
           >
-
             <p
-              className="px-4 py-2 cursor-pointer"
-              onClick={() =>
-                navigate(`/edit-group/${group.id}`)
-              }
+              className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer"
+              onClick={() => {
+                console.log(group);
+                navigate(`/edit-group/${group.id}`);
+                setOpenMenu(null);
+              }}
             >
               Edit
+            </p>
+
+            <p
+              className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer text-red-600"
+              onClick={() => {
+                setConfirmModel({
+                  isOpen: true,
+                  title: "Delete Group",
+                  message: "Are you sure you want to delete this group?",
+                  onConfirm: () => deleteGroup(group)
+                });
+              }}
+            >
+              Delete
+            </p>
+            <p
+              className="px-4 py-2.5 hover:bg-[var(--neutral-100)] cursor-pointer"
+              onClick={() => {
+                    setConfirmModel({
+                      isOpen: true,
+                      title: group.isActive
+                        ? "Deactivate Group"
+                        : "Activate Group",
+                      message: group.isActive
+                        ? "Are you sure you want to make this group inactive?"
+                        : "Are you sure you want to make this group active?",
+                      onConfirm: () => handleGroupStatusToggle(group)
+                    });
+                  }}
+            >
+              {group.isActive ? "Inactive" : "Active"}
             </p>
           </div>
         )}
       </div>
-    )
-   }));
+    ),
+  }));
 };
 
 
@@ -365,7 +452,7 @@ const handleStatusOptions = (e) =>{
     setStatus(e.target.value)
 };
 
-const handleStatusToggle = async (user) => {
+const updateUserStatus = async (user) => {
   try {
     const response = await fetch(
       `${API_URL}/users/${user.userId}`,
@@ -375,7 +462,8 @@ const handleStatusToggle = async (user) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          isActive: !user.isActive
+          isActive: !user.isActive,
+          updatedBy: localStorage.getItem("userId")
         })
       }
     );
@@ -405,6 +493,111 @@ const handleStatusToggle = async (user) => {
 
   } catch (error) {
     console.log(error);
+  }
+};
+
+const deleteUser = async (user) => {
+  try {
+
+    const response = await fetch(
+      `${API_URL}/users/${user.userId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          updatedBy: localStorage.getItem("userId")
+        })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed");
+    }
+
+    toast.success("User deleted successfully");
+
+    setUserData((prev) =>
+      prev.filter(
+        (item) => item.userId !== user.userId
+      )
+    );
+
+    setOpenMenu(null);
+
+  } catch (error) {
+    console.log(error);
+    toast.error("Failed to delete user");
+  }
+};
+
+const deleteGroup = async (group) => {
+  try {
+
+    const response = await fetch(
+      `${API_URL}/groups/${group.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          updatedBy: localStorage.getItem("userId")
+        })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed");
+    }
+
+    toast.success("Group deleted successfully");
+
+    setGroupData((prev) =>
+      prev.filter(
+        (item) => item.id !== group.id
+      )
+    );
+
+    setOpenMenu(null);
+
+  } catch (error) {
+    console.log(error);
+    toast.error("Failed to delete group");
+  }
+};
+
+const handleGroupStatusToggle = async (group) => {
+  try {
+    const response = await fetch(`${API_URL}/groups/${group.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(
+        { isActive: !group.isActive,
+          updatedBy: localStorage.getItem("userId")
+    }),
+      
+    });
+
+    if (!response.ok) throw new Error("Failed");
+
+    setGroupData((prev) =>
+      prev.map((item) =>
+        item.id === group.id
+          ? { ...item, isActive: !item.isActive }
+          : item
+      )
+    );
+
+    toast.success(
+      group.isActive ? "Group deactivated successfully" : "Group activated successfully"
+    );
+
+    setOpenMenu(null);
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to update status");
   }
 };
     return(
@@ -564,7 +757,28 @@ const handleStatusToggle = async (user) => {
 
         
         </div>
-        
+        <ConfirmationModal
+              isOpen={confirmModel.isOpen}
+              title={confirmModel.title}
+              message={confirmModel.message}
+              onConfirm={() => {
+                confirmModel.onConfirm?.();
+                setConfirmModel({
+                  isOpen: false,
+                  title: "",
+                  message: "",
+                  onConfirm: null
+                });
+              }}
+              onCancel={() =>
+                setConfirmModel({
+                  isOpen: false,
+                  title: "",
+                  message: "",
+                  onConfirm: null
+                })
+              }
+            />
         </>
     )
 }
