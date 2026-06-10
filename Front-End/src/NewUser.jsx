@@ -8,7 +8,7 @@ import Toggle from "./components/Toggle";
 import ImgUploader from "./components/ImgUploader";
 import Button from "./components/Button";
 import Back from './assets/icons/Back.svg';
-import { API_URL } from "./config/api";
+import { apiFetch } from "./config/api";
 
 function NewUser() {
 
@@ -29,6 +29,7 @@ function NewUser() {
   image: ""  
 });
   const [errors, setErrors] = useState({});
+  
 
   const grpoptions = [
     "Operator",
@@ -127,29 +128,26 @@ function NewUser() {
   };
 
   const handleSubmit = async() => {
+     
     if(!validateForm()){
       return;
     }
+
+    const loggedInUserId =localStorage.getItem("userId");
+
     const payload = {
-      ...formData 
+      ...formData,
+      createdBy: loggedInUserId,
+      updatedBy: loggedInUserId
     };
 
     console.log(payload)
     try{
-      const loggedInUserId =localStorage.getItem("userId");
-      const response = await fetch(
-        `${API_URL}/users`,
+     
+      const response = await apiFetch('/users',
         {
           method:"POST",
-
-          headers:{
-            "Content-Type":"application/json"
-          },
-          body:JSON.stringify({
-            ...formData,
-            createdBy: loggedInUserId,
-            updatedBy: loggedInUserId
-          })
+          body:JSON.stringify(payload)
         }
       );
       const data = await response.json();

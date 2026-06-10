@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { API_URL } from "./config/api";
+import { apiFetch } from "./config/api";
 import {toast} from "react-toastify";
 
 import Button from "./components/Button";
-import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
+
 import Input from "./components/Input";
 import Select from "./components/Select";
 
@@ -91,18 +90,19 @@ function NewWorkStation() {
          return;
       }
 
+      const loggedInUserId = localStorage.getItem("userId");
+
+         const payload = {
+            ...formData,
+            createdBy: loggedInUserId,
+            updatedBy: loggedInUserId
+         };
+
       try{
-         const response = await fetch(
-            `${API_URL}/workstation`,
+         const response = await apiFetch(`/workstation`,
             {
                method:"POST",
-               headers:{
-                  "content-Type":"application/json"
-               },
-               body: JSON.stringify({...formData,
-                  createdBy: localStorage.getItem("userId"),
-                  updatedBy: localStorage.getItem("userId")
-            })
+               body: JSON.stringify(payload)
             }
          );
          const data = await response.json();
@@ -337,12 +337,6 @@ function NewWorkStation() {
                                     }`}
                                  />
                               </Toggle>
-
-                              <span className="text-[14px] text-[var(--primary-800)]">
-
-                                 {formData.isActive}
-
-                              </span>
 
                            </div>
 

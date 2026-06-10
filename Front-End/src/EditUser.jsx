@@ -7,17 +7,15 @@ import Toggle from "./components/Toggle";
 import ImgUploader from "./components/ImgUploader";
 import Button from "./components/Button";
 import Back from './assets/icons/Back.svg';
-import { API_URL } from "./config/api";
+import { apiFetch } from "./config/api";
 import {toast} from "react-toastify";
 
 function EditUser() {
 
   const navigate = useNavigate();
   const {userId} = useParams();
-  const [grpName, setGrpName] = useState([]);
-  const [date, setDate] = useState("");
-  const [gender, setGender] = useState("");
   const [isOn, setIsOn] = useState(false);
+  const [isApi, setIsApi] = useState(false);
   const [image, setImage] = useState(null);
   const [formData, setFormData] = useState({
   userId: "",
@@ -45,18 +43,6 @@ function EditUser() {
     "Female",
     "Other"
   ];
-
-  const handleGenderChange = (e) => {
-    setGender(e.target.value);
-  };
-
-  const handleDateChange = (e) => {
-    setDate(e.target.value);
-  };
-
-  const handleGrpChange = (values) => {
-    setGrpName(values);
-  };
 
   const handleToggle = () => {
     const newStatus = !isOn;
@@ -119,7 +105,6 @@ function EditUser() {
     }
 
   if (name === "groupName") {
-    console.log("Group Value:",value);
     if(!value){
     error = "Group Name is required";
   }}
@@ -171,16 +156,11 @@ function EditUser() {
       updatedBy: loggedInUserId
     };
 
-    console.log(payload)
     try{
-      const response = await fetch(
-      `${API_URL}/users/${userId}`,
+      const response = await apiFetch(
+      `/users/${userId}`,
         {
           method:"PUT",
-
-          headers:{
-            "Content-Type":"application/json"
-          },
           body:JSON.stringify(payload)
         }
       );
@@ -189,7 +169,7 @@ function EditUser() {
       toast.success("User Updated Successfully");
     } catch(error){
       console.log(error);
-      toast.error("Error creating user");
+      toast.error("Error updating user");
     }
   };
 
@@ -257,11 +237,17 @@ function EditUser() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
+ 
 
   useEffect(() => {
 
-  fetch(`${API_URL}/users/${userId}`)
-    .then((res) => res.json())
+  apiFetch(`/users/${userId}`)
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("Unauthorized");
+      }
+      return res.json();
+    })
     .then((data) => {
 
       setFormData({
@@ -281,10 +267,18 @@ function EditUser() {
       setIsOn(data.isActive);
 
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      setIsApi(true);
+    });
 
 }, [userId]);
-
+    if(isApi){
+    return (
+      <p>
+        try again
+      </p>
+    )}
   return (
         
         <div className="h-full flex flex-1 flex-col bg-[var(--neutral-100)] overflow-hidden">
@@ -371,10 +365,7 @@ function EditUser() {
                   value={formData.groupName}
                   required={true}
                   onChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        groupName: value
-                      }))
+                      updateField("groupName", value)
                   }
                   options={grpoptions}
                   error = {errors.groupName}

@@ -2,14 +2,17 @@ const express = require("express");
 
 const router = express.Router();
 
-const { createWorkStation, getWorkStation, getWorkStationById, updateWorkStation } = require("../controllers/workStationController");
+const { createWorkStation, getWorkStation, getWorkStationById, updateWorkStation, deleteWorkStation } = require("../controllers/workStationController");
+const verifyToken = require("../middleware/authMiddleware");
 
-router.post("/", createWorkStation);
+router.post("/",verifyToken, createWorkStation);
 
-router.get("/", getWorkStation);
+router.get("/",verifyToken, getWorkStation);
 
-router.get("/:id", getWorkStationById);
+router.get("/:id",verifyToken, getWorkStationById);
 
-router.put("/:id", updateWorkStation);
+router.put("/:id",verifyToken, updateWorkStation);
+
+router.delete("/:id",verifyToken, deleteWorkStation);
 
 module.exports = router;

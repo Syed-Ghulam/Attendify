@@ -1,17 +1,18 @@
 const express = require("express");
 const router = express.Router();
+const verifyToken = require("../middleware/authMiddleware");
 
 const{createUser, getUsers, getUserByUserId,updateUser, deleteUser, restoreUser, login} = require("../controllers/userController");
 
-router.post("/",createUser);
+router.post("/", verifyToken, createUser);
 
-router.get("/",getUsers);
+router.get("/",verifyToken,getUsers);
 
-router.get("/:userId", getUserByUserId);
+router.get("/:userId", verifyToken, getUserByUserId);
 
-router.put("/:userId", updateUser);
+router.put("/:userId", verifyToken, updateUser);
 
-router.delete("/:userId", deleteUser);
+router.delete("/:userId", verifyToken,deleteUser);
 
 router.put("/restore/:userId", restoreUser);
 

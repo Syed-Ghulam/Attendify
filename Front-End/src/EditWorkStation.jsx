@@ -1,11 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { API_URL } from "./config/api";
+import { apiFetch } from "./config/api";
 import {toast} from "react-toastify";
 
 import Button from "./components/Button";
-import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
 import Input from "./components/Input";
 import Select from "./components/Select";
 
@@ -50,7 +48,7 @@ function EditWorkStation() {
    };
 
    useEffect(() => {
-   fetch(`${API_URL}/workstation/${id}`)
+   apiFetch(`/workstation/${id}`)
       .then((res) => res.json())
       .then((data) => {
 
@@ -115,13 +113,10 @@ function EditWorkStation() {
       }
 
       try{
-         const response = await fetch(
-            `${API_URL}/workstation/${id}`,
+         const response = await apiFetch(
+            `/workstation/${id}`,
             {
                method:"PUT",
-               headers:{
-                  "content-Type":"application/json"
-               },
                body: JSON.stringify({...formData,
                 updatedBy: localStorage.getItem("userId")
                })
@@ -343,7 +338,7 @@ function EditWorkStation() {
                                  onClick={handleToggle}
                                  className={`relative h-5 w-10 rounded-full transition-all
                                  ${
-                                    formData.isActive === "Active"
+                                    formData.isActive
                                        ? "bg-[var(--success)]"
                                        : "bg-[var(--neutral-300)]"
                                  }`}
@@ -353,18 +348,12 @@ function EditWorkStation() {
                                     className={`absolute top-[2px]
                                     h-4 w-4 rounded-full bg-white transition-all
                                     ${
-                                       formData.status === "Active"
+                                       formData.isActive
                                           ? "left-5"
                                           : "left-1"
                                     }`}
                                  />
                               </Toggle>
-
-                              <span className="text-[14px] text-[var(--primary-800)]">
-
-                                 {formData.isActive}
-
-                              </span>
 
                            </div>
 

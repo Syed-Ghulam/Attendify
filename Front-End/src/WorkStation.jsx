@@ -10,7 +10,7 @@ import Button from "./components/Button";
 import Table from "./components/Table";
 import UnCheck from "./assets/icons/Uncheck.svg";
 import More from "./assets/icons/more_vert.svg";
-import { API_URL } from "./config/api";
+import { apiFetch } from "./config/api";
 
 function WorkStation(){
     
@@ -19,7 +19,7 @@ function WorkStation(){
     const [search, setSearch] = useState("");
     const [line, setLine] = useState("ALL");
     const [facility, setFacility] = useState("ALL");
-    const [status, setStatus] = useState("Active");
+    const [status, setStatus] = useState("ALL");
     const [workStationData, setWorkStationData] = useState([]);
     const [openMenu, setOpenMenu] = useState(null);
 
@@ -31,11 +31,21 @@ function WorkStation(){
         });
 
     const lineOptions = [
-        "ALL"
+        "ALL",
+        ...new Set(
+            workStationData.map(
+                (item) => item.lineNameNumber
+            )
+        )
     ];
 
     const facilityOptions = [
-        "ALL"
+        "ALL",
+        ...new Set(
+            workStationData.map(
+                (item) => item.facility
+            )
+        )
     ];
 
     const statusOptions = [
@@ -98,7 +108,7 @@ function WorkStation(){
     ];
 
     useEffect(()=>{
-        fetch(`${API_URL}/workstation`)
+        apiFetch('/workstation')
         .then((res)=> res.json())
         .then((data) =>{
             const formattedData = data.map((workStation) =>({
@@ -136,13 +146,9 @@ function WorkStation(){
     const updateWorkStationStatus = async (workStation) => {
    try {
 
-      const response = await fetch(
-         `${API_URL}/workstation/${workStation.id}`,
+      const response = await apiFetch(`/workstation/${workStation.id}`,
          {
             method: "PUT",
-            headers: {
-               "Content-Type": "application/json"
-            },
             body: JSON.stringify({
                isActive: !workStation.isActive,
                updatedBy: localStorage.getItem("userId")
@@ -179,8 +185,61 @@ function WorkStation(){
    }
 };
 
+const deleteWorkStation = async (workStation) => {
+  try {
+    const response = await apiFetch(`/workstation/${workStation.id}`,
+      {
+        method: "DELETE",
+        body: JSON.stringify({
+          updatedBy: localStorage.getItem("userId")
+        })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed");
+    }
+
+    setWorkStationData((prev) =>
+      prev.filter(
+        (item) => item.action.id !== workStation.id
+      )
+    );
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const filteredWorkStationData = workStationData.filter((row) => {
+
+    const matchesSearch =
+        row.workstationName
+            .toLowerCase()
+            .includes(search.toLowerCase());
+
+    const matchesLine =
+        line === "ALL" ||
+        row.lineNameNumber === line;
+
+    const matchesFacility =
+        facility === "ALL" ||
+        row.facility === facility;
+
+    const matchesStatus =
+        status === "ALL" ||
+        row.status === status;
+
+    return (
+        matchesSearch &&
+        matchesLine &&
+        matchesFacility &&
+        matchesStatus
+    );
+});
+
     const getWorkStationTableData = () => {
-   return workStationData.map((row) => ({
+   return filteredWorkStationData.map((row) => ({
       ...row,
 
       action: (
@@ -223,6 +282,20 @@ function WorkStation(){
                      </p>
 
                      <p
+                        className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer text-red-600"
+                        onClick={() => {
+                            setConfirmModel({
+                            isOpen: true,
+                            title: "Delete WorkStation",
+                            message: "Are you sure you want to delete this workstation?",
+                            onConfirm: () => deleteWorkStation(row.action)
+                            });
+                        }}
+                        >
+                        Delete
+                     </p>
+
+                     <p
                         className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer"
                         onClick={() => {
                             setConfirmModel({
@@ -247,6 +320,12 @@ function WorkStation(){
    }));
 };
 
+const clearFilters = () => {
+    setSearch("");
+    setLine("ALL");
+    setFacility("ALL");
+    setStatus("ALL");
+};
     return(
         <>
         
@@ -317,11 +396,31 @@ function WorkStation(){
                             
                             />
 
-                            <Button 
-                                text = "clear"
-                                className="h-[42px] px-7 rounded-[4px] border border-[var(--primary-700)] text-[var(--primary-700)]
-                                bg-[var(--primary-100)] text-[15px] font-medium cursor-pointer"
-                            />
+                           {
+                                (
+                                    search ||
+                                    line !== "ALL" ||
+                                    facility !== "ALL" ||
+                                    status !== "ALL"
+                                ) && (
+                                    <Button
+                                        text="Clear"
+                                        onClick={clearFilters}
+                                        className="
+                                            h-[42px]
+                                            px-7
+                                            rounded-[4px]
+                                            border
+                                            border-[var(--primary-700)]
+                                            text-[var(--primary-700)]
+                                            bg-[var(--primary-100)]
+                                            text-[15px]
+                                            font-medium
+                                            cursor-pointer
+                                        "
+                                    />
+                                )
+                            }
 
                             <Button 
                                 type="button"

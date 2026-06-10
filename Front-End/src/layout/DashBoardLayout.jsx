@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 
 function DashBoardLayout(){
+    console.log("hg")
     return(
         <div className="h-screen flex flex-col overflow-hidden">
              <Header />

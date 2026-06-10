@@ -3,7 +3,7 @@ import Back from './assets/icons/Back.svg';
 import { useNavigate, useParams } from "react-router-dom";
 import Input from "./components/Input";
 import { useEffect, useState } from "react";
-import { API_URL } from "./config/api";
+import { apiFetch } from "./config/api";
 import Select from "./components/Select";
 import TextArea from "./components/TextArea";
 import Toggle from "./components/Toggle";
@@ -77,28 +77,28 @@ function EditGroup (){
 
         try{
 
-            const response = await fetch(
-                `${API_URL}/groups/${id}`,
+            const response = await apiFetch(`/groups/${id}`,
                 {
                     method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
                     body: JSON.stringify({...formData, updatedBy: localStorage.getItem("userId")})
                 }
             );
 
+            if (!response.ok) {
+                throw new Error("Update failed");
+            }
+
              const data = await response.json();
-             console.log(data);
+             
              toast.success("Group Updated Successfully");
         } catch(error){
             console.log(error);
-            toast.error("Error creating Group");
+            toast.error("Error updating Group");
         }
     };
 
     useEffect(() => {
-        fetch(`${API_URL}/groups/${id}`)
+        apiFetch(`/groups/${id}`)
            .then(res => res.json())
            .then(data => {
                setFormData({

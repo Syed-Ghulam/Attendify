@@ -8,7 +8,7 @@ import Select from "./components/Select";
 import { useState } from "react";
 import TextArea from './components/TextArea';
 import Toggle from "./components/Toggle";
-import { API_URL } from "./config/api";
+import { apiFetch } from "./config/api";
 import {toast} from "react-toastify";
 
 
@@ -21,7 +21,7 @@ function NewGroup(){
         roleName:"",
         description:"",
         isActive: false
-    })
+    });
 
     const roleOptions = [
         "QC Operations",
@@ -109,14 +109,9 @@ function NewGroup(){
 
         try{
             console.log("Payload: ",payload)
-            const response = await fetch(
-                `${API_URL}/groups`,
+            const response = await apiFetch('/groups',
                 {
                     method:"POST",
-
-                    headers:{
-                        "Content-Type":"application/json"
-                    },
                     body:JSON.stringify(payload)
                 }
             );

@@ -4,14 +4,13 @@ import { useNavigate, useParams} from "react-router-dom";
 import Toggle from "./components/Toggle";
 import Button from "./components/Button";
 import Back from './assets/icons/Back.svg';
-import { API_URL } from "./config/api";
+import { apiFetch } from "./config/api";
 
 
 function ViewUser() {
-
   const navigate = useNavigate();
   const {userId} = useParams();
-  const [isOn, setIsOn] = useState(false);
+  const [isApi, setIsApi] = useState(false);
   const [formData, setFormData] = useState({
   userId: "",
   groupName: "",
@@ -28,9 +27,15 @@ function ViewUser() {
 
   useEffect(() => {
 
-  fetch(`${API_URL}/users/${userId}`)
-    .then((res) => res.json())
+  apiFetch(`/users/${userId}`)
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("Unauthorized");
+      }
+      return res.json();
+    })
     .then((data) => {
+
 
       setFormData({
         userId: data.userId || "",
@@ -46,12 +51,19 @@ function ViewUser() {
         image: data.image || ""
       });
 
-      setIsOn(data.isActive);
-
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+    setIsApi(true)
+  });
 
 }, [userId]);
+
+if(isApi){
+  return(
+    <p>try again</p>
+  )
+}
 
   return (
         
@@ -272,7 +284,7 @@ function ViewUser() {
                   <div className="flex h-[42px] items-center gap-3">
 
                     <Toggle
-                      isOn={isOn}
+                      isOn={formData.isActive}
                       disabled={true} 
                     />
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { API_URL } from "./config/api";
+import { apiFetch } from "./config/api";
 import Tabs from "./components/Tabs";
 import SearchInput from './components/SearchInput' 
 import Select from "./components/Select";
@@ -11,6 +11,7 @@ import UnCheck from "./assets/icons/Uncheck.svg"
 import More from "./assets/icons/more_vert.svg";
 import DummyImg from './assets/icons/DummyImg.svg'
 import { toast } from "react-toastify";
+
 
 function Users(){
 
@@ -415,20 +416,26 @@ const getGroupTableData = () => {
   }));
 };
 
+useEffect(() => {
+
+  apiFetch('/users')
+  .then((res) => {
+    if (!res.ok) {
+      throw new Error("Unauthorized");
+    }
+    return res.json();
+  })
+  .then((data) => {
+    setUserData(data);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+}, []);
 
 useEffect(() => {
-   fetch(`${API_URL}/users`)
-   .then((res) => res.json())
-   .then((data) => {
-      setUserData(data);
-   })
-   .catch((err) =>{ 
-      console.log(err);
-   });
-},[]);
-
-useEffect(() => {
-   fetch(`${API_URL}/groups`)
+   apiFetch('/groups')
    .then((res) => res.json())
    .then((data) => {
       
@@ -454,13 +461,10 @@ const handleStatusOptions = (e) =>{
 
 const updateUserStatus = async (user) => {
   try {
-    const response = await fetch(
-      `${API_URL}/users/${user.userId}`,
+    const response = await apiFetch(`/users/${user.userId}`
+      ,
       {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
           isActive: !user.isActive,
           updatedBy: localStorage.getItem("userId")
@@ -499,13 +503,9 @@ const updateUserStatus = async (user) => {
 const deleteUser = async (user) => {
   try {
 
-    const response = await fetch(
-      `${API_URL}/users/${user.userId}`,
+    const response = await apiFetch(`/users/${user.userId}`,
       {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
           updatedBy: localStorage.getItem("userId")
         })
@@ -535,13 +535,9 @@ const deleteUser = async (user) => {
 const deleteGroup = async (group) => {
   try {
 
-    const response = await fetch(
-      `${API_URL}/groups/${group.id}`,
+    const response = await apiFetch(`/groups/${group.id}`,
       {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
           updatedBy: localStorage.getItem("userId")
         })
@@ -570,9 +566,8 @@ const deleteGroup = async (group) => {
 
 const handleGroupStatusToggle = async (group) => {
   try {
-    const response = await fetch(`${API_URL}/groups/${group.id}`, {
+    const response = await apiFetch(`/groups/${group.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(
         { isActive: !group.isActive,
           updatedBy: localStorage.getItem("userId")
