@@ -9,8 +9,14 @@ const createWorkStation = async (req, res) =>{
             workstation
         });
     } catch(error){
+        if (error.name === "SequelizeUniqueConstraintError") {
+                return res.status(400).json({
+                message: "IP Address already exists"
+                });
+            }
         res.status(500).json({
-            message:error.message
+            message:"Error creating workStation",
+            error
         });
     }
 };

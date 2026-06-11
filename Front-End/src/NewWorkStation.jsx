@@ -106,7 +106,11 @@ function NewWorkStation() {
             }
          );
          const data = await response.json();
-         console.log(data);
+         
+         if(!response.ok){
+            toast.error(data.message);
+            return;
+         }
          toast.success("WorkStation Created Successfully");
       } catch(error){
          console.log(error);
@@ -145,7 +149,7 @@ function NewWorkStation() {
 
       
 
-            <div className="flex flex-1 flex-col">
+            <div className="h-full flex flex-1 flex-col bg-[var(--neutral-100)] overflow-hidden">
 
                {/* Header Section */}
 
@@ -170,7 +174,7 @@ function NewWorkStation() {
                            Manage Workstation /
                         </p>
 
-                        <h2 className="text-[30px] font-bold leading-none text-[var(--primary-900)]">
+                        <h2 className="text-[30px] font-bold text-[var(--primary-900)]">
                            New WorkStation
                         </h2>
 

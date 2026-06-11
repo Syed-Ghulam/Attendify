@@ -1,39 +1,33 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { apiFetch } from "./config/api";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { apiFetch } from "../config/api";
 import {toast} from "react-toastify";
 
-import Button from "./components/Button";
-import Input from "./components/Input";
-import Select from "./components/Select";
+import Button from "../components/Button";
 
-import Back from "./assets/icons/Back.svg";
-import Toggle from "./components/Toggle";
+import Input from "../components/Input";
+import Select from "../components/Select";
+
+import Back from "../assets/icons/Back.svg";
+import Toggle from "../components/Toggle";
 
 
-function EditWorkStation() {
+function NewLine() {
 
    const navigate = useNavigate();
-   const { id } = useParams();
    const [isOn, setIsOn] = useState(false);
 
-   const [formData, setFormData] = useState({
-      workstationName: "",
-      ipAddress: "",
-      facility: "BPL Medical Technologies",
-      code: "",
-      linenameNumber: "Line 1",
-      isActive: false
-   });
+ const [formData, setFormData] = useState({
+   lineNameNumber: "",
+   facility: "BPL Medical Technologies",
+   lineCode: "",
+   isActive: false
+});
 
    const [errors, setErros] = useState({});
 
    const facilityOptions = [
       "BPL Medical Technologies"
-   ];
-
-   const lineOptions = [
-      "Electrocardiograph"
    ];
 
    const handleToggle = () => {
@@ -47,49 +41,19 @@ function EditWorkStation() {
       });
    };
 
-   useEffect(() => {
-   apiFetch(`/workstation/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
+    const validateField = (name, value) => {
+    let error = "";
 
-        console.log("WORKSTATION DATA:", data);
+    if (name === "lineNameNumber" && !value.trim()) {
+        error = "Line Name / Number is required";
+    }
 
-         setFormData({
-            workstationName: data.workstationName || "",
-            ipAddress: data.ipAddress || "",
-            facility: data.facility || "",
-            code: data.code || "",
-            linenameNumber: data.linenameNumber || "",
-            isActive: data.isActive || false
-         });
+    if (name === "facility" && !value) {
+        error = "Facility is required";
+    }
 
-         setIsOn(data.isActive);
-
-      })
-      .catch((err) => console.log(err));
-}, [id]);
-
-   const validateField = (name, value) => {
-   let error = "";
-
-   if (name === "workstationName" && !value.trim()) {
-      error = "Workstation Name is required";
-   }
-
-   if (name === "ipAddress" && !value.trim()) {
-      error = "IP Address is required";
-   }
-
-   if (name === "facility" && !value) {
-      error = "Facility is required";
-   }
-
-   if (name === "linenameNumber" && !value) {
-      error = "Line Name/Number is required";
-   }
-
-   return error;
-};
+    return error;
+    };
 
    const handleChange = (e) => {
 
@@ -106,57 +70,54 @@ function EditWorkStation() {
       }));
    };
 
-   const handleUpdate = async() => {
+   const handleSubmit = async() => {
       
       if(!validateForm()){
          return;
       }
 
+      const loggedInUserId = localStorage.getItem("userId");
+
+         const payload = {
+            ...formData,
+            createdBy: loggedInUserId,
+            updatedBy: loggedInUserId
+         };
+
       try{
-         const response = await apiFetch(
-            `/workstation/${id}`,
+         const response = await apiFetch("/line",
             {
-               method:"PUT",
-               body: JSON.stringify({...formData,
-                updatedBy: localStorage.getItem("userId")
-               })
+               method:"POST",
+               body: JSON.stringify(payload)
             }
          );
          const data = await response.json();
          console.log(data);
-         toast.success("WorkStation Updated Successfully");
+         toast.success("Line Created Successfully");
       } catch(error){
          console.log(error);
-         toast.error("Error Updating WorkStation");
+         toast.error("Error Creating Line");
       }
    };
 
-   const validateForm = ()=>{
-      let newErrors = {};
+   const validateForm = () => {
 
-      //Workstation
-      if(!formData.workstationName.trim()){
-         newErrors.workstationName = "Workstation Name is required"
-      }
+   let newErrors = {};
 
-      //IP Address
-      if(!formData.ipAddress.trim()){
-         newErrors.ipAddress = "IP Address is required"
-      }
+   if (!formData.lineNameNumber.trim()) {
+      newErrors.lineNameNumber =
+         "Line Name / Number is required";
+   }
 
-      //Facility
-      if(!formData.facility){
-         newErrors.facility = "Facility is required"
-      }
+   if (!formData.facility) {
+      newErrors.facility =
+         "Facility is required";
+   }
 
-      //LineName/ Number
-      if(!formData.linenameNumber){
-         newErrors.linenameNumber = "LineName/Number is required"
-      }
+   setErros(newErrors);
 
-      setErros(newErrors);
-      return Object.keys(newErrors).length===0;
-   };
+   return Object.keys(newErrors).length === 0;
+};
 
    return (
 
@@ -187,8 +148,8 @@ function EditWorkStation() {
                            Manage Workstation /
                         </p>
 
-                        <h2 className="text-[30px] font-bold leading-none text-[var(--primary-900)]">
-                           Edit WorkStation
+                        <h2 className="text-[30px] font-bold text-[var(--primary-900)]">
+                           New Line
                         </h2>
 
                      </div>
@@ -212,46 +173,23 @@ function EditWorkStation() {
 
                      <div className="p-6">
 
-                        {/* Workstation Name */}
-
-                        <div className="mb-5 w-[510px]">
+                        <div className="mb-5 w-[550px]">
 
                            <Input
-                              id="workstationName"
-                              label="Workstation Name"
+                              id="lineNameNumber"
+                              label="Line Name / Number"
                               type="text"
                               required={true}
-                              value={formData.workstationName}
+                              value={formData.lineNameNumber}
                               onChange={handleChange}
-                              error = {errors.workstationName}
-                              placeHolder="Enter workstation name"
+                              error = {errors.lineNameNumber}
+                              placeHolder="Enter Line Name / Number "
                            />
                         </div>
-
-                        {/* IP Address */}
-
-                        <div className="mb-5 w-[510px]">
-
-                           <Input
-                              id="ipAddress"
-                              label="IP Address"
-                              type="text"
-                              required={true}
-                              value={formData.ipAddress}
-                              onChange={handleChange}
-                              placeHolder="Enter IP address"
-                              error ={errors.ipAddress}
-                           />
-
-                        </div>
-
-                        {/* Facility + Code */}
-
-                        <div className="mb-5 flex gap-4">
-
+                        
                            {/* Facility */}
 
-                           <div className="w-[280px]">
+                           <div className="w-[550px]">
 
                               <Select
                                  id="facility"
@@ -276,53 +214,23 @@ function EditWorkStation() {
 
                            </div>
 
-                           {/* Code */}
 
-                           <div className="w-[230px]">
+                           <div className="mt-6 flex gap-6">
+                           
+                           <div className="w-[300px]">
 
                               <Input
-                                 id="code"
+                                 id="lineCode"
                                  label="Code"
                                  type="text"
-                                 value={formData.code}
+                                 value={formData.lineCode}
                                  onChange={handleChange}
                                  placeHolder="Enter code"
                               />
 
                            </div>
 
-                        </div>
-
-                        {/* Line Name */}
-
-                        <div className="mb-5 w-[510px]">
-
-                           <Select
-                              id="linenameNumber"
-                              label="Line Name / Number"
-                              required={true}
-                              value={formData.linenameNumber}
-                              onChange={handleChange}
-                              options={lineOptions}
-                              error = {errors.linenameNumber}
-                              labelClassName="
-                                       mb-[6px]
-                                       block
-                                       text-[13px]
-                                       font-semibold
-                                       text-[var(--primary-900)]
-                                    "
-                              className="h-[42px] w-full rounded-[4px]
-                              border border-[var(--neutral-300)]
-                              bg-white px-3 text-[14px]
-                              outline-none cursor-pointer"
-                           />
-
-                        </div>
-
-                        {/* Status */}
-
-                        <div className="mt-6">
+                           <div>
 
                            <p className="mb-2 text-[13px]
                            font-semibold text-[var(--primary-800)]">
@@ -359,6 +267,12 @@ function EditWorkStation() {
 
                         </div>
 
+                        </div>
+
+                        {/* Status */}
+
+                        
+
                      </div>
 
                   </div>
@@ -373,8 +287,8 @@ function EditWorkStation() {
 
                      <Button
                         type="submit"
-                        text="Save"
-                        onClick ={handleUpdate}
+                        text="Create"
+                        onClick ={handleSubmit}
                         className="w-[120px]
                          bg-[var(--primary-900)] text-white"
                      />
@@ -398,4 +312,4 @@ function EditWorkStation() {
    );
 }
 
-export default EditWorkStation;
+export default NewLine;

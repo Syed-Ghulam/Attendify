@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
-import Tabs from "./components/Tabs";
-import ConfirmationModal from "./components/ConfirmationModal";
-import SearchInput from "./components/SearchInput";
-import Select from "./components/Select";
-import Button from "./components/Button";
-import Table from "./components/Table";
-import UnCheck from "./assets/icons/Uncheck.svg";
-import More from "./assets/icons/more_vert.svg";
-import { apiFetch } from "./config/api";
+import Header from "../components/Header";
+import Sidebar from "../components/Sidebar";
+import Line from "./Line";
+import Facility from "./Facility";
+import Tabs from "../components/Tabs";
+import ConfirmationModal from "../components/ConfirmationModal";
+import SearchInput from "../components/SearchInput";
+import Select from "../components/Select";
+import Button from "../components/Button";
+import Table from "../components/Table";
+import UnCheck from "../assets/icons/Uncheck.svg";
+import More from "../assets/icons/more_vert.svg";
+import { apiFetch } from "../config/api";
 
 function WorkStation(){
     
@@ -54,7 +56,7 @@ function WorkStation(){
         "Inactive"
     ];
 
-    const columns = [
+    const workStationColumns = [
         {
             label:<button><img src={UnCheck} alt="checkbox"/></button>,
             key:"checkBox"
@@ -347,109 +349,112 @@ const clearFilters = () => {
 
                     <div className="px-6 p-5">
 
-                        <div className="mt-1 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-                          <div className="w-full lg:w-[260px]">
-                            <SearchInput
-                               id="search"
-                               placeHolder = "Search"
-                               value={search}
-                               onChange = {(e) =>
-                                setSearch(e.target.value)
-                               } 
-                            />
-                          </div>
-
-                          <div className="flex flex-wrap items-end gap-4">
-                            <Select
-                            id="line"
-                            labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
-                            label="Line"
-                            value={line}
-                            onChange={handleLineOptions}
-                            options = {lineOptions}
-                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
-                            bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
-                            
-                            />
-
-                            <Select
-                            id="facillity"
-                            labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
-                            label="Facility"
-                            value={facility}
-                            onChange={handleFacilityOptions}
-                            options = {facilityOptions}
-                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
-                            bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
-                            
-                            />
-
-                            <Select
-                            id="status"
-                            labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
-                            label="Status"
-                            value={status}
-                            onChange={handleStatusOptions}
-                            options = {statusOptions}
-                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
-                            bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
-                            
-                            />
-
-                           {
-                                (
-                                    search ||
-                                    line !== "ALL" ||
-                                    facility !== "ALL" ||
-                                    status !== "ALL"
-                                ) && (
-                                    <Button
-                                        text="Clear"
-                                        onClick={clearFilters}
-                                        className="
-                                            h-[42px]
-                                            px-7
-                                            rounded-[4px]
-                                            border
-                                            border-[var(--primary-700)]
-                                            text-[var(--primary-700)]
-                                            bg-[var(--primary-100)]
-                                            text-[15px]
-                                            font-medium
-                                            cursor-pointer
-                                        "
-                                    />
-                                )
-                            }
-
-                            <Button 
-                                type="button"
-                                text = "Create New"
-                                onClick = {()=>navigate("/new-workstation")}
-                                className="h-[42px] px-6 bg-[var(--primary-900)] text-white rounded-[8px] cursor-pointer"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="mt-5">
+                        <div className="">
                             {
                                 activeTab === "Workstation" && (
+                                    <>
+                                    <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                                    <div className="w-full lg:w-[260px]">
+                                        <SearchInput
+                                        id="search"
+                                        placeHolder = "Search"
+                                        value={search}
+                                        onChange = {(e) =>
+                                            setSearch(e.target.value)
+                                        } 
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-wrap items-end gap-4">
+                                        <Select
+                                        id="line"
+                                        labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
+                                        label="Line"
+                                        value={line}
+                                        onChange={handleLineOptions}
+                                        options = {lineOptions}
+                                        className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
+                                        bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
+                                        
+                                        />
+
+                                        <Select
+                                        id="facillity"
+                                        labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
+                                        label="Facility"
+                                        value={facility}
+                                        onChange={handleFacilityOptions}
+                                        options = {facilityOptions}
+                                        className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
+                                        bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
+                                        
+                                        />
+
+                                        <Select
+                                        id="status"
+                                        labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
+                                        label="Status"
+                                        value={status}
+                                        onChange={handleStatusOptions}
+                                        options = {statusOptions}
+                                        className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
+                                        bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
+                                        
+                                        />
+
+                                    {
+                                            (
+                                                search ||
+                                                line !== "ALL" ||
+                                                facility !== "ALL" ||
+                                                status !== "ALL"
+                                            ) && (
+                                                <Button
+                                                    text="Clear"
+                                                    onClick={clearFilters}
+                                                    className="
+                                                        h-[42px]
+                                                        px-7
+                                                        rounded-[4px]
+                                                        border
+                                                        border-[var(--primary-700)]
+                                                        text-[var(--primary-700)]
+                                                        bg-[var(--primary-100)]
+                                                        text-[15px]
+                                                        font-medium
+                                                        cursor-pointer
+                                                    "
+                                                />
+                                            )
+                                        }
+
+                                        <Button 
+                                            type="button"
+                                            text = "Create New"
+                                            onClick = {()=>navigate("/new-workstation")}
+                                            className="h-[42px] px-6 bg-[var(--primary-900)] text-white rounded-[8px] cursor-pointer"
+                                        />
+                                    </div>
+                                    </div>
+                                    <div className="mt-5">
                                     <Table 
-                                      columns = {columns}
+                                      columns = {workStationColumns}
                                       data = {getWorkStationTableData()}  
                                     />
+                                    </div>
+                                    </>
                                 )
                             }
 
                             {
                                 activeTab === "Line" && (
-                                    <h2>Line Content </h2>
+                                    <Line />
                                 )
                             }
 
                             {
                                 activeTab === "Facility" && (
-                                    <h2>Facillity content</h2>
+                                    <Facility />
                                 )
                             }
                         </div>

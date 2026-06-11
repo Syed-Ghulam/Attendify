@@ -150,8 +150,14 @@ function NewUser() {
           body:JSON.stringify(payload)
         }
       );
+
       const data = await response.json();
-      console.log(data);
+
+      if(!response.ok){
+        toast.error(data.message);
+        return;
+      }
+      
       toast.success("User Created Successfully");
     } catch(error){
       console.log(error);
