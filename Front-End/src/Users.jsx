@@ -318,7 +318,7 @@ const getTableData = () => {
 
 const getGroupTableData = () => {
 
-  console.log(filteredGroups);
+  
   console.log("openMenu =", openMenu);
   return filteredGroups.map((group) => ({
     

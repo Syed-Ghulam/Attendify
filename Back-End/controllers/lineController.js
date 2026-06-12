@@ -42,9 +42,12 @@ const getLines = async (req, res) => {
 const getLineById = async (req, res) => {
     try {
 
-        const line = await Line.findByPk(
-            req.params.id
-        );
+       const line = await Line.findOne({
+            where: {
+                id: req.params.id,
+                isDeleted: false
+            }
+        });
 
         if (!line) {
             return res.status(404).json({
@@ -66,9 +69,12 @@ const getLineById = async (req, res) => {
 const updateLine = async (req, res) => {
     try {
 
-        const line = await Line.findByPk(
-            req.params.id
-        );
+       const line = await Line.findOne({
+            where: {
+                id: req.params.id,
+                isDeleted: false
+            }
+        });
 
         if (!line) {
             return res.status(404).json({

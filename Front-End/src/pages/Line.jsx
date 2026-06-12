@@ -5,7 +5,9 @@ import Select from "../components/Select";
 import Button from "../components/Button";
 import Table from "../components/Table";
 import UnCheck from "../assets/icons/Uncheck.svg";
+import More from "../assets/icons/more_vert.svg";
 import { apiFetch } from "../config/api";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 
 function Line (){
@@ -13,10 +15,18 @@ function Line (){
     const [search, setSearch] = useState("");
     const [facility, setFacility] = useState("ALL");
     const [status, setStatus] = useState("ALL");
+    const [openMenu, setOpenMenu] = useState(null);
 
     const [lineData, setLineData] = useState([]);
 
     const navigate = useNavigate();
+
+    const [confirmModel, setConfirmModel] = useState({
+        isOpen: false,
+        title:"",
+        message:"",
+        onConfirm: null
+    });
 
     const facilityOptions = [
         "ALL"
@@ -93,7 +103,7 @@ function Line (){
                     facility:line.facility,
                     createdOn: new Date(line.createdAt).toLocaleDateString(),
                     status: line.isActive ? "Active" : "Inactive",
-                    action:"..."
+                    action:line
                 }));
 
                 setLineData(formattedData);
@@ -103,8 +113,151 @@ function Line (){
             });
     },[]);
 
+    const updateLineStatus = async(line) => {
+
+        try{
+
+            const response = await apiFetch(`/line/${line.id}`,
+                {
+                    method:"PUT",
+                    body: JSON.stringify({
+                        isActive: !line.isActive,
+                        updatedBy: localStorage.getItem("userId")
+                    })
+                }
+            );
+
+            if(!response.ok)
+                throw new Error("Failed");
+
+            setLineData((prev) =>
+                prev.map((item) =>
+                    item.action.id === line.id ? {
+                        ...item,
+                        status: !line.isActive ? "Active" : "Inactive",
+                        action : {
+                            ...item.action,
+                            isActive: !line.isActive,
+                            updatedBy: localStorage.getItem("userId")
+                        }
+                    } : item
+                )
+            );
+
+            setOpenMenu(null);
+
+        } catch (error){
+            console.log(error);
+        }
+    };
+
+    const deleteLine = async (line) => {
+
+        try{
+            const response = await apiFetch(`/line/${line.id}`,
+                {
+                    method: "DELETE",
+                    body: JSON.stringify({
+                        updatedBy: localStorage.getItem("userId")
+                    })
+                }
+            );
+
+            if(!response.ok)
+                throw new Error("Failed");
+
+            setLineData((prev) =>
+                prev.filter(
+                    (item) => item.action.id !== line.id
+                ) 
+            );
+        } catch(error){
+            console.log(error);
+        }
+    };
+
+    const filteredLineData = lineData.filter((row) => {
+
+        const matchesSearch = row.lineNameNumber.toLowerCase().includes(search.toLowerCase());
+
+        const matchesFacility = facility === "ALL" || row.facility === facility;
+
+        const matchesStatus = status === "ALL" || row.status === status;
+
+        return (
+            matchesSearch && matchesFacility && matchesStatus
+        );
+    });
+
+    const getLineTableData = () => {
+        return filteredLineData.map((row) => ({
+            ...row,
+
+            action: (
+                <div className="relative">
+                    <Button
+                      type="button"
+                      className="cursor-pointer"
+                      onClick = {() => 
+                        setOpenMenu(
+                            openMenu === row.action.id ? null : row.action.id
+                        )
+                      }
+                    >
+                        <img src={More} alt="more options" />
+                    </Button>
+
+                    {
+                        openMenu === row.action.id && (
+                            <div className="absolute right-full mr-2 top-0 w-[120px] bg-white
+                                    border border-[var(--neutral-200)] rounded-[8px] shadow-lg z-50"       
+                            >
+                                <p className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer"
+                                   onClick={()=> {
+                                    navigate(`edit-line/${row.action.id}`);
+                                    setOpenMenu(null);
+                                   }}
+                                >
+                                    Edit
+                                </p>
+
+                                <p className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer text-red-600"
+                                    onClick={() => {
+                                        setConfirmModel({
+                                            isOpen: true,
+                                            title: "Delete Line",
+                                            message: "Are you sure you want to delete this Line ?",
+                                            onConfirm: () => deleteLine(row.action)
+                                     });
+                                    }}
+                                >
+                                    Delete
+                                </p>
+
+                                <p
+                                   className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer"
+                                   onClick={() => {
+                                       setConfirmModel({
+                                          isOpen: true,
+                                          title: row.action.isActive ? "Deactivate Line" : "Activate Line",
+                                          message: row.action.isActive ? "Are you sure you want to make this line inactive ?"
+                                                    : "Are you sure you want to make this line active ?",
+                                          onConfirm : () => updateLineStatus(row.action)                  
+                                       })
+                                   }}   
+                                >
+                                    {row.action.isActive ? "Inactive" : "Active"}
+                                </p>
+                            </div>
+                        )
+                    }
+                </div>
+            )
+        }));
+    };
+
     return(
-        
+        <>
                 <div>
                     <div>
 
@@ -184,10 +337,33 @@ function Line (){
                     <div className="mt-5">
                         <Table 
                          columns = {lineColumns}
-                         data={lineData}
+                         data={getLineTableData()}
                         />
                     </div>
         </div>
+        <ConfirmationModal 
+           isOpen={confirmModel.isOpen}
+           title = {confirmModel.title}
+           message={confirmModel.message}
+           onConfirm={() => {
+            confirmModel.onConfirm?.();
+            setConfirmModel({
+                isOpen: false,
+                title:"",
+                message: "",
+                onConfirm:null
+            });
+           }}
+           onCancel={() => 
+            setConfirmModel({
+                isOpen: false,
+                title: "",
+                message: "",
+                onConfirm: null
+            })
+           }
+        />
+        </>
     );
 }
 export default Line;

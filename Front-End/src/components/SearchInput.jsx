@@ -1,4 +1,4 @@
-
+import SearchIcon from "../assets/icons/Search.svg"
 function SearchInput(props){
 
    return(
@@ -40,7 +40,7 @@ function SearchInput(props){
                text-[var(--primary-900)]
             "
          >
-            ⌕
+            <img src={SearchIcon} alt="search-icon" />
          </span>
 
       </div>

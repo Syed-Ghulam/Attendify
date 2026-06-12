@@ -147,8 +147,7 @@ function NewGroup(){
                                         state: {
                                         activeTab: "Groups"
                                         }
-                                    })
-                                    }
+                                    })}
                                type="button"
                                className="
                                 mt-[22px]

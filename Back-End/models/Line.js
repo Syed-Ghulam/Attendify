@@ -8,7 +8,7 @@ const Line = sequelize.define("Line", {
     },
 
     lineCode: {
-        type: DataTypes.STRING(50),
+        type: DataTypes.STRING(50)
     },
 
     facility: {

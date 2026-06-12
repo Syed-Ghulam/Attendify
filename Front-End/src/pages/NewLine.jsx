@@ -132,8 +132,12 @@ function NewLine() {
                   <div className="flex items-center gap-3">
 
                      <Button
-                        type="button"
-                        onClick={() => navigate("/workstation")}
+                        type="button"    
+                        onClick={() => navigate("/workstation",{
+                           state:{
+                              activeTab:"Line"
+                           }
+                        })}
                         className="mt-[18px] flex h-6 w-6 items-center
                         justify-center rounded-full cursor-pointer"
                      >
@@ -268,10 +272,6 @@ function NewLine() {
                         </div>
 
                         </div>
-
-                        {/* Status */}
-
-                        
 
                      </div>
 

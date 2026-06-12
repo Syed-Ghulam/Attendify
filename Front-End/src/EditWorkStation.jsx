@@ -123,7 +123,6 @@ function EditWorkStation() {
             }
          );
          const data = await response.json();
-         console.log(data);
          toast.success("WorkStation Updated Successfully");
       } catch(error){
          console.log(error);

@@ -137,6 +137,7 @@ function NewUser() {
 
     const payload = {
       ...formData,
+      dob: formData.dob || null,
       createdBy: loggedInUserId,
       updatedBy: loggedInUserId
     };
@@ -214,17 +215,22 @@ function NewUser() {
 
     //DOB
 
-    if(formData.dob){
-      const dob = new Date(formData.dob);
-      const today = new Date();
+   if (formData.dob) {
+  const dob = new Date(formData.dob);
 
-      const hundredYearsAgo = new Date();
-      hundredYearsAgo.setFullYear(today.getFullYear() - 100);
+  if (isNaN(dob.getTime())) {
+    newErrors.dob = "Enter valid Date of Birth";
+  } else {
+    const today = new Date();
 
-      if(dob > today || dob < hundredYearsAgo){
-        newErrors.dob = "Enter valid Date of Birth";
-      }
+    const hundredYearsAgo = new Date();
+    hundredYearsAgo.setFullYear(today.getFullYear() - 100);
+
+    if (dob > today || dob < hundredYearsAgo) {
+      newErrors.dob = "Enter valid Date of Birth";
     }
+  }
+}
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

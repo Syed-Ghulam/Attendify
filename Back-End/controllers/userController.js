@@ -10,10 +10,9 @@ const createUser = async(req, res) =>{
           defaultPassword,
           10
         );
-        const { dob } = req.body;
+        console.log(req.body);
         const user = await User.create({
           ...req.body,
-          dob: dob ? dob : null,
           password: hashedPassword,
           
         });
@@ -22,19 +21,30 @@ const createUser = async(req, res) =>{
             message:"User created successfully",
             user
         });
-    } catch(error){
-        console.log(error.name);
-          if (error.name === "SequelizeUniqueConstraintError") {
-        return res.status(400).json({
-            message: "UserId or Email already exists"
-        });
-    }
-        
-        res.status(500).json({
-            message:"Error creating user",
-            error
-        });
-    }
+    } catch(error) {
+  if (error.name === "SequelizeUniqueConstraintError") {
+
+    const messages = error.errors.map(err => {
+      switch(err.path) {
+        case "userId":
+          return "User ID";
+        case "email":
+          return "Email";
+        default:
+          return err.path;
+      }
+    });
+
+    return res.status(400).json({
+      message: `${messages.join(" and ")} already exist`
+    });
+  }
+
+  res.status(500).json({
+    message: "Error creating user",
+    error: error.message
+  });
+}
 };
 
 const getUsers = async(req,res) =>{
