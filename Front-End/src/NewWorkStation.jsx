@@ -47,6 +47,9 @@ function NewWorkStation() {
       });
    };
 
+   const ipRegex =
+   /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)$/;
+
    const validateField = (name, value) => {
    let error = "";
 
@@ -54,8 +57,13 @@ function NewWorkStation() {
       error = "Workstation Name is required";
    }
 
-   if (name === "ipAddress" && !value.trim()) {
-      error = "IP Address is required";
+   
+   if (name === "ipAddress") {
+      if (!value.trim()) {
+         error = "IP Address is required";
+      } else if (!ipRegex.test(value)) {
+         error = "Please enter a valid IP Address";
+      }
    }
 
    if (name === "facility" && !value) {
@@ -127,9 +135,13 @@ function NewWorkStation() {
       }
 
       //IP Address
-      if(!formData.ipAddress.trim()){
-         newErrors.ipAddress = "IP Address is required"
+      if (name === "ipAddress") {
+      if (!value.trim()) {
+         newError = "IP Address is required";
+      } else if (!ipRegex.test(value)) {
+         newError = "Please enter a valid IP Address";
       }
+   }
 
       //Facility
       if(!formData.facility){
@@ -170,11 +182,11 @@ function NewWorkStation() {
 
                      <div>
 
-                        <p className="text-[12px] text-[var(--neutral-500)]">
+                        <p className="text-[15px] text-[var(--neutral-500)]">
                            Manage Workstation /
                         </p>
 
-                        <h2 className="text-[30px] font-bold text-[var(--primary-900)]">
+                        <h2 className="text-[15px] font-bold text-[var(--primary-900)]">
                            New WorkStation
                         </h2>
 

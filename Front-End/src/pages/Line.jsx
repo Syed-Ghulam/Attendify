@@ -306,6 +306,7 @@ function Line (){
                                     status !== "ALL"
                                 ) && (
                                     <Button
+                                        type="button"
                                         text="Clear"
                                         onClick={clearFilters}
                                         className="

@@ -15,7 +15,7 @@ function Toggle(props){
             `}
         
       >
-    <div className="w-6 h-6 bg-white rounded-full"/>
+    <div className="w-3 h-3 bg-white rounded-full"/>
         </Button>
 
         <span className='text-[14px] text-[var(--primary-900)]'>

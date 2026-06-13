@@ -107,6 +107,68 @@ function Facility() {
       });
    },[]);
 
+   const updateFacilityStatus = async (facility) => {
+
+      try{
+
+         const response = await apiFetch(`/facility/${facility.id}`,
+            {
+               method:"PUT",
+               body: JSON.stringify({
+                  isActive: !facility.isActive,
+                  updatedBy: localStorage.getItem("userId")
+               })
+            }
+         );
+
+         if(!response.ok)
+            throw new Error("Failed");
+
+         setFacilityData((prev) =>
+            prev.map((item) => 
+               item.action.id === facility.id ? {
+                  ...item,
+                  status: !facility.isActive ? "Active" : "Inactive",
+                  action : {
+                     ...item.action,
+                     isActive: !facility.isActive,
+                     updatedBy: localStorage.getItem("userId")
+                  }
+               } : item
+            )
+         );
+
+         setOpenMenu(null);
+      } catch(error){
+         console.log(error);
+      }
+   };
+
+   const deleteFacility = async(facility) => {
+
+      try{
+         const response = await apiFetch(`/facility/${facility.id}`,
+            {
+               method: "DELETE",
+               body: JSON.stringify({
+                  updatedBy: localStorage.getItem("userId")
+               })
+            }
+         );
+
+         if(!response.ok)
+            throw new Error("Failed");
+
+         setFacilityData((prev) =>
+            prev.filter(
+               (item) => item.action.id !== facility.id
+            )
+         );
+      } catch(error){
+         console.log(error);
+      }
+   };
+
    const filteredFacilityData = facilityData.filter((row) => {
 
       const matchesSearch = row.facilityName.toLowerCase().includes(search.toLowerCase());
@@ -143,7 +205,7 @@ function Facility() {
                      >
                         <p className="px-4 py-2 hover:bg-[var(--neutral-100)] cursor-pointer"
                            onClick={() => {
-                              navigate();
+                              navigate(`edit-facility/${row.action.id}`);
                               setOpenMenu(null);
                            }}
                         >
@@ -198,15 +260,21 @@ function Facility() {
                      <SearchInput
                         id = "search"
                         placeHolder = "Search"
-                        
+                        value={search}
+                        onChange = {(e) =>
+                           setSearch(e.target.value)
+                        }
                      />
                   </div>
 
-                  <div>
+                  <div className="flex flex-wrap items-end gap-4">
 
                      <Select
                        id="status"
                        label="Status"
+                       value={status}
+                       onChange={handleStatusOptions}
+                       options = {statusOptions}
                        labelClassName="mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
                        className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
                        bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
@@ -217,10 +285,11 @@ function Facility() {
                            search || status !=="ALL"
                         ) && (
                            <Button
+                              type="button"
                               text="Clear"
                               onClick={clearFilters}
                               className="h-[42px] px-7 rounded-[4px] border border-[var(--primary-700)]
-                                  text-[var(--primary-100)] text-[15px] font-medium cursor-pointer" 
+                                  text-[var(--primary-700)] bg-[var(--primary-100)] text-[15px] font-medium cursor-pointer" 
                            />
                         )
                      }
@@ -228,6 +297,7 @@ function Facility() {
                      <Button
                         type="button"
                         text="Create New"
+                        onClick = {() => navigate("new-facility")}
                         className="h-[42px] px-6 bg-[var(--primary-900)] text-white rounded-[8px] cursor-pointer"
                      />
                   </div>

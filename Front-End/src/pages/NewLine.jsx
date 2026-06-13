@@ -236,18 +236,12 @@ function NewLine() {
 
                            <div>
 
-                           <p className="mb-2 text-[13px]
-                           font-semibold text-[var(--primary-800)]">
-
-                              Status
-                           </p>
-
-                           <div className="flex items-center gap-2">
-
                               <Toggle
                                  type="button"
+                                 label = "Status"
                                  isOn={isOn}
                                  onClick={handleToggle}
+                                 labelClassName="mb-2 text-[13px] font-semibold text-[var(--primary-800)]"
                                  className={`relative h-5 w-10 rounded-full transition-all
                                  ${
                                     formData.isActive
@@ -268,8 +262,6 @@ function NewLine() {
                               </Toggle>
 
                            </div>
-
-                        </div>
 
                         </div>
 

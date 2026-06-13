@@ -20,6 +20,8 @@ import DashBoardLayout from "./layout/DashBoardLayout.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import EditLine from "./pages/EditLine.jsx";
 import Facility from "./pages/Facility.jsx";
+import NewFacility from "./pages/NewFacility.jsx";
+import EditFacility from "./pages/EditFacility.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -54,7 +56,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/workstation/new-line" element={<NewLine />} />
         <Route path="/workstation/edit-line/:id" element={<EditLine />} />
 
-        {/* <Route path="/workstation/new-facility" element={<Facility />} /> */}
+         <Route path="/workstation/new-facility" element={<NewFacility />} />
+         <Route path="/workstation/edit-facility/:id" element={<EditFacility/>} /> 
       </Route>
 
     </Routes>
