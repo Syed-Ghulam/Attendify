@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { apiFetch } from "./config/api";
+
 import Tabs from "./components/Tabs";
 import SearchInput from './components/SearchInput' 
 import Select from "./components/Select";
@@ -11,6 +11,7 @@ import UnCheck from "./assets/icons/Uncheck.svg"
 import More from "./assets/icons/more_vert.svg";
 import DummyImg from './assets/icons/DummyImg.svg'
 import { toast } from "react-toastify";
+import { apiService } from "./services/apiServices";
 
 
 function Users(){
@@ -417,34 +418,35 @@ const getGroupTableData = () => {
 };
 
 useEffect(() => {
-
-  apiFetch('/users')
-  .then((res) => {
-    if (!res.ok) {
-      throw new Error("Unauthorized");
+  loadUsers();
+},[]);
+  const loadUsers = async() => {
+    try{
+      const data = await apiService.getUsers();
+      setUserData(data);
+    } catch (error){
+      console.log(error);
     }
-    return res.json();
-  })
-  .then((data) => {
-    setUserData(data);
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
-}, []);
+  };
 
 useEffect(() => {
-   apiFetch('/groups')
-   .then((res) => res.json())
-   .then((data) => {
-      
-      setGroupData(data);
-   })
-   .catch((err) =>{ 
-      console.log(err);
-   });
-},[]);
+  loadGroups();
+}, []);
+
+const loadGroups = async () => {
+  try {
+
+    const data =
+      await apiService.getGroups();
+
+    setGroupData(data);
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+};
 
 
 const handleGenderOptions = (e) =>{
@@ -461,20 +463,13 @@ const handleStatusOptions = (e) =>{
 
 const updateUserStatus = async (user) => {
   try {
-    const response = await apiFetch(`/users/${user.userId}`
-      ,
+    
+    await apiService.updateUser(
+      user.userId, 
       {
-        method: "PUT",
-        body: JSON.stringify({
-          isActive: !user.isActive,
-          updatedBy: localStorage.getItem("userId")
-        })
+        isActive: !user.isActive
       }
     );
-
-    if (!response.ok) {
-      throw new Error("Failed");
-    }
 
     setUserData((prev) =>
       prev.map((item) =>
@@ -503,18 +498,9 @@ const updateUserStatus = async (user) => {
 const deleteUser = async (user) => {
   try {
 
-    const response = await apiFetch(`/users/${user.userId}`,
-      {
-        method: "DELETE",
-        body: JSON.stringify({
-          updatedBy: localStorage.getItem("userId")
-        })
-      }
+    await apiService.deleteUser(
+      user.userId
     );
-
-    if (!response.ok) {
-      throw new Error("Failed");
-    }
 
     toast.success("User deleted successfully");
 
@@ -535,18 +521,7 @@ const deleteUser = async (user) => {
 const deleteGroup = async (group) => {
   try {
 
-    const response = await apiFetch(`/groups/${group.id}`,
-      {
-        method: "DELETE",
-        body: JSON.stringify({
-          updatedBy: localStorage.getItem("userId")
-        })
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed");
-    }
+    await apiService.deleteGroup(group.id);
 
     toast.success("Group deleted successfully");
 
@@ -566,16 +541,8 @@ const deleteGroup = async (group) => {
 
 const handleGroupStatusToggle = async (group) => {
   try {
-    const response = await apiFetch(`/groups/${group.id}`, {
-      method: "PUT",
-      body: JSON.stringify(
-        { isActive: !group.isActive,
-          updatedBy: localStorage.getItem("userId")
-    }),
-      
-    });
-
-    if (!response.ok) throw new Error("Failed");
+    
+    await apiService.updateGroup(group.id,{isActive: !group.isActive, updatedBy: localStorage.getItem("userId")});
 
     setGroupData((prev) =>
       prev.map((item) =>

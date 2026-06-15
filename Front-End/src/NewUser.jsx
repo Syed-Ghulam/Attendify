@@ -8,7 +8,7 @@ import Toggle from "./components/Toggle";
 import ImgUploader from "./components/ImgUploader";
 import Button from "./components/Button";
 import Back from './assets/icons/Back.svg';
-import { apiFetch } from "./config/api";
+import { apiService } from "./services/apiServices";
 
 function NewUser() {
 
@@ -146,24 +146,11 @@ function NewUser() {
     console.log(payload)
     try{
      
-      const response = await apiFetch('/users',
-        {
-          method:"POST",
-          body:JSON.stringify(payload)
-        }
-      );
-
-      const data = await response.json();
-
-      if(!response.ok){
-        toast.error(data.message);
-        return;
-      }
-      
+      await apiService.createUser(payload);  
       toast.success("User Created Successfully");
     } catch(error){
       console.log(error);
-      toast.error("Error creating user");
+      toast.error(error.message);
     }
   };
 

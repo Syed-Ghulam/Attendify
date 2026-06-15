@@ -4,7 +4,7 @@ import { useNavigate, useParams} from "react-router-dom";
 import Toggle from "./components/Toggle";
 import Button from "./components/Button";
 import Back from './assets/icons/Back.svg';
-import { apiFetch } from "./config/api";
+import { apiService } from "./services/apiServices";
 
 
 function ViewUser() {
@@ -26,38 +26,39 @@ function ViewUser() {
 });
 
   useEffect(() => {
-
-  apiFetch(`/users/${userId}`)
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error("Unauthorized");
-      }
-      return res.json();
-    })
-    .then((data) => {
-
-
-      setFormData({
-        userId: data.userId || "",
-        groupName: data.groupName || "",
-        firstName: data.firstName || "",
-        lastName: data.lastName || "",
-        dob: data.dob ? data.dob.split("T")[0] : "",
-        gender: data.gender || "Male",
-        phone: data.phone || "",
-        email: data.email || "",
-        address: data.address || "",
-        isActive: data.isActive ?? false,
-        image: data.image || ""
-      });
-
-    })
-    .catch((err) => {
-      console.log(err);
-    setIsApi(true)
-  });
-
+  loadUser();
 }, [userId]);
+
+const loadUser = async () => {
+  try {
+
+    const data = await apiService.getUserById(
+      userId
+    );
+
+    setFormData({
+      userId: data.userId || "",
+      groupName: data.groupName || "",
+      firstName: data.firstName || "",
+      lastName: data.lastName || "",
+      dob: data.dob
+        ? data.dob.split("T")[0]
+        : "",
+      gender: data.gender || "Male",
+      phone: data.phone || "",
+      email: data.email || "",
+      address: data.address || "",
+      isActive: data.isActive ?? false,
+      image: data.image || ""
+    });
+
+  } catch (error) {
+
+    console.log(error);
+    setIsApi(true);
+
+  }
+};
 
 if(isApi){
   return(

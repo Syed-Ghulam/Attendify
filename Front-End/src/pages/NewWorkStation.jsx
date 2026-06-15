@@ -1,20 +1,20 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { apiFetch } from "./config/api";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { apiService } from "../services/apiServices";
 import {toast} from "react-toastify";
 
-import Button from "./components/Button";
-import Input from "./components/Input";
-import Select from "./components/Select";
+import Button from "../components/Button";
 
-import Back from "./assets/icons/Back.svg";
-import Toggle from "./components/Toggle";
+import Input from "../components/Input";
+import Select from "../components/Select";
+
+import Back from "../assets/icons/Back.svg";
+import Toggle from "../components/Toggle";
 
 
-function EditWorkStation() {
+function NewWorkStation() {
 
    const navigate = useNavigate();
-   const { id } = useParams();
    const [isOn, setIsOn] = useState(false);
 
    const [formData, setFormData] = useState({
@@ -47,27 +47,8 @@ function EditWorkStation() {
       });
    };
 
-   useEffect(() => {
-   apiFetch(`/workstation/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-
-        console.log("WORKSTATION DATA:", data);
-
-         setFormData({
-            workstationName: data.workstationName || "",
-            ipAddress: data.ipAddress || "",
-            facility: data.facility || "",
-            code: data.code || "",
-            linenameNumber: data.linenameNumber || "",
-            isActive: data.isActive || false
-         });
-
-         setIsOn(data.isActive);
-
-      })
-      .catch((err) => console.log(err));
-}, [id]);
+   const ipRegex =
+   /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)$/;
 
    const validateField = (name, value) => {
    let error = "";
@@ -76,8 +57,13 @@ function EditWorkStation() {
       error = "Workstation Name is required";
    }
 
-   if (name === "ipAddress" && !value.trim()) {
-      error = "IP Address is required";
+   
+   if (name === "ipAddress") {
+      if (!value.trim()) {
+         error = "IP Address is required";
+      } else if (!ipRegex.test(value)) {
+         error = "Please enter a valid IP Address";
+      }
    }
 
    if (name === "facility" && !value) {
@@ -106,27 +92,27 @@ function EditWorkStation() {
       }));
    };
 
-   const handleUpdate = async() => {
+   const handleSubmit = async() => {
       
       if(!validateForm()){
          return;
       }
 
+      const loggedInUserId = localStorage.getItem("userId");
+
+         const payload = {
+            ...formData,
+            createdBy: loggedInUserId,
+            updatedBy: loggedInUserId
+         };
+
       try{
-         const response = await apiFetch(
-            `/workstation/${id}`,
-            {
-               method:"PUT",
-               body: JSON.stringify({...formData,
-                updatedBy: localStorage.getItem("userId")
-               })
-            }
-         );
-         const data = await response.json();
-         toast.success("WorkStation Updated Successfully");
+       await apiService.createWorkStation(payload);
+
+            toast.success("WorkStation Created Successfully");
       } catch(error){
          console.log(error);
-         toast.error("Error Updating WorkStation");
+         toast.error(error.message);
       }
    };
 
@@ -139,8 +125,10 @@ function EditWorkStation() {
       }
 
       //IP Address
-      if(!formData.ipAddress.trim()){
-         newErrors.ipAddress = "IP Address is required"
+      if (!formData.ipAddress.trim()) {
+         newErrors.ipAddress = "IP Address is required";
+      } else if (!ipRegex.test(formData.ipAddress)) {
+         newErrors.ipAddress = "Please enter a valid IP Address";
       }
 
       //Facility
@@ -182,12 +170,12 @@ function EditWorkStation() {
 
                      <div>
 
-                        <p className="text-[12px] text-[var(--neutral-500)]">
+                        <p className="text-[15px] text-[var(--neutral-500)]">
                            Manage Workstation /
                         </p>
 
-                        <h2 className="text-[30px] font-bold leading-none text-[var(--primary-900)]">
-                           Edit WorkStation
+                        <h2 className="text-[15px] font-bold text-[var(--primary-900)]">
+                           New WorkStation
                         </h2>
 
                      </div>
@@ -372,8 +360,8 @@ function EditWorkStation() {
 
                      <Button
                         type="submit"
-                        text="Save"
-                        onClick ={handleUpdate}
+                        text="Create"
+                        onClick ={handleSubmit}
                         className="w-[120px]
                          bg-[var(--primary-900)] text-white"
                      />
@@ -397,4 +385,4 @@ function EditWorkStation() {
    );
 }
 
-export default EditWorkStation;
+export default NewWorkStation;

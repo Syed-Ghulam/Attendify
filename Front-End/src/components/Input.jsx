@@ -3,7 +3,7 @@ function Input(props){
         <>
           <label htmlFor={props.id}
                 className="
-                    mb-[6px]
+                    mt-[15px]
                     block
                     text-[13px]
                     font-semibold
@@ -25,6 +25,7 @@ function Input(props){
             readOnly={props.readOnly}
 
             className="
+                      mt-3
                       h-[42px]
                       w-full
                       rounded-[4px]

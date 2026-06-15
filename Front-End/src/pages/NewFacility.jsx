@@ -5,7 +5,7 @@ import Input from "../components/Input";
 import TextArea from "../components/TextArea";
 import Toggle from "../components/Toggle";
 import { useState } from "react";
-import { apiFetch } from "../config/api";
+import { apiService } from "../services/apiServices";
 import { toast } from "react-toastify";
 
 function NewFacility (){
@@ -30,10 +30,10 @@ function NewFacility (){
 
         setIsOn(newStatus);
 
-        setFormData({
-            ...formData,
+        setFormData((prev) => ({
+            ...prev,
             isActive: newStatus
-        });
+        }));
     };
 
     const validateField = (name, value) => {
@@ -44,6 +44,7 @@ function NewFacility (){
 
         if(name === "location" && !value.trim())
             error="Location is required";
+        return error;
     }
 
     const handleChange = (e) => {
@@ -88,18 +89,11 @@ function NewFacility (){
         };
 
         try{
-            const response = await apiFetch("/facility",
-                {
-                    method:"POST",
-                    body: JSON.stringify(payload)
-                }
-            );
-            const data = await response.json();
-            console.log(data);
+          await apiService.createFacility(payload);
             toast.success("Facility created successfully");
         } catch(error) {
             console.log(error);
-            toast.error("Error creating Facility");
+            toast.error(error.message);
         }
     };
 

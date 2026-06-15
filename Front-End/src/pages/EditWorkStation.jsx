@@ -1,20 +1,20 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { apiFetch } from "./config/api";
+import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { apiService } from "../services/apiServices";
 import {toast} from "react-toastify";
 
-import Button from "./components/Button";
+import Button from "../components/Button";
+import Input from "../components/Input";
+import Select from "../components/Select";
 
-import Input from "./components/Input";
-import Select from "./components/Select";
-
-import Back from "./assets/icons/Back.svg";
-import Toggle from "./components/Toggle";
+import Back from "../assets/icons/Back.svg";
+import Toggle from "../components/Toggle";
 
 
-function NewWorkStation() {
+function EditWorkStation() {
 
    const navigate = useNavigate();
+   const { id } = useParams();
    const [isOn, setIsOn] = useState(false);
 
    const [formData, setFormData] = useState({
@@ -41,14 +41,42 @@ function NewWorkStation() {
 
       setIsOn(newStatus);
 
-      setFormData({
-         ...formData,
+      setFormData((prev) => ({
+         ...prev,
          isActive: newStatus
-      });
+      }));
    };
 
-   const ipRegex =
-   /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)$/;
+ useEffect(() => {
+   loadWorkStation();
+}, [id]);
+
+const loadWorkStation = async () => {
+   try {
+
+      const data =
+         await apiService.getWorkStationById(id);
+
+      setFormData({
+         workstationName: data.workstationName || "",
+         ipAddress: data.ipAddress || "",
+         facility: data.facility || "",
+         code: data.code || "",
+         linenameNumber: data.linenameNumber || "",
+         isActive: data.isActive ?? false
+      });
+
+      setIsOn(data.isActive);
+
+   } catch (error) {
+
+      console.log(error);
+
+   }
+};
+
+const ipRegex =
+/^(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)$/;
 
    const validateField = (name, value) => {
    let error = "";
@@ -57,13 +85,15 @@ function NewWorkStation() {
       error = "Workstation Name is required";
    }
 
-   
    if (name === "ipAddress") {
-      if (!value.trim()) {
-         error = "IP Address is required";
-      } else if (!ipRegex.test(value)) {
-         error = "Please enter a valid IP Address";
-      }
+
+   if (!value.trim()) {
+      error = "IP Address is required";
+   }
+   else if (!ipRegex.test(value)) {
+      error = "Please enter a valid IP Address";
+   }
+
    }
 
    if (name === "facility" && !value) {
@@ -92,37 +122,25 @@ function NewWorkStation() {
       }));
    };
 
-   const handleSubmit = async() => {
+   const handleUpdate = async() => {
       
       if(!validateForm()){
          return;
       }
 
-      const loggedInUserId = localStorage.getItem("userId");
-
-         const payload = {
-            ...formData,
-            createdBy: loggedInUserId,
-            updatedBy: loggedInUserId
-         };
-
       try{
-         const response = await apiFetch(`/workstation`,
+         
+         await apiService.updateWorkStation(id,
             {
-               method:"POST",
-               body: JSON.stringify(payload)
+               ...formData,
+               updatedBy: localStorage.getItem("userId")
             }
          );
-         const data = await response.json();
-         
-         if(!response.ok){
-            toast.error(data.message);
-            return;
-         }
-         toast.success("WorkStation Created Successfully");
+
+         toast.success("WorkStation Updated Successfully");
       } catch(error){
          console.log(error);
-         toast.error("Error Creating WorkStation");
+         toast.error(error.message);
       }
    };
 
@@ -135,13 +153,12 @@ function NewWorkStation() {
       }
 
       //IP Address
-      if (name === "ipAddress") {
-      if (!value.trim()) {
-         newError = "IP Address is required";
-      } else if (!ipRegex.test(value)) {
-         newError = "Please enter a valid IP Address";
+     if (!formData.ipAddress.trim()) {
+         newErrors.ipAddress = "IP Address is required";
       }
-   }
+      else if (!ipRegex.test(formData.ipAddress)) {
+         newErrors.ipAddress = "Please enter a valid IP Address";
+      }
 
       //Facility
       if(!formData.facility){
@@ -182,12 +199,12 @@ function NewWorkStation() {
 
                      <div>
 
-                        <p className="text-[15px] text-[var(--neutral-500)]">
+                        <p className="text-[12px] text-[var(--neutral-500)]">
                            Manage Workstation /
                         </p>
 
-                        <h2 className="text-[15px] font-bold text-[var(--primary-900)]">
-                           New WorkStation
+                        <h2 className="text-[30px] font-bold leading-none text-[var(--primary-900)]">
+                           Edit WorkStation
                         </h2>
 
                      </div>
@@ -372,8 +389,8 @@ function NewWorkStation() {
 
                      <Button
                         type="submit"
-                        text="Create"
-                        onClick ={handleSubmit}
+                        text="Save"
+                        onClick ={handleUpdate}
                         className="w-[120px]
                          bg-[var(--primary-900)] text-white"
                      />
@@ -397,4 +414,4 @@ function NewWorkStation() {
    );
 }
 
-export default NewWorkStation;
+export default EditWorkStation;

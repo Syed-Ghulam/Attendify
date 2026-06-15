@@ -5,7 +5,7 @@ import Input from "../components/Input";
 import { useEffect, useState } from "react";
 import Select from "../components/Select";
 import Toggle from "../components/Toggle";
-import { apiFetch } from "../config/api";
+import { apiService } from "../services/apiServices";
 import { toast } from "react-toastify";
 
 function EditLine(){
@@ -31,29 +31,41 @@ function EditLine(){
 
         setIsOn(newStatus);
 
-        setFormData({
-            ...formData,
+        setFormData((prev) => ({
+            ...prev,
             isActive: newStatus
-        });
+        }));
     };
 
-    useEffect(() => {
-        apiFetch(`/line/${id}`)
-        .then((res) => res.json())
-        .then((data) => {
+useEffect(() => {
+    loadLine();
+}, [id]);
 
-            setFormData({
-                lineNameNumber: data.lineNameNumber || "",
-                facility: data.facility || "",
-                lineCode: data.lineCode || "",
-                isActive: data.isActive || false
-            });
+const loadLine = async () => {
+    try {
 
-            setIsOn(data.isActive);
-        })
+        const data =
+            await apiService.getLineById(id);
 
-        .catch((err) => console.log(err));
-    }, [id]);
+        setFormData({
+            lineNameNumber:
+                data.lineNameNumber || "",
+            facility:
+                data.facility || "",
+            lineCode:
+                data.lineCode || "",
+            isActive:
+                data.isActive ?? false
+        });
+
+        setIsOn(data.isActive ?? false);
+
+    } catch (error) {
+
+        console.log(error);
+
+    }
+};
 
     const validateField = (name, value) => {
         let error = "";
@@ -87,25 +99,20 @@ function EditLine(){
             return;
 
         try{
-            const response = await apiFetch(`/line/${id}`,{
-                method:"PUT",
-                body: JSON.stringify({...formData,
-                    updatedBy: localStorage.getItem("userId")
-                })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                toast.error(data.message);
-                return;
-            }
+            await apiService.updateLine(
+                id,
+                {
+                    ...formData,
+                    updatedBy:
+                    localStorage.getItem("userId")
+                }
+            );
 
             toast.success("Line Updated Successfully");
         
         } catch(error){
             console.log(error);
-            toast.error("Error Updating Line");
+            toast.error(error.message);
         }
     };
 

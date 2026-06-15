@@ -5,7 +5,7 @@ import Input from "../components/Input";
 import TextArea from "../components/TextArea";
 import Toggle from "../components/Toggle";
 import { useEffect, useState } from "react";
-import { apiFetch } from "../config/api";
+import { apiService } from "../services/apiServices";
 import { toast } from "react-toastify";
 
 function EditFacility(){
@@ -28,10 +28,10 @@ function EditFacility(){
 
         setIsOn(newStatus);
         
-        setFormData({
-            ...formData,
+        setFormData((prev) => ({
+            ...prev,
             isActive: newStatus
-        });
+        }));
     };
 
     const validateField = (name, value) => {
@@ -43,6 +43,7 @@ function EditFacility(){
 
         if(name === "location" && !value.trim())
             error = "Location is required";
+        return error;
     }
 
     const handleChange = (e) => {
@@ -65,24 +66,18 @@ function EditFacility(){
             return;
 
         try{
-            const response = await apiFetch(`/facility/${id}`,{
-                method:"PUT",
-                body: JSON.stringify({...formData,
+           await apiService.updateFacility(
+                id,
+                {
+                    ...formData,
                     updatedBy: localStorage.getItem("userId")
-                })
-            });
-
-            const data = await response.json();
-
-            if(!response.ok){
-                toast.error(data.message);
-                return;
-            }
+                }
+            );
 
             toast.success("Facility Updated Successfully");
         } catch(error){
             console.log(error);
-            toast.error("Error Updating Line");
+            toast.error(error.message);
         }
     };
 
@@ -101,23 +96,32 @@ function EditFacility(){
         return Object.keys(newErrors).length === 0;
     };
 
-    useEffect(() => {
-        apiFetch(`/facility/${id}`)
-        .then((res) => res.json())
-        .then((data) => {
-            setFormData({
-                facilityName: data.facilityName || "",
-                location: data.location || "",
-                code: data.code || "",
-                description: data.description || "",
-                isActive: data.isActive || false
-            });
+  useEffect(() => {
+    loadFacility();
+}, [id]);
 
-            setIsOn(data.isActive);
-        })
+const loadFacility = async () => {
+    try {
 
-        .catch((err) => console.log(err));
-    }, [id]);
+        const data =
+            await apiService.getFacilityById(id);
+
+        setFormData({
+            facilityName: data.facilityName || "",
+            location: data.location || "",
+            code: data.code || "",
+            description: data.description || "",
+            isActive: data.isActive ?? false
+        });
+
+        setIsOn(data.isActive ?? false);
+
+    } catch (error) {
+
+        console.log(error);
+
+    }
+};
 
     return(
 
@@ -192,7 +196,7 @@ function EditFacility(){
                                    label="Code"
                                    type="text"
                                    placeHolder="Enter Code"
-                                   value = {formData.handleChange}
+                                   value = {formData.code}
                                    onChange = {handleChange} 
                                 />
                             </div>

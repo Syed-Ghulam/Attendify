@@ -8,7 +8,7 @@ import Select from "./components/Select";
 import { useState } from "react";
 import TextArea from './components/TextArea';
 import Toggle from "./components/Toggle";
-import { apiFetch } from "./config/api";
+import { apiService } from "./services/apiServices";
 import {toast} from "react-toastify";
 
 
@@ -108,20 +108,12 @@ function NewGroup(){
         }
 
         try{
-            console.log("Payload: ",payload)
-            const response = await apiFetch('/groups',
-                {
-                    method:"POST",
-                    body:JSON.stringify(payload)
-                }
-            );
-
-            const data= await response.json();
+          const data = await apiService.createGroup(payload);
             console.log(data);
             toast.success("Group Created Successfully");
         } catch(error){
             console.log(error);
-            toast.error("Error creating group");
+            toast.error(error.message);
         }
     };
     return(

@@ -12,7 +12,8 @@ import Button from "../components/Button";
 import Table from "../components/Table";
 import UnCheck from "../assets/icons/Uncheck.svg";
 import More from "../assets/icons/more_vert.svg";
-import { apiFetch } from "../config/api";
+import { apiService } from "../services/apiServices";
+import { toast } from "react-toastify";
 
 function WorkStation(){
     
@@ -109,29 +110,58 @@ function WorkStation(){
 
     ];
 
-    useEffect(()=>{
-        apiFetch('/workstation')
-        .then((res)=> res.json())
-        .then((data) =>{
-            const formattedData = data.map((workStation) =>({
-                checkBox: <button type="checkBox"><img src={UnCheck} alt="checkbox"/></button>,
-                workstationName:workStation.workstationName,
-                code:workStation.code,
-                ipAddress:workStation.ipAddress,
-                facility: workStation.facility,
-                lineNameNumber:workStation.linenameNumber,
-                linecode:"DCC PRODUCT LINE 1",
-                createdOn: new Date(workStation.createdAt).toLocaleDateString(),
-                status:workStation.isActive ? "Active" : "Inactive",
-                action:workStation
+   useEffect(() => {
+  loadWorkStations();
+}, []);
 
-            }));
-            setWorkStationData(formattedData)
-        })
-        .catch((err) =>{
-            console.log(err);
-        })
-    },[]);
+const loadWorkStations = async () => {
+  try {
+
+    const data =
+      await apiService.getWorkStations();
+
+    const formattedData = data.map(
+      (workStation) => ({
+        checkBox: (
+          <button type="checkBox">
+            <img
+              src={UnCheck}
+              alt="checkbox"
+            />
+          </button>
+        ),
+        workstationName:
+          workStation.workstationName,
+        code: workStation.code,
+        ipAddress:
+          workStation.ipAddress,
+        facility:
+          workStation.facility,
+        lineNameNumber:
+          workStation.linenameNumber,
+        linecode:
+          "DCC PRODUCT LINE 1",
+        createdOn: new Date(
+          workStation.createdAt
+        ).toLocaleDateString(),
+        status:
+          workStation.isActive
+            ? "Active"
+            : "Inactive",
+        action: workStation
+      })
+    );
+
+    setWorkStationData(
+      formattedData
+    );
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+};
 
     const handleLineOptions = (e) =>{
         setLine(e.target.value);
@@ -148,19 +178,17 @@ function WorkStation(){
     const updateWorkStationStatus = async (workStation) => {
    try {
 
-      const response = await apiFetch(`/workstation/${workStation.id}`,
-         {
-            method: "PUT",
-            body: JSON.stringify({
-               isActive: !workStation.isActive,
-               updatedBy: localStorage.getItem("userId")
-            })
-         }
+      await apiService.updateWorkStation(
+        workStation.id,
+        {
+            isActive:
+            !workStation.isActive,
+            updatedBy:
+            localStorage.getItem(
+                "userId"
+            )
+        }
       );
-
-      if (!response.ok) {
-         throw new Error("Failed");
-      }
 
       setWorkStationData((prev) =>
          prev.map((item) =>
@@ -173,12 +201,13 @@ function WorkStation(){
                    action: {
                      ...item.action,
                      isActive: !workStation.isActive,
-                     updatedBy: localStorage.getItem("userId")
                    }
                  }
                : item
          )
       );
+
+      toast.success(workStation.isActive ? "Workstation deactivated successfully" : "Workstation activated successfully");
 
       setOpenMenu(null);
 
@@ -189,24 +218,19 @@ function WorkStation(){
 
 const deleteWorkStation = async (workStation) => {
   try {
-    const response = await apiFetch(`/workstation/${workStation.id}`,
-      {
-        method: "DELETE",
-        body: JSON.stringify({
-          updatedBy: localStorage.getItem("userId")
-        })
-      }
+    await apiService.deleteWorkStation(
+        workStation.id
     );
-
-    if (!response.ok) {
-      throw new Error("Failed");
-    }
 
     setWorkStationData((prev) =>
       prev.filter(
         (item) => item.action.id !== workStation.id
       )
     );
+
+    toast.success("Workstation deleted successfully");
+
+    setOpenMenu(null);
 
   } catch (error) {
     console.log(error);

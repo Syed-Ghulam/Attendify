@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { apiFetch } from "../config/api";
+import { apiService } from "../services/apiServices";
 import {toast} from "react-toastify";
 
 import Button from "../components/Button";
@@ -35,10 +35,10 @@ function NewLine() {
 
       setIsOn(newStatus);
 
-      setFormData({
-         ...formData,
+     setFormData((prev) => ({
+         ...prev,
          isActive: newStatus
-      });
+      }));
    };
 
     const validateField = (name, value) => {
@@ -85,18 +85,11 @@ function NewLine() {
          };
 
       try{
-         const response = await apiFetch("/line",
-            {
-               method:"POST",
-               body: JSON.stringify(payload)
-            }
-         );
-         const data = await response.json();
-         console.log(data);
+         await apiService.createLine(payload);
          toast.success("Line Created Successfully");
       } catch(error){
          console.log(error);
-         toast.error("Error Creating Line");
+         toast.error(error.message);
       }
    };
 

@@ -6,8 +6,9 @@ import Button from "../components/Button";
 import Table from "../components/Table";
 import UnCheck from "../assets/icons/Uncheck.svg";
 import More from "../assets/icons/more_vert.svg";
-import { apiFetch } from "../config/api";
+import { apiService } from "../services/apiServices";
 import ConfirmationModal from "../components/ConfirmationModal";
+import { toast } from "react-toastify";
 
 
 function Line (){
@@ -88,47 +89,56 @@ function Line (){
         }
     ];
 
-    useEffect(() => {
-         apiFetch("/line")
-            .then((res) => res.json())
-            .then((data) => {
+  useEffect(() => {
+   loadLines();
+}, []);
 
-                const formattedData = data.map((line) => ({
-                    checkBox:(
-                        <button type="checkBox">
-                            <img src={UnCheck} alt="checkbox" />
-                        </button>
-                    ),
-                    lineNameNumber:line.lineNameNumber,
-                    facility:line.facility,
-                    createdOn: new Date(line.createdAt).toLocaleDateString(),
-                    status: line.isActive ? "Active" : "Inactive",
-                    action:line
-                }));
+const loadLines = async () => {
+   try {
 
-                setLineData(formattedData);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    },[]);
+      const data =
+         await apiService.getLines();
+
+      const formattedData = data.map(
+         (line) => ({
+            checkBox: (
+               <button type="checkBox">
+                  <img src={UnCheck} alt="checkbox" />
+               </button>
+            ),
+            lineNameNumber: line.lineNameNumber,
+            facility: line.facility,
+            createdOn: new Date(
+               line.createdAt
+            ).toLocaleDateString(),
+            status: line.isActive
+               ? "Active"
+               : "Inactive",
+            action: line
+         })
+      );
+
+      setLineData(formattedData);
+
+   } catch (error) {
+
+      console.log(error);
+
+   }
+};
 
     const updateLineStatus = async(line) => {
 
         try{
 
-            const response = await apiFetch(`/line/${line.id}`,
+            await apiService.updateLine(
+                line.id,
                 {
-                    method:"PUT",
-                    body: JSON.stringify({
-                        isActive: !line.isActive,
-                        updatedBy: localStorage.getItem("userId")
-                    })
+                    isActive: !line.isActive,
+                    updatedBy:
+                        localStorage.getItem("userId")
                 }
-            );
-
-            if(!response.ok)
-                throw new Error("Failed");
+                );
 
             setLineData((prev) =>
                 prev.map((item) =>
@@ -138,10 +148,16 @@ function Line (){
                         action : {
                             ...item.action,
                             isActive: !line.isActive,
-                            updatedBy: localStorage.getItem("userId")
+                            
                         }
                     } : item
                 )
+            );
+
+            toast.success(
+                line.isActive
+                    ? "Line deactivated successfully"
+                    : "Line activated successfully"
             );
 
             setOpenMenu(null);
@@ -154,26 +170,24 @@ function Line (){
     const deleteLine = async (line) => {
 
         try{
-            const response = await apiFetch(`/line/${line.id}`,
-                {
-                    method: "DELETE",
-                    body: JSON.stringify({
-                        updatedBy: localStorage.getItem("userId")
-                    })
-                }
-            );
 
-            if(!response.ok)
-                throw new Error("Failed");
+            await apiService.deleteLine(line.id);
 
             setLineData((prev) =>
                 prev.filter(
                     (item) => item.action.id !== line.id
                 ) 
             );
+
+            
+        toast.success("Line deleted successfully");
+
+        setOpenMenu(null);
+
         } catch(error){
             console.log(error);
         }
+
     };
 
     const filteredLineData = lineData.filter((row) => {

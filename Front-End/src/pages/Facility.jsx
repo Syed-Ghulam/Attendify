@@ -7,7 +7,8 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import UnCheck from "../assets/icons/Uncheck.svg";
 import More from "../assets/icons/more_vert.svg";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../config/api";
+import { apiService } from "../services/apiServices";
+import { toast } from "react-toastify";
 
 function Facility() {
 
@@ -81,48 +82,68 @@ function Facility() {
       }
    ];
 
-   useEffect(() => {
-      apiFetch("/facility")
-      .then((res) => res.json())
-      .then((data) => {
+useEffect(() => {
+   loadFacilities();
+}, []);
 
-         const formattedData = data.map((facility) => ({
-            checkBox:(
+const loadFacilities = async () => {
+   try {
+
+      const data =
+         await apiService.getFacilities();
+
+      const formattedData = data.map(
+         (facility) => ({
+            checkBox: (
                <button>
-                  <img src={UnCheck} alt="checkbox" />
+                  <img
+                     src={UnCheck}
+                     alt="checkbox"
+                  />
                </button>
             ),
-            facilityName: facility.facilityName,
-            location:facility.location,
-            description: facility.description,
-            createdOn: new Date(facility.createdAt).toLocaleDateString(),
-            status: facility.isActive ? "Active" : "Inactive",
+            facilityName:
+               facility.facilityName,
+            location:
+               facility.location,
+            description:
+               facility.description,
+            createdOn:
+               new Date(
+                  facility.createdAt
+               ).toLocaleDateString(),
+            status:
+               facility.isActive
+                  ? "Active"
+                  : "Inactive",
             action: facility
-         }));
+         })
+      );
 
-         setFacilityData(formattedData);
-      })
-      .catch((err) => {
-         console.log(err);
-      });
-   },[]);
+      setFacilityData(
+         formattedData
+      );
+
+   } catch (error) {
+
+      console.log(error);
+
+   }
+};
 
    const updateFacilityStatus = async (facility) => {
 
       try{
 
-         const response = await apiFetch(`/facility/${facility.id}`,
-            {
-               method:"PUT",
-               body: JSON.stringify({
-                  isActive: !facility.isActive,
-                  updatedBy: localStorage.getItem("userId")
-               })
-            }
-         );
-
-         if(!response.ok)
-            throw new Error("Failed");
+       await apiService.updateFacility(
+         facility.id,
+         {
+            isActive:
+            !facility.isActive,
+            updatedBy:
+            localStorage.getItem("userId")
+         }
+);
 
          setFacilityData((prev) =>
             prev.map((item) => 
@@ -131,41 +152,45 @@ function Facility() {
                   status: !facility.isActive ? "Active" : "Inactive",
                   action : {
                      ...item.action,
-                     isActive: !facility.isActive,
-                     updatedBy: localStorage.getItem("userId")
+                     isActive: !facility.isActive
                   }
                } : item
             )
          );
 
+         toast.success(
+            facility.isActive
+               ? "Facility deactivated successfully"
+               : "Facility activated successfully"
+         );
+
+
+
          setOpenMenu(null);
       } catch(error){
          console.log(error);
+         toast.error(error.message);
       }
    };
 
    const deleteFacility = async(facility) => {
 
       try{
-         const response = await apiFetch(`/facility/${facility.id}`,
-            {
-               method: "DELETE",
-               body: JSON.stringify({
-                  updatedBy: localStorage.getItem("userId")
-               })
-            }
-         );
-
-         if(!response.ok)
-            throw new Error("Failed");
+         await apiService.deleteFacility(facility.id);
 
          setFacilityData((prev) =>
             prev.filter(
                (item) => item.action.id !== facility.id
             )
          );
+         toast.success(
+            "Facility deleted successfully"
+         );
+
+         setOpenMenu(null);
       } catch(error){
          console.log(error);
+        toast.error("Failed to delete facility");
       }
    };
 

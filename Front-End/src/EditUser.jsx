@@ -7,7 +7,7 @@ import Toggle from "./components/Toggle";
 import ImgUploader from "./components/ImgUploader";
 import Button from "./components/Button";
 import Back from './assets/icons/Back.svg';
-import { apiFetch } from "./config/api";
+import { apiService } from "./services/apiServices";
 import {toast} from "react-toastify";
 
 function EditUser() {
@@ -157,15 +157,11 @@ function EditUser() {
     };
 
     try{
-      const response = await apiFetch(
-      `/users/${userId}`,
-        {
-          method:"PUT",
-          body:JSON.stringify(payload)
-        }
+      await apiService.updateUser(
+        userId,
+        payload
       );
-      const data = await response.json();
-      console.log(data);
+      
       toast.success("User Updated Successfully");
     } catch(error){
       console.log(error);
@@ -237,42 +233,46 @@ function EditUser() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
- 
+
 
   useEffect(() => {
+  loadUser();
+}, [userId]);
 
-  apiFetch(`/users/${userId}`)
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error("Unauthorized");
-      }
-      return res.json();
-    })
-    .then((data) => {
+const loadUser = async () => {
+  try {
 
-      setFormData({
-        userId: data.userId || "",
-        groupName: data.groupName || "",
-        firstName: data.firstName || "",
-        lastName: data.lastName || "",
-        dob: data.dob ? data.dob.split("T")[0] : "",
-        gender: data.gender || "Male",
-        phone: data.phone || "",
-        email: data.email || "",
-        address: data.address || "",
-        isActive: data.isActive ?? false,
-        image: data.image || ""
-      });
+    const data = await apiService.getUserById(
+      userId
+    );
 
-      setIsOn(data.isActive);
-
-    })
-    .catch((err) => {
-      console.log(err);
-      setIsApi(true);
+    setFormData({
+      userId: data.userId || "",
+      groupName: data.groupName || "",
+      firstName: data.firstName || "",
+      lastName: data.lastName || "",
+      dob: data.dob
+        ? data.dob.split("T")[0]
+        : "",
+      gender: data.gender || "Male",
+      phone: data.phone || "",
+      email: data.email || "",
+      address: data.address || "",
+      isActive: data.isActive ?? false,
+      image: data.image || ""
     });
 
-}, [userId]);
+    setIsOn(data.isActive);
+
+  } catch (error) {
+
+    console.log(error);
+    setIsApi(true);
+
+  }
+};
+ 
+
     if(isApi){
     return (
       <p>

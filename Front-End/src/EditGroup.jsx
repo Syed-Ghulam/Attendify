@@ -3,7 +3,7 @@ import Back from './assets/icons/Back.svg';
 import { useNavigate, useParams } from "react-router-dom";
 import Input from "./components/Input";
 import { useEffect, useState } from "react";
-import { apiFetch } from "./config/api";
+import { apiService } from "./services/apiServices";
 import Select from "./components/Select";
 import TextArea from "./components/TextArea";
 import Toggle from "./components/Toggle";
@@ -77,39 +77,46 @@ function EditGroup (){
 
         try{
 
-            const response = await apiFetch(`/groups/${id}`,
-                {
-                    method: "PUT",
-                    body: JSON.stringify({...formData, updatedBy: localStorage.getItem("userId")})
-                }
-            );
+            const data = await apiService.updateGroup(
+                    id,
+                    {
+                        ...formData,
+                        updatedBy: localStorage.getItem("userId")
+                    }
+                    );
 
-            if (!response.ok) {
-                throw new Error("Update failed");
-            }
-
-             const data = await response.json();
+             console.log(data);
              
              toast.success("Group Updated Successfully");
         } catch(error){
             console.log(error);
-            toast.error("Error updating Group");
+            toast.error(error.message);
         }
     };
 
-    useEffect(() => {
-        apiFetch(`/groups/${id}`)
-           .then(res => res.json())
-           .then(data => {
-               setFormData({
-                groupName: data.groupName || "",
-                roleName: data.roleName || "",
-                description: data.description || "",
-                isActive: data.isActive || false
-               });
-           })
-           .catch(err => console.log(err));
-    }, [id]);
+   useEffect(() => {
+  loadGroup();
+}, [id]);
+
+const loadGroup = async () => {
+  try {
+
+    const data =
+      await apiService.getGroupById(id);
+
+    setFormData({
+      groupName: data.groupName || "",
+      roleName: data.roleName || "",
+      description: data.description || "",
+      isActive: data.isActive || false
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+};
     
     return(
         <div className="h-full flex flex-1 flex-col bg-[var(--neutral-100)] overflow-hidden">

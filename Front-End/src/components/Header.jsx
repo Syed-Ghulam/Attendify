@@ -52,7 +52,10 @@ function Header(props){
             <button className='relative cursor-pointer'>
                 <img src={Notification} alt='notification' />
             </button>
-
+            <button
+             className='cursor-pointer'
+             onClick={() => setShowMenu(!showMenu)}
+             >
             <div className="flex h-9 w-9 items-center justify-center overflow-hidden
             rounded-full bg-[var(--primary-100)] text-[12px] font-semibold text-[var(--primary-900)] flex-shrink-0">
                 {
@@ -64,6 +67,7 @@ function Header(props){
                     
                 }
             </div>
+            </button>
               <div className="relative leading-tight">
 
         <h4
@@ -77,6 +81,7 @@ function Header(props){
             "
         >
             {user.name} 
+        
             <button className='cursor-pointer'
                     onClick={() => setShowMenu(!showMenu)}>
                 <img src={ProfileIcon} alt='Profile Icon' />
@@ -118,6 +123,8 @@ function Header(props){
             }
         </h4>
 
+        
+
         <p
             className="
                 text-[10px]
@@ -128,6 +135,7 @@ function Header(props){
         </p>
 
     </div>
+    
         </div>
             
         </header>
