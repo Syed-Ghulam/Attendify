@@ -4,8 +4,7 @@ import Select from "../components/Select";
 import Button from "../components/Button";
 import Table from "../components/Table";
 import ConfirmationModal from "../components/ConfirmationModal";
-import UnCheck from "../assets/icons/Uncheck.svg";
-import More from "../assets/icons/more_vert.svg";
+import Icon from "../components/Icon";
 import { useNavigate } from "react-router-dom";
 import { apiService } from "../services/apiServices";
 import { toast } from "react-toastify";
@@ -45,7 +44,7 @@ function Facility() {
       {
          label: (
             <button>
-               <img src={UnCheck} alt="checkbox" />
+               <Icon name="UnCheck" alt="checkbox" />
             </button>
          ),
          key:"checkBox"
@@ -96,8 +95,8 @@ const loadFacilities = async () => {
          (facility) => ({
             checkBox: (
                <button>
-                  <img
-                     src={UnCheck}
+                  <Icon
+                     name="UnCheck"
                      alt="checkbox"
                   />
                </button>
@@ -139,9 +138,7 @@ const loadFacilities = async () => {
          facility.id,
          {
             isActive:
-            !facility.isActive,
-            updatedBy:
-            localStorage.getItem("userId")
+            !facility.isActive
          }
 );
 
@@ -220,7 +217,7 @@ const loadFacilities = async () => {
                      )
                   }
                >
-                  <img src={More} alt="more options" />
+                  <Icon name="More" alt="more options" />
                </Button>
 
                {

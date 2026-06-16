@@ -1,8 +1,17 @@
 const WorkStation = require("../models/WorkStation");
 
-const createWorkStation = async (req, res) =>{
+const createWorkStation = async (req, res, next) =>{
     try{
-        const workstation = await WorkStation.create(req.body);
+        const workstation = await WorkStation.create({
+            workstationName: req.body.workstationName,
+            ipAddress: req.body.ipAddress,
+            facility: req.body.facility,
+            code: req.body.code,
+            linenameNumber: req.body.linenameNumber,
+            isActive: req.body.isActive,
+            createdBy: req.user.userId,
+            updatedBy: req.user.userId
+        });
 
         res.status(201).json({
             message: "WorkStation created Successfully",
@@ -14,14 +23,11 @@ const createWorkStation = async (req, res) =>{
                 message: "IP Address already exists"
                 });
             }
-        res.status(500).json({
-            message:"Error creating workStation",
-            error
-        });
+        next(error);
     }
 };
 
-const getWorkStation = async(req,res) =>{
+const getWorkStation = async(req,res, next) =>{
     try{
         const workstations = await WorkStation.findAll({
             where:{
@@ -32,14 +38,12 @@ const getWorkStation = async(req,res) =>{
         res.status(200).json(workstations);
 
     }catch(error){
-        res.status(500).json({
-            message: error.message
-        });
+     next(error);
 
     }
 };
 
-const getWorkStationById = async (req, res) => {
+const getWorkStationById = async (req, res, next) => {
     try {
 
         const workstation = await WorkStation.findByPk(
@@ -55,13 +59,11 @@ const getWorkStationById = async (req, res) => {
         res.status(200).json(workstation);
 
     } catch(error){
-        res.status(500).json({
-            message: error.message
-        });
+      next(error);
     }
 };
 
-const updateWorkStation = async (req, res) => {
+const updateWorkStation = async (req, res, next) => {
     try {
 
         const workstation = await WorkStation.findByPk(
@@ -75,7 +77,13 @@ const updateWorkStation = async (req, res) => {
         }
 
         await workstation.update({
-            ...req.body
+            workstationName: req.body.workstationName,
+            ipAddress: req.body.ipAddress,
+            facility: req.body.facility,
+            code: req.body.code,
+            linenameNumber: req.body.linenameNumber,
+            isActive: req.body.isActive,
+            updatedBy: req.user.userId
         });
 
         res.status(200).json({
@@ -84,13 +92,11 @@ const updateWorkStation = async (req, res) => {
         });
 
     } catch(error){
-        res.status(500).json({
-            message: error.message
-        });
+       next(error)
     }
 };
 
-const deleteWorkStation = async (req, res) => {
+const deleteWorkStation = async (req, res, next) => {
     try {
 
         const workstation = await WorkStation.findByPk(
@@ -105,7 +111,7 @@ const deleteWorkStation = async (req, res) => {
 
         await workstation.update({
             isDeleted: true,
-            updatedBy: req.body.updatedBy
+            updatedBy: req.user.userId
         });
 
         res.status(200).json({
@@ -113,9 +119,7 @@ const deleteWorkStation = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        next(error)
     }
 };
 

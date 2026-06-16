@@ -1,12 +1,13 @@
 import { useNavigate, useParams } from "react-router-dom";
 import Button from "../components/Button";
-import Back from "../assets/icons/Back.svg";
+import Icon from "../components/Icon";
 import Input from "../components/Input";
 import { useEffect, useState } from "react";
 import Select from "../components/Select";
 import Toggle from "../components/Toggle";
 import { apiService } from "../services/apiServices";
 import { toast } from "react-toastify";
+import { validateRequired, validateSelect } from "../utils/validation";
 
 function EditLine(){
 
@@ -70,11 +71,11 @@ const loadLine = async () => {
     const validateField = (name, value) => {
         let error = "";
 
-        if(name === "lineNameNumber" && !value.trim())
-            error = "Line Name / Number is required";
+        if(name === "lineNameNumber")
+            error = validateRequired(value, "Line Name / Number ");
 
-        if(name === "facility" && !value)
-            error = "Facility is required";
+        if(name === "facility")
+            error = validateSelect(value, "Facility");
 
         return error;
     };
@@ -102,9 +103,7 @@ const loadLine = async () => {
             await apiService.updateLine(
                 id,
                 {
-                    ...formData,
-                    updatedBy:
-                    localStorage.getItem("userId")
+                    ...formData
                 }
             );
 
@@ -120,12 +119,14 @@ const loadLine = async () => {
 
         let newErrors = {};
 
-        if(!formData.lineNameNumber.trim()){
-            newErrors.lineNameNumber = "Line Name / Number is required"
+        const lineNameError = validateRequired(formData.lineNameNumber, "Line Name / Number");
+        if(lineNameError){
+            newErrors.lineNameNumber = lineNameError;
         };
 
-        if(!formData.facility){
-            newErrors.facility = "Facility is required";
+        const facilityError = validateSelect(formData.facility, "Facility");
+        if(facilityError){
+            newErrors.facility = facilityError;
         }
 
         setErrors(newErrors);
@@ -148,7 +149,7 @@ const loadLine = async () => {
                       justify-center rounded-full cursor-pointer"
                     >
 
-                        <img src={Back} alt="Back Button" />
+                        <Icon name="Back" alt="Back Button" />
 
                     </Button>
 

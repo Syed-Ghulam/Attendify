@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams} from "react-router-dom";
 import Toggle from "./components/Toggle";
 import Button from "./components/Button";
-import Back from './assets/icons/Back.svg';
+import Icon from "./components/Icon";
 import { apiService } from "./services/apiServices";
 
 
@@ -95,7 +95,7 @@ if(isApi){
                   cursor-pointer
                   rounded-full" 
               >
-                <img src={Back} alt="Back Button"/>
+                <Icon name="Back" alt="Back Button"/>
               </Button>
               
 

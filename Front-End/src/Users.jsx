@@ -7,9 +7,7 @@ import Select from "./components/Select";
 import Button from "./components/Button";
 import ConfirmationModal from "./components/ConfirmationModal";
 import  Table  from "./components/Table";
-import UnCheck from "./assets/icons/Uncheck.svg"
-import More from "./assets/icons/more_vert.svg";
-import DummyImg from './assets/icons/DummyImg.svg'
+import Icon from "./components/Icon";
 import { toast } from "react-toastify";
 import { apiService } from "./services/apiServices";
 
@@ -64,7 +62,7 @@ const hasFilters =
 
 const columns = [
  {
-    label:<button><img src={UnCheck} alt="checkbox"/></button>,
+    label:<button><Icon name="UnCheck" alt="checkbox"/></button>,
     key:"checkBox"
  },
 
@@ -126,7 +124,7 @@ const columns = [
 
 const grpColumns = [
    {
-      label:<button><img src={UnCheck} alt="checkbox"/></button>,
+      label:<button><Icon name="UnCheck" alt="checkbox"/></button>,
       key:"checkBox"
    },
 
@@ -206,12 +204,12 @@ const getTableData = () => {
   return filteredUsers.map((user) => ({
     checkBox: (
       <button>
-        <img src={UnCheck} alt="checkbox" />
+        <Icon name="UnCheck" alt="checkbox" />
       </button>
     ),
 
     profileImage: (
-      <img src={DummyImg} alt="Profile" />
+      <Icon name="DummyImg" alt="Profile" />
     ),
 
     userId: user.userId,
@@ -252,7 +250,7 @@ const getTableData = () => {
           }
           className="cursor-pointer"
         >
-          <img src={More} alt="More" />
+          <Icon name="More" alt="More" />
         </Button>
 
         {openMenu === user.userId && (
@@ -325,7 +323,7 @@ const getGroupTableData = () => {
     
     checkBox: (
       <button>
-        <img src={UnCheck} alt="checkbox" />
+        <Icon name="UnCheck" alt="checkbox" />
       </button>
     ),
 
@@ -350,7 +348,7 @@ const getGroupTableData = () => {
           }}
           className="cursor-pointer p-2 hover:bg-gray-100 rounded"
         >
-          <img src={More} alt="More" />
+          <Icon name="More" alt="More" />
         </Button>
 
         {openMenu === `group-${group.id}` && (
@@ -542,7 +540,7 @@ const deleteGroup = async (group) => {
 const handleGroupStatusToggle = async (group) => {
   try {
     
-    await apiService.updateGroup(group.id,{isActive: !group.isActive, updatedBy: localStorage.getItem("userId")});
+    await apiService.updateGroup(group.id,{isActive: !group.isActive,});
 
     setGroupData((prev) =>
       prev.map((item) =>

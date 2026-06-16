@@ -70,10 +70,7 @@ export const apiService = {
 
         const response = await apiFetch(`/users/${userId}`,
               {
-                method: "DELETE",
-                body: JSON.stringify({
-                   updatedBy: localStorage.getItem("userId")
-                })
+                method: "DELETE" 
               }
             );
         
@@ -161,10 +158,7 @@ export const apiService = {
     const response = await apiFetch(
         `/groups/${groupId}`,
         {
-        method: "DELETE",
-        body: JSON.stringify({
-            updatedBy: localStorage.getItem("userId")
-        })
+        method: "DELETE"
         }
     );
 
@@ -267,10 +261,7 @@ export const apiService = {
     const response = await apiFetch(
         `/workstation/${workStationId}`,
         {
-        method: "DELETE",
-        body: JSON.stringify({
-            updatedBy: localStorage.getItem("userId")
-        })
+        method: "DELETE"
         }
     );
 
@@ -359,9 +350,6 @@ export const apiService = {
             `/line/${lineId}`,
             {
             method: "DELETE",
-            body: JSON.stringify({
-                updatedBy: localStorage.getItem("userId")
-            })
             }
         );
 
@@ -454,10 +442,6 @@ export const apiService = {
                 `/facility/${id}`,
                 {
                     method: "DELETE",
-                    body: JSON.stringify({
-                        updatedBy:
-                        localStorage.getItem("userId")
-                    })
                 }
             );
 

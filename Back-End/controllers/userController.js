@@ -2,7 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const createUser = async(req, res) =>{
+const createUser = async(req, res, next) =>{
     try{
         const defaultPassword = "admin@123";
 
@@ -10,10 +10,22 @@ const createUser = async(req, res) =>{
           defaultPassword,
           10
         );
-        console.log(req.body);
+        
         const user = await User.create({
-          ...req.body,
+          userId: req.body.userId,
+          groupName: req.body.groupName,
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          dob: req.body.dob,
+          gender: req.body.gender,
+          phone: req.body.phone,
+          email: req.body.email,
+          address: req.body.address,
+          isActive: req.body.isActive,
+          image: req.body.image,
           password: hashedPassword,
+          createdBy: req.user.userId,
+          updatedBy: req.user.userId
           
         });
 
@@ -40,14 +52,12 @@ const createUser = async(req, res) =>{
     });
   }
 
-  res.status(500).json({
-    message: "Error creating user",
-    error: error.message
-  });
-}
+  next(error);
+ }
 };
 
-const getUsers = async(req,res) =>{
+
+const getUsers = async(req,res, next) =>{
     try{
         const users = await User.findAll({
           where: {
@@ -56,15 +66,11 @@ const getUsers = async(req,res) =>{
         });
         res.status(200).json(users);
     } catch(error){
-        console.log(error)
-        res.status(500).json({
-            message:"Error Fetching users",
-            error
-        });
+        next(error)
     }
 };
 
-const getUserByUserId = async (req, res) => {
+const getUserByUserId = async (req, res, next) => {
   try {
 
     const user = await User.findOne({
@@ -84,15 +90,12 @@ const getUserByUserId = async (req, res) => {
 
   } catch (error) {
 
-    res.status(500).json({
-      message: "Error fetching user",
-      error
-    });
-
+    next(error);
   }
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res,next) => {
+  try{
   const user = await User.findOne({
     where: {
       userId: req.params.userId,
@@ -106,14 +109,30 @@ const updateUser = async (req, res) => {
       });
     }
 
-  await user.update({...req.body});
+  await user.update({
+        groupName: req.body.groupName,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        dob: req.body.dob,
+        gender: req.body.gender,
+        phone: req.body.phone,
+        email: req.body.email,
+        address: req.body.address,
+        isActive: req.body.isActive,
+        image: req.body.image,
+        updatedBy: req.user.userId
+
+    });
 
   res.json({
     message: "User updated successfully"
   });
+} catch (error){
+  next(error);
+}
 };
 
-const deleteUser = async(req, res) => {
+const deleteUser = async(req, res, next) => {
 
   try{
 
@@ -132,23 +151,18 @@ const deleteUser = async(req, res) => {
 
     await user.update({
       isDeleted: true,
-      updatedBy: req.body.updatedBy
+      updatedBy: req.user.userId
     });
 
     res.status(200).json({
       message: "User deleted successfully"
     });
   } catch (error) {
-    console.log(error);
-
-    res.status(500).json({
-      message:"Error deleting user",
-      error: error.message
-    });
+    next(error)
   }
 };
 
-const restoreUser = async (req, res) =>{
+const restoreUser = async (req, res, next) =>{
   try{
     const user = await User.findOne({
       where:{
@@ -164,23 +178,20 @@ const restoreUser = async (req, res) =>{
     }
 
     await user.update({
-      isDeleted: false
+      isDeleted: false,
+      updatedBy: req.user.userId
     });
 
     res.status(200).json({
       message : "User restored successfully"
     });
   } catch(error) {
-    console.log(error);
-
-    res.status(500).json({
-      message: "Error restoring user",
-      error: error.message
-    });
+     next(error);
   }
 };
 
-const login = async( req, res) => {
+const login = async( req, res, next) => {
+  try{
     const {userId, password} = req.body;
 
     const user = await User.findOne({
@@ -222,6 +233,9 @@ const login = async( req, res) => {
       token,
       userId: user.userId
     });
+  }catch(error){
+    next(error);
+  }
 };
 
 module.exports = {

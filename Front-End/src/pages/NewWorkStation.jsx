@@ -2,13 +2,14 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { apiService } from "../services/apiServices";
 import {toast} from "react-toastify";
+import { validateRequired,validateIpAddress,validateSelect } from "../utils/validation";
 
 import Button from "../components/Button";
 
 import Input from "../components/Input";
 import Select from "../components/Select";
 
-import Back from "../assets/icons/Back.svg";
+import Icon from "../components/Icon";
 import Toggle from "../components/Toggle";
 
 
@@ -41,39 +42,31 @@ function NewWorkStation() {
 
       setIsOn(newStatus);
 
-      setFormData({
-         ...formData,
+    setFormData((prev) => ({
+         ...prev,
          isActive: newStatus
-      });
+      }));
    };
 
-   const ipRegex =
-   /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)$/;
-
+   
    const validateField = (name, value) => {
    let error = "";
 
-   if (name === "workstationName" && !value.trim()) {
-      error = "Workstation Name is required";
-   }
+   if (name === "workstationName") 
+      error = validateRequired(value, "Workstation Name");
 
    
-   if (name === "ipAddress") {
-      if (!value.trim()) {
-         error = "IP Address is required";
-      } else if (!ipRegex.test(value)) {
-         error = "Please enter a valid IP Address";
-      }
-   }
+   if (name === "ipAddress") 
+         error = validateIpAddress(value);
+      
 
-   if (name === "facility" && !value) {
-      error = "Facility is required";
-   }
+   if (name === "facility") 
+      error = validateSelect(value,"Facility");
+   
 
-   if (name === "linenameNumber" && !value) {
-      error = "Line Name/Number is required";
-   }
-
+   if (name === "linenameNumber") 
+      error = validateSelect(value, "Line Name / Number");
+   
    return error;
 };
 
@@ -98,12 +91,8 @@ function NewWorkStation() {
          return;
       }
 
-      const loggedInUserId = localStorage.getItem("userId");
-
          const payload = {
-            ...formData,
-            createdBy: loggedInUserId,
-            updatedBy: loggedInUserId
+            ...formData
          };
 
       try{
@@ -120,26 +109,28 @@ function NewWorkStation() {
       let newErrors = {};
 
       //Workstation
-      if(!formData.workstationName.trim()){
-         newErrors.workstationName = "Workstation Name is required"
-      }
+      const  workstationError = validateRequired(formData.workstationName, "Workstation Name");
+      if(workstationError)
+         newErrors.workstationName = workstationError;
+      
 
       //IP Address
-      if (!formData.ipAddress.trim()) {
-         newErrors.ipAddress = "IP Address is required";
-      } else if (!ipRegex.test(formData.ipAddress)) {
-         newErrors.ipAddress = "Please enter a valid IP Address";
-      }
+      const ipError = validateIpAddress(formData.ipAddress);
+      if (ipError) 
+         newErrors.ipAddress = ipError;
+      
 
       //Facility
-      if(!formData.facility){
-         newErrors.facility = "Facility is required"
-      }
+      const facilityError = validateSelect(formData.facility, "Facility");
+      if(facilityError)
+         newErrors.facility = facilityError;
+      
 
       //LineName/ Number
-      if(!formData.linenameNumber){
-         newErrors.linenameNumber = "LineName/Number is required"
-      }
+      const lineError = validateSelect(formData.linenameNumber,"Line Name / Number");
+      if(lineError)
+         newErrors.linenameNumber = lineError
+      
 
       setErros(newErrors);
       return Object.keys(newErrors).length===0;
@@ -164,7 +155,7 @@ function NewWorkStation() {
                         justify-center rounded-full cursor-pointer"
                      >
 
-                        <img src={Back} alt="Back Button" />
+                        <Icon name="Back" alt="Back Button" />
 
                      </Button>
 

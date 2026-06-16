@@ -1,5 +1,5 @@
 import { useState } from "react";
-import imgUpload from '../assets/icons/imgUpload.svg';
+import Icon from "./Icon";
 
 function ImgUploader(props){
 
@@ -51,7 +51,11 @@ function ImgUploader(props){
          >
 
           <div className="flex items-center gap-2">
-            <img src={imgUpload} alt="uploadImage" className="h-5 w-5" />
+            <Icon
+              name = "ImgUpload"
+              alt = "Upload Image"
+              className="h-5 w-5"
+            />
             <span className="text-[15px] font-semibold text-[var(--primary-900)]">
                Add Profile Image
             </span>

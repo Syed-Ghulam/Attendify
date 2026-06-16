@@ -7,8 +7,17 @@ import Select from "./components/Select";
 import Toggle from "./components/Toggle";
 import ImgUploader from "./components/ImgUploader";
 import Button from "./components/Button";
-import Back from './assets/icons/Back.svg';
+import Icon from "./components/Icon";
 import { apiService } from "./services/apiServices";
+import {
+  validateRequired,
+  validateSelect,
+  validateName,
+  validateOptionalName,
+  validateEmail,
+  validatePhone,
+  validateDob
+} from "./utils/validation";
 
 function NewUser() {
 
@@ -67,49 +76,27 @@ function NewUser() {
   const validateField = (name, value) =>{
     let error = "";
 
-    if(name === "userId" && !value.trim()){
-      error = "User ID is required";
-    }
+    if(name === "userId")
+      error = validateRequired(value, "User ID");
 
-    if(name === "groupName" && !value){
-      error = "Group Name is required";
-    }
-
-    if(name === "firstName"){
-      if(!value.trim()){
-        error = "First Name is required";
-      }
-      else if(!/^[A-Za-z\s]+$/.test(value)){
-        error = "Enter Valid First Name";
-      }
-    }
-
-    if(name === "lastName" && value.trim()){
-      if(!/^[A-Za-z\s]+$/.test(value)){
-        error = "Enter Valid Lastname";
-      }
-    }
-
-    if(name === "email" && value && (!value.includes("@") || !value.includes("."))){
-      error = "Enter valid Email";
-    }
-
-    if(name === "phone"){
-      if(!value.trim() || !/^[6-9]\d{9}$/.test(value) || /(\d)\1{4,}/.test(value)){
-        error = "Enter Valid Phone Number";
-    }}
-
-    if(name === "dob" && value){
-      const dob = new Date(value);
-      const today = new Date();
-
-      const hundredYearsAgo = new Date();
-      hundredYearsAgo.setFullYear(today.getFullYear() - 100);
-      if(dob > today || dob < hundredYearsAgo){
-        error = "Enter valid Date of Birth";
-      }
-    }
-
+    if(name === "groupName")
+      error = validateSelect(value, "Group Name");
+    
+    if(name === "firstName")
+      error = validateName(value, "First Name");
+      
+    if(name === "lastName")
+      error = validateOptionalName(value,"Last Name");
+     
+    if(name === "email")
+      error = validateEmail(value);
+    
+    if(name === "phone")
+      error = validatePhone(value);
+   
+    if(name === "dob")
+      error = validateDob(value);
+      
     return error;
   }
 
@@ -134,16 +121,11 @@ function NewUser() {
       return;
     }
 
-    const loggedInUserId =localStorage.getItem("userId");
-
     const payload = {
       ...formData,
       dob: formData.dob || null,
-      createdBy: loggedInUserId,
-      updatedBy: loggedInUserId
     };
 
-    console.log(payload)
     try{
      
       await apiService.createUser(payload);  
@@ -154,75 +136,50 @@ function NewUser() {
     }
   };
 
-  const validateForm = ()=>{
-    let newErrors = {};
-    
-    //User ID
-    if(!formData.userId.trim()){
-      newErrors.userId = "User ID is required";
-    }
+ const validateForm = () => {
 
-    //First Name
-   if(!formData.firstName.trim()){
-      newErrors.firstName = "First Name is required";
-    }
-    else if(!/^[A-Za-z\s]+$/.test(formData.firstName)){
-      newErrors.firstName = "Enter valid First Name";
-    }
+  let newErrors = {};
 
-    //last Name
-    if(formData.lastName.trim() &&
-      !/^[A-Za-z\s]+$/.test(formData.lastName)
-      ){
+  const userIdError = validateRequired(formData.userId,"User ID");
+  if (userIdError) 
+    newErrors.userId = userIdError;
+  
 
-      newErrors.lastName = "Enter valid Last Name";
-    }
+  const groupError = validateSelect(formData.groupName,"Group Name");
+  if (groupError) 
+    newErrors.groupName = groupError;
+  
 
-    //Email
-    if(!formData.email.includes("@") || !formData.email.includes(".")){
-      newErrors.email = "Enter valid email";
-    }
+  const firstNameError = validateName(formData.firstName,"First Name");
+  if (firstNameError) 
+    newErrors.firstName = firstNameError;
+  
 
-    //Phone
-   if(!formData.phone.trim() ||
-        !/^[6-9]\d{9}$/.test(formData.phone) ||
-        /(\d)\1{4,}/.test(formData.phone)
-      ){
-      newErrors.phone = "Enter Valid Phone Number";
-   }
+  const lastNameError = validateOptionalName(formData.lastName,"Last Name");
+  if (lastNameError) 
+    newErrors.lastName = lastNameError;
 
-    //GroupName
-    if(!formData.groupName){
-      newErrors.groupName = "Group Name is required";
-    }
+  const emailError = validateEmail(formData.email);
+  if (emailError) 
+    newErrors.email = emailError;
 
-    //Gender
-    if(!formData.gender){
-      newErrors.gender = "Gender is required";
-    }
+  const phoneError = validatePhone(formData.phone);
+  if (phoneError)
+    newErrors.phone = phoneError;
 
-    //DOB
+  const genderError = validateSelect(formData.gender,"Gender");
+  if (genderError) 
+    newErrors.gender = genderError;
 
-   if (formData.dob) {
-  const dob = new Date(formData.dob);
+  const dobError = validateDob(formData.dob);
+  if (dobError) 
+    newErrors.dob = dobError;
+  
 
-  if (isNaN(dob.getTime())) {
-    newErrors.dob = "Enter valid Date of Birth";
-  } else {
-    const today = new Date();
+  setErrors(newErrors);
 
-    const hundredYearsAgo = new Date();
-    hundredYearsAgo.setFullYear(today.getFullYear() - 100);
-
-    if (dob > today || dob < hundredYearsAgo) {
-      newErrors.dob = "Enter valid Date of Birth";
-    }
-  }
-}
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }
+  return Object.keys(newErrors).length === 0;
+};
 
   return (
 
@@ -234,7 +191,7 @@ function NewUser() {
               border-b
               border-[var(--neutral-200)]
               bg-[var(--neutral-100)]
-              px-6
+              px-4 sm:px-6
               py-4
             "
           >
@@ -252,7 +209,7 @@ function NewUser() {
                   justify-center
                   rounded-full" 
               >
-                <img src={Back} alt="Back Button"/>
+                <Icon name="Back" alt="Back Button"/>
               </Button>
 
               <div>
@@ -281,10 +238,10 @@ function NewUser() {
           {/* SCROLLABLE CONTENT */}
           <div className="flex flex-1 flex-col overflow-auto">
 
-            <div className="w-full max-w-[1150px] px-6 py-5">
+            <div className="w-full px-6 md:px-8 lg:px-10 py-6">
 
               {/* USER ID */}
-              <div className="mb-3">
+              <div className="mb-5 w-full max-w-[520px]">
 
                 <Input
                   id ="userId"
@@ -300,7 +257,7 @@ function NewUser() {
 
 
               {/* GROUP NAME */}
-              <div className="mb-3">
+              <div className="mb-8 w-full max-w-[520px]">
 
                 <SearchableSelect
                   id="groupName"
@@ -340,20 +297,22 @@ function NewUser() {
                 />
               </div>
 
-
+            
               {/* FORM GRID */}
               <div
                 className="
                   grid
                   grid-cols-1
-                  gap-x-5
-                  gap-y-3
-                  xl:grid-cols-2
+                  md:grid-cols-2
+                  gap-x-8
+                  gap-y-6
+                  w-full
+                  xl:max-w-[1100px]
                 "
               >
 
                 {/* FIRST NAME */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     id ="firstName"
@@ -369,7 +328,7 @@ function NewUser() {
 
 
                 {/* LAST NAME */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     id="lastName"
@@ -386,7 +345,7 @@ function NewUser() {
 
 
                 {/* DOB */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     type = "date"
@@ -401,7 +360,7 @@ function NewUser() {
 
 
                 {/* GENDER */}
-                <div>
+                <div className="w-full">
 
                   <Select
                     id="gender"
@@ -440,7 +399,7 @@ function NewUser() {
                 </div>
 
                 {/* PHONE */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     id ="phone"
@@ -456,7 +415,7 @@ function NewUser() {
 
 
                 {/* MAIL */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     id="email"
@@ -472,7 +431,7 @@ function NewUser() {
 
 
                 {/* ADDRESS */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     id ="address"
@@ -487,7 +446,7 @@ function NewUser() {
 
 
                 {/* STATUS */}
-                <div>
+                <div className="w-full">
 
                   <p className="mb-[6px] text-[13px] font-semibold text-[var(--primary-900)]">
                     Status
@@ -507,7 +466,7 @@ function NewUser() {
 
 
               {/* IMAGE SECTION */}
-              <div className="mt-5">
+              <div className="mt-5 w-[250px]">
 
                 <ImgUploader
                   label="Image"
@@ -568,7 +527,7 @@ function NewUser() {
                 }
 
               </div>
-
+            
             </div>
 
           </div>
@@ -580,12 +539,12 @@ function NewUser() {
               border-t
               border-[var(--neutral-200)]
               bg-white
-              px-6
+              px-4 sm:px-6
               py-4
             "
           >
 
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
 
               <Button
                 type="submmit"

@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
-import Back from "../assets/icons/Back.svg";
+import Icon from "../components/Icon";
 import Input from "../components/Input";
 import TextArea from "../components/TextArea";
 import Toggle from "../components/Toggle";
 import { useState } from "react";
 import { apiService } from "../services/apiServices";
 import { toast } from "react-toastify";
+import {validateRequired} from "../utils/validation";
 
 function NewFacility (){
 
@@ -39,11 +40,12 @@ function NewFacility (){
     const validateField = (name, value) => {
         let error = "";
 
-        if(name === "facilityName" && !value.trim())
-            error = "Facility Name is required";
+        if(name === "facilityName")
+            error = validateRequired(value, "Facility Name");
 
-        if(name === "location" && !value.trim())
-            error="Location is required";
+        if(name === "location")
+            error= validateRequired(value, "Location");
+
         return error;
     }
 
@@ -64,28 +66,25 @@ function NewFacility (){
     const validateForm = () => {
         let newErrors = {};
 
-        if(!formData.facilityName.trim())
-            newErrors.facilityName = "Facility Name is required";
+        const facilityNameError = validateRequired(formData.facilityName,"Facility Name");
+        if(facilityNameError)
+            newErrors.facilityName = facilityNameError;
 
-        if(!formData.location.trim())
-            newErrors.location = "Location is required";
+        const locationError = validateRequired(formData.location,"Location");
+        if(locationError)
+            newErrors.location = locationError;
 
         setErrors(newErrors);
-
         return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async() => {
 
         if(!validateForm())
-            return;
-
-        const loggedInUserId = localStorage.getItem("userId");
+            return;  
 
         const payload ={
-            ...formData,
-            createdBy: loggedInUserId,
-            updatedBy: loggedInUserId
+            ...formData
         };
 
         try{
@@ -115,7 +114,7 @@ function NewFacility (){
                        })}
                        className="mt-[18px] flex h-6 w-6 items-center justify-center rounded-full cursor-pointer"
                     >
-                        <img src={Back} alt="Back Button" />
+                        <Icon name="Back" alt="Back Button" />
 
                     </Button>
 

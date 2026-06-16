@@ -6,9 +6,18 @@ import Select from "./components/Select";
 import Toggle from "./components/Toggle";
 import ImgUploader from "./components/ImgUploader";
 import Button from "./components/Button";
-import Back from './assets/icons/Back.svg';
+import Icon from "./components/Icon";
 import { apiService } from "./services/apiServices";
 import {toast} from "react-toastify";
+import {
+  validateRequired,
+  validateSelect,
+  validateName,
+  validateOptionalName,
+  validateEmail,
+  validatePhone,
+  validateDob
+} from "./utils/validation";
 
 function EditUser() {
 
@@ -64,69 +73,32 @@ function EditUser() {
     }
   };
 
-  const validateField = (name, value) => {
-  let error = "";
-
-  if (name === "userId" && !value.trim()) {
-    error = "User ID is required";
-  }
-
-  if(name === "firstName"){
-  if(!value.trim()){
-    error = "First Name is required";
-  }
-  else if(!/^[A-Za-z\s]+$/.test(value)){
-    error = "Enter valid First Name";
-  }
- }
-
- if(name === "lastName" && value.trim()){
-  if(!/^[A-Za-z\s]+$/.test(value)){
-    error = "Enter valid Last Name";
-  }
-}
-
-  if (
-    name === "email" &&
-    value &&
-    (!value.includes("@") || !value.includes("."))
-  ) {
-    error = "Enter valid email";
-  }
-
-   if(name === "phone"){
-      if(!value.trim()){
-        error = "Phone Number is required";
-      }
-      else if(
-        !/^[6-9]\d{9}$/.test(value) || /(\d)\1{4,}/.test(value)){
-        error = "Enter valid Phone Number";
-      }
+    const validateField = (name, value) =>{
+      let error = "";
+  
+      if(name === "userId")
+        error = validateRequired(value, "User ID");
+  
+      if(name === "groupName")
+        error = validateSelect(value, "Group Name");
+      
+      if(name === "firstName")
+        error = validateName(value, "First Name");
+        
+      if(name === "lastName")
+        error = validateOptionalName(value,"Last Name");
+       
+      if(name === "email")
+        error = validateEmail(value);
+      
+      if(name === "phone")
+        error = validatePhone(value);
+     
+      if(name === "dob")
+        error = validateDob(value);
+        
+      return error;
     }
-
-  if (name === "groupName") {
-    if(!value){
-    error = "Group Name is required";
-  }}
-
-  if (name === "gender" && !value) {
-    error = "Gender is required";
-  }
-
-  if(name === "dob" && value){
-  const dob = new Date(value);
-  const today = new Date();
-
-  const hundredYearsAgo = new Date();
-  hundredYearsAgo.setFullYear(today.getFullYear() - 100);
-
-  if(dob > today || dob < hundredYearsAgo){
-    error = "Enter valid Date of Birth";
-  }
-}
-
-  return error;
-};
 
 
 
@@ -150,10 +122,10 @@ function EditUser() {
     if(!validateForm()){
       return;
     }
-    const loggedInUserId =localStorage.getItem("userId");
+    
     const payload = {
       ...formData,
-      updatedBy: loggedInUserId
+      
     };
 
     try{
@@ -169,70 +141,50 @@ function EditUser() {
     }
   };
 
-  const validateForm = ()=>{
+  const validateForm = () => {
+  
     let newErrors = {};
+  
+    const userIdError = validateRequired(formData.userId,"User ID");
+    if (userIdError) 
+      newErrors.userId = userIdError;
     
-    //User ID
-    if(!formData.userId.trim()){
-      newErrors.userId = "User ID is required";
-    }
-
-    //First Name
-      if(!formData.firstName.trim()){
-      newErrors.firstName = "First Name is required";
-    }
-    else if(!/^[A-Za-z\s]+$/.test(formData.firstName)){
-      newErrors.firstName = "Enter valid First Name";
-    }
-
-    //Last Name
-    if(
-      formData.lastName.trim() &&
-      !/^[A-Za-z\s]+$/.test(formData.lastName)
-    ){
-      newErrors.lastName = "Enter valid Last Name";
-    }
-
-    //Email
-    if(!formData.email.includes("@") || !formData.email.includes(".")){
-      newErrors.email = "Enter valid email";
-    }
-
-    //Phone
-    if(!formData.phone.trim()){
-      newErrors.phone = "Phone number is required";
-    }
-    else if( !/^[6-9]\d{9}$/.test(formData.phone) ||/(\d)\1{4,}/.test(formData.phone)){
-      newErrors.phone = "Enter valid Phone Number";
-    }
-
-    //GroupName
-    if(!formData.groupName){
-      newErrors.groupName = "Group Name is required";
-    }
-
-    //Gender
-    if(!formData.gender){
-      newErrors.gender = "Gender is required";
-    }
-
-    //Dob
-
-    if(formData.dob){
-      const dob = new Date(formData.dob);
-      const today = new Date();
-
-      const hundredYearsAgo = new Date();
-      hundredYearsAgo.setFullYear(today.getFullYear() - 100);
-
-      if(dob > today || dob < hundredYearsAgo){
-        newErrors.dob = "Enter valid Date of Birth";
-      }
-    }
-
+  
+    const groupError = validateSelect(formData.groupName,"Group Name");
+    if (groupError) 
+      newErrors.groupName = groupError;
+    
+  
+    const firstNameError = validateName(formData.firstName,"First Name");
+    if (firstNameError) 
+      newErrors.firstName = firstNameError;
+    
+  
+    const lastNameError = validateOptionalName(formData.lastName,"Last Name");
+    if (lastNameError) 
+      newErrors.lastName = lastNameError;
+  
+    const emailError = validateEmail(formData.email);
+    if (emailError) 
+      newErrors.email = emailError;
+  
+    const phoneError = validatePhone(formData.phone);
+    if (phoneError)
+      newErrors.phone = phoneError;
+  
+    const genderError = validateSelect(formData.gender,"Gender");
+    if (genderError) 
+      newErrors.gender = genderError;
+  
+    const dobError = validateDob(formData.dob);
+    if (dobError) 
+      newErrors.dob = dobError;
+    
+  
     setErrors(newErrors);
+  
     return Object.keys(newErrors).length === 0;
-  }
+  };
 
 
   useEffect(() => {
@@ -308,7 +260,7 @@ const loadUser = async () => {
                   cursor-pointer
                   rounded-full" 
               >
-                <img src={Back} alt="Back Button"/>
+                <Icon name="Back" alt="Back Button"/>
               </Button>
 
               <div>

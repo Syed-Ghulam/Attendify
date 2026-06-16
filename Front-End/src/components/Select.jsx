@@ -1,4 +1,4 @@
-import Arrow from "../assets/icons/Vector.svg";
+import Icon from "./Icon";
 
 function Select(props){
 
@@ -50,9 +50,9 @@ function Select(props){
             </select>
 
             {/* Arrow Icon */}
-            <img
-               src={Arrow}
-               alt="arrow"
+            <Icon
+               name = "DropDown"
+               alt="DropDown"
                className="
                absolute
                right-4

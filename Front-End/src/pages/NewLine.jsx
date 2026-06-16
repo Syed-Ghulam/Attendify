@@ -2,14 +2,15 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { apiService } from "../services/apiServices";
 import {toast} from "react-toastify";
+import {validateRequired, validateSelect} from "../utils/validation"
 
 import Button from "../components/Button";
 
 import Input from "../components/Input";
 import Select from "../components/Select";
-
-import Back from "../assets/icons/Back.svg";
+import Icon from "../components/Icon";
 import Toggle from "../components/Toggle";
+
 
 
 function NewLine() {
@@ -44,12 +45,12 @@ function NewLine() {
     const validateField = (name, value) => {
     let error = "";
 
-    if (name === "lineNameNumber" && !value.trim()) {
-        error = "Line Name / Number is required";
+    if (name === "lineNameNumber") {
+        error = validateRequired(value, "Line Name / Number");
     }
 
-    if (name === "facility" && !value) {
-        error = "Facility is required";
+    if (name === "facility") {
+        error = validateSelect(value, "Facility");
     }
 
     return error;
@@ -76,12 +77,8 @@ function NewLine() {
          return;
       }
 
-      const loggedInUserId = localStorage.getItem("userId");
-
          const payload = {
-            ...formData,
-            createdBy: loggedInUserId,
-            updatedBy: loggedInUserId
+            ...formData
          };
 
       try{
@@ -97,14 +94,13 @@ function NewLine() {
 
    let newErrors = {};
 
-   if (!formData.lineNameNumber.trim()) {
-      newErrors.lineNameNumber =
-         "Line Name / Number is required";
-   }
-
-   if (!formData.facility) {
-      newErrors.facility =
-         "Facility is required";
+   const lineNameError = validateRequired(formData.lineNameNumber,"Line Name / Number");
+   if (lineNameError) 
+      newErrors.lineNameNumber =lineNameError;
+   
+   const facilityError = validateSelect(formData.facility, "Facility");
+   if (facilityError) {
+      newErrors.facility =facilityError;
    }
 
    setErros(newErrors);
@@ -135,7 +131,7 @@ function NewLine() {
                         justify-center rounded-full cursor-pointer"
                      >
 
-                        <img src={Back} alt="Back Button" />
+                        <Icon name="Back" alt="Back Button" />
 
                      </Button>
 

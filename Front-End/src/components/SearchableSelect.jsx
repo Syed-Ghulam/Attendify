@@ -1,8 +1,8 @@
 import { useState } from "react";
-import Arrow from "../assets/icons/Vector.svg";
+import Icon from "./Icon";
 import SearchInput from "./SearchInput";
 
-function MultiSelect(props) {
+function SearchableSelect(props) {
    const [showOptions, setShowOptions] = useState(false);
    const [searchTerm, setSearchTerm] = useState("");
 
@@ -79,9 +79,9 @@ function MultiSelect(props) {
                )}
             </div>
 
-            <img
-               src={Arrow}
-               alt="arrow"
+            <Icon
+               name="DropDown"
+               alt="DropDown"
                className="
                   absolute
                   right-4
@@ -161,4 +161,4 @@ function MultiSelect(props) {
    );
 }
 
-export default MultiSelect;
+export default SearchableSelect;

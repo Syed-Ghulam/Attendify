@@ -3,15 +3,16 @@ const router = express.Router();
 const verifyToken = require("../middleware/authMiddleware");
 
 const {createGroup, getGroups, getGroupById, updateGroup, deleteGroup} = require("../controllers/groupController");
+const validateGroup = require("../middleware/validateGroup");
 
 
-router.post("/", verifyToken,createGroup);
+router.post("/", verifyToken,validateGroup, createGroup);
 
 router.get("/", verifyToken, getGroups);
 
 router.get('/:id', verifyToken,getGroupById);
 
-router.put("/:id", verifyToken, updateGroup);
+router.put("/:id", verifyToken, validateGroup, updateGroup);
 
 router.delete("/:id", verifyToken, deleteGroup);
 

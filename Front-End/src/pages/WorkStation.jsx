@@ -10,8 +10,7 @@ import SearchInput from "../components/SearchInput";
 import Select from "../components/Select";
 import Button from "../components/Button";
 import Table from "../components/Table";
-import UnCheck from "../assets/icons/Uncheck.svg";
-import More from "../assets/icons/more_vert.svg";
+import Icon from "../components/Icon";
 import { apiService } from "../services/apiServices";
 import { toast } from "react-toastify";
 
@@ -59,7 +58,7 @@ function WorkStation(){
 
     const workStationColumns = [
         {
-            label:<button><img src={UnCheck} alt="checkbox"/></button>,
+            label:<button><Icon name="UnCheck" alt="checkbox"/></button>,
             key:"checkBox"
         },
 
@@ -124,8 +123,8 @@ const loadWorkStations = async () => {
       (workStation) => ({
         checkBox: (
           <button type="checkBox">
-            <img
-              src={UnCheck}
+            <Icon
+              name="UnCheck"
               alt="checkbox"
             />
           </button>
@@ -181,12 +180,7 @@ const loadWorkStations = async () => {
       await apiService.updateWorkStation(
         workStation.id,
         {
-            isActive:
-            !workStation.isActive,
-            updatedBy:
-            localStorage.getItem(
-                "userId"
-            )
+            isActive:!workStation.isActive
         }
       );
 
@@ -281,7 +275,7 @@ const filteredWorkStationData = workStationData.filter((row) => {
                   )
                }
             >
-               <img src={More} alt="more options" />
+               <Icon name="More" alt="more options" />
             </button>
 
             {

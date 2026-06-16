@@ -1,9 +1,16 @@
 const Line = require("../models/Line");
 
-const createLine = async (req, res) => {
+const createLine = async (req, res, next) => {
     try {
 
-        const line = await Line.create(req.body);
+        const line = await Line.create({
+            lineNameNumber: req.body.lineNameNumber,
+            lineCode: req.body.lineCode,
+            facility: req.body.facility,
+            isActive: req.body.isActive,
+            createdBy: req.user.userId,
+            updatedBy: req.user.userId
+        });
 
         res.status(201).json({
             message: "Line created successfully",
@@ -12,14 +19,12 @@ const createLine = async (req, res) => {
 
     } catch (error) {
 
-        res.status(500).json({
-            message: error.message
-        });
+    next(error);
 
     }
 };
 
-const getLines = async (req, res) => {
+const getLines = async (req, res, next) => {
     try {
 
         const lines = await Line.findAll({
@@ -32,14 +37,12 @@ const getLines = async (req, res) => {
 
     } catch (error) {
 
-        res.status(500).json({
-            message: error.message
-        });
+      next(error);
 
     }
 };
 
-const getLineById = async (req, res) => {
+const getLineById = async (req, res, next) => {
     try {
 
        const line = await Line.findOne({
@@ -59,14 +62,12 @@ const getLineById = async (req, res) => {
 
     } catch (error) {
 
-        res.status(500).json({
-            message: error.message
-        });
+        next(error);
 
     }
 };
 
-const updateLine = async (req, res) => {
+const updateLine = async (req, res, next) => {
     try {
 
        const line = await Line.findOne({
@@ -83,7 +84,11 @@ const updateLine = async (req, res) => {
         }
 
         await line.update({
-            ...req.body
+            lineNameNumber: req.body.lineNameNumber,
+            lineCode: req.body.lineCode,
+            facility: req.body.facility,
+            isActive: req.body.isActive,
+            updatedBy: req.user.userId
         });
 
         res.status(200).json({
@@ -93,14 +98,12 @@ const updateLine = async (req, res) => {
 
     } catch (error) {
 
-        res.status(500).json({
-            message: error.message
-        });
+        next(error)
 
     }
 };
 
-const deleteLine = async (req, res) => {
+const deleteLine = async (req, res, next) => {
     try {
 
         const line = await Line.findByPk(
@@ -115,7 +118,7 @@ const deleteLine = async (req, res) => {
 
         await line.update({
             isDeleted: true,
-            updatedBy: req.body.updatedBy
+            updatedBy: req.user.userId
         });
 
         res.status(200).json({
@@ -124,10 +127,7 @@ const deleteLine = async (req, res) => {
 
     } catch (error) {
 
-        res.status(500).json({
-            message: error.message
-        });
-
+        next(error);
     }
 };
 

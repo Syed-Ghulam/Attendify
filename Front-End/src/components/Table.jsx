@@ -1,6 +1,4 @@
-import Refresh from '../assets/icons/refresh.svg';
-import ArrowLeft from '../assets/icons/Arrow Left.svg';
-import ArrowRight from '../assets/icons/Arrow Right.svg';
+import Icon from "./Icon";
 import { useState } from 'react';
 
 function Table({columns, data}) {
@@ -139,7 +137,8 @@ function Table({columns, data}) {
              disabled={currentPage === 1}
              className="flex text-[var(--neutral-500)] text-[18px] cursor-pointer">
                 
-                <img src={ArrowLeft} alt="left arrow" /> <img src={ArrowLeft} alt="left arrow" className='-ml-3' />
+                <Icon name="ArrowLeft" alt="First Page" /> 
+                <Icon name="ArrowLeft" alt="First Page" className='-ml-3' />
                 
             </button>
 
@@ -147,7 +146,9 @@ function Table({columns, data}) {
             onClick={() => setCurrentPage(currentPage -1)}
             disabled = {currentPage === 1}
             className="text-[var(--neutral-500)] text-[18px] cursor-pointer">
-                <img src={ArrowLeft} alt="left arrow" />
+
+                <Icon name="ArrowLeft" alt="Previous" />
+
             </button>
 
             {/* Active Page */}
@@ -164,14 +165,19 @@ function Table({columns, data}) {
             onClick={() => setCurrentPage(currentPage+1)}
             disabled = {currentPage === totalPages}
             className="text-[var(--neutral-500)] text-[18px] cursor-pointer">
-                <img src={ArrowRight} alt="Right arrow" />
+
+                <Icon name="ArrowRight" alt="Next" />
+
             </button>
 
             <button 
             onClick={() => setCurrentPage(totalPages)}
             disabled = {currentPage === totalPages}
             className="flex text-[var(--neutral-500)] text-[18px] cursor-pointer">
-                <img src={ArrowRight} alt="Right arrow" /> <img src={ArrowRight} alt="Right arrow" className='-ml-3'/>
+
+                <Icon name="ArrowRight" alt="Last Page" />
+                <Icon name="ArrowRight" alt="Last Page" className='-ml-3'/>
+
             </button>
 
         </div>
@@ -221,7 +227,9 @@ function Table({columns, data}) {
         </span>
 
         <button className="text-[var(--neutral-500)] text-[18px] cursor-pointer">
-            <img src={Refresh} alt="refresh" />
+
+            <Icon name="Refresh" alt="refresh" />
+
         </button>
 
     </div>

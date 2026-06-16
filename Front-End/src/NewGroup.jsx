@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "./components/Button";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
-import Back from "./assets/icons/Back.svg";
+import Icon from "./components/Icon";
 import Input from "./components/Input";
 import Select from "./components/Select";
 import { useState } from "react";
@@ -10,6 +10,7 @@ import TextArea from './components/TextArea';
 import Toggle from "./components/Toggle";
 import { apiService } from "./services/apiServices";
 import {toast} from "react-toastify";
+import { validateRequired, validateSelect } from "./utils/validation";
 
 
 function NewGroup(){
@@ -31,13 +32,13 @@ function NewGroup(){
     const validateField = (name, value) => {
     let error = "";
 
-    if (name === "groupName" && !value.trim()) {
-        error = "Group Name is required";
-    }
+    if (name === "groupName") 
+        error = validateRequired(value,"Group Name");
+    
 
-    if (name === "roleName" && !value) {
-        error = "Role Name is required";
-    }
+    if (name === "roleName") 
+        error = validateSelect(value,"Role Name");
+    
 
     return error;
 };
@@ -45,9 +46,10 @@ function NewGroup(){
     const handleRoleChange = (e) =>{
         const value = e.target.value;
 
-        setFormData({
-            ...formData,roleName: value
-        });
+        setFormData((prev) => ({
+            ...prev,
+            roleName: value
+        }));
 
         setErrors((prev) => ({
             ...prev,
@@ -60,18 +62,20 @@ function NewGroup(){
 
         setIsOn(newStatus);
 
-        setFormData({
-            ...formData, isActive: newStatus
-        });
+     setFormData((prev) => ({
+            ...prev,
+            isActive: newStatus
+        }));
     };
 
     const handleChange = (e)=>{
 
         const {id, value} = e.target;
 
-        setFormData({
-            ...formData,[id]: value
-        });
+        setFormData((prev) => ({
+            ...prev,
+            [id]: value
+        }));
 
         setErrors((prev) => ({
             ...prev,
@@ -79,16 +83,19 @@ function NewGroup(){
         }));
     };
 
-    const validateForm = () => {
+     const validateForm = () => {
+
     let newErrors = {};
 
-    if (!formData.groupName.trim()) {
-        newErrors.groupName = "Group Name is required";
-    }
+    const groupNameError = validateRequired(formData.groupName,"Group Name");
+    if (groupNameError)
+        newErrors.groupName = groupNameError;
+    
 
-    if (!formData.roleName) {
-        newErrors.roleName = "Role Name is required";
-    }
+    const roleNameError = validateSelect(formData.roleName,"Role Name");
+    if (roleNameError)
+        newErrors.roleName = roleNameError;
+    
 
     setErrors(newErrors);
 
@@ -103,8 +110,6 @@ function NewGroup(){
 
         const payload = {
             ...formData,
-            createdBy: localStorage.getItem("userId"),
-            updatedBy: localStorage.getItem("userId")
         }
 
         try{
@@ -150,7 +155,7 @@ function NewGroup(){
                                 cursor-pointer
                                 rounded-full"  
                             >
-                                <img src={Back} alt="Back Button" />
+                                <Icon name="Back" alt="Back Button" />
                             </Button>
 
                             <div>

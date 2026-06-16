@@ -1,5 +1,5 @@
 import Button from "./components/Button";
-import Back from './assets/icons/Back.svg';
+import Icon from "./components/Icon";
 import { useNavigate, useParams } from "react-router-dom";
 import Input from "./components/Input";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import Select from "./components/Select";
 import TextArea from "./components/TextArea";
 import Toggle from "./components/Toggle";
 import { toast } from "react-toastify";
+import { validateRequired, validateSelect } from "./utils/validation";
 
 function EditGroup (){
     const navigate = useNavigate();
@@ -29,40 +30,41 @@ function EditGroup (){
     const validateField = (name, value) => {
         let error = "";
 
-        if (name === "groupName" && !value.trim()) {
-            error = "Group Name is required";
+        if (name === "groupName") {
+            error = validateRequired(value,"Group Name");
         }
 
-        if (name === "roleName" && !value) {
-            error = "Role Name is required";
+        if (name === "roleName") {
+            error = validateSelect(value,"Role Name");
         }
 
         return error;
     };
 
-    const validateForm = () =>{
-        let newErrors = {};
+   const validateForm = () => {
 
-        if(!formData.groupName.trim()) {
-            newErrors.groupName = "Group Name is Required";
-        }
+    let newErrors = {};
 
-        if(!formData.roleName) {
-            newErrors.roleName = "Role Name is Required";
-        }
+    const groupNameError = validateRequired(formData.groupName,"Group Name");
+    if (groupNameError) 
+        newErrors.groupName = groupNameError;
 
-        setErrors(newErrors);
+    const roleNameError = validateSelect(formData.roleName,"Role Name");
+    if (roleNameError) 
+        newErrors.roleName = roleNameError;
 
-        return Object.keys(newErrors).length === 0;
-    };
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+};
 
     const handleChange = (e) => {
         const {id, value} = e.target;
 
-        setFormData({
-            ...formData,
-            [id] : value
-        });
+        setFormData((prev) => ({
+            ...prev,
+            [id]: value
+        }));
 
         setErrors((prev) => ({
             ...prev,
@@ -80,8 +82,7 @@ function EditGroup (){
             const data = await apiService.updateGroup(
                     id,
                     {
-                        ...formData,
-                        updatedBy: localStorage.getItem("userId")
+                        ...formData,  
                     }
                     );
 
@@ -146,7 +147,7 @@ const loadGroup = async () => {
                         cursor-pointer
                         rounded-full" 
                     >
-                        <img src={Back} alt="Back Button" />
+                        <Icon name="Back" alt="Back Button" />
                     </Button>
 
                     <div>
@@ -230,10 +231,10 @@ const loadGroup = async () => {
                           label="Status"
                           isOn={formData.isActive}
                           onClick={() =>
-                            setFormData({
-                                ...formData,
-                                isActive: !formData.isActive
-                            })
+                            setFormData((prev) => ({
+                                    ...prev,
+                                    isActive: !prev.isActive
+                                }))
                           }
                            labelClassName="
                                 mt-[15px]

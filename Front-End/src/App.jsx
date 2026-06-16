@@ -6,8 +6,7 @@ import { API_URL } from './config/api';
 import { useEffect } from 'react';
 import { toast } from "react-toastify";
 
-import BPL_logo from './assets/icons/BPL_Logo.svg';
-import Login_img from './assets/icons/Login_img.svg';
+import Icon from "./components/Icon";
 
 function App() {
 
@@ -118,7 +117,7 @@ function App() {
           <div className='w-full md:w-[45%] lg:w-[35%] flex flex-col justify-center px-6
                 sm:px-10 md:px-12 lg:px-16 xl:px-24'>
 
-              <img src={BPL_logo} alt="logo" className='mb-5' />
+              <Icon name="BPLtitle" alt="logo" className='mb-5' />
 
               <div className='w-full max-w-[360px]'>
               <h4 className='mb-8 text-[24px] sm:text-[24px] font-semibold text-[var(--primary-900)]'>
@@ -168,8 +167,8 @@ function App() {
 
           <div className='hidden md:block md:w-[55%] lg:w-[65%] h-screen'>
 
-              <img 
-                 src={Login_img} 
+              <Icon
+                 name="LoginImg" 
                  alt="login image"
                  className='w-full h-full object-cover'
                />

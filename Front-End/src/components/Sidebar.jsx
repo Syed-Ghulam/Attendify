@@ -1,5 +1,6 @@
 import Button from './Button';
 import { menuItems } from '../config/sidebarMenu';
+import Icon from "./Icon"; 
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 
@@ -61,8 +62,8 @@ function Sidebar() {
                              ${isActive? "bg-[var(--primary-900)]" : "bg-transparent"}`}
                     >
 
-                        <img
-                            src={item.icon} alt='icon'
+                        <Icon
+                            name={item.icon} alt={item.id}
                             className={`${isActive? "brightness-0 invert":""}`}
                           
                         />
