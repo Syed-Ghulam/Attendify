@@ -103,6 +103,37 @@ const updateLine = async (req, res, next) => {
     }
 };
 
+const updateLineStatus = async (req, res, next) => {
+    try {
+
+        const line = await Line.findOne({
+            where: {
+                id: req.params.id,
+                isDeleted: false
+            }
+        });
+
+        if (!line) {
+            return res.status(404).json({
+                message: "Line not found"
+            });
+        }
+
+        await line.update({
+            isActive: req.body.isActive,
+            updatedBy: req.user.userId
+        });
+
+        res.status(200).json({
+            message: "Line status updated successfully"
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 const deleteLine = async (req, res, next) => {
     try {
 
@@ -136,5 +167,6 @@ module.exports = {
     getLines,
     getLineById,
     updateLine,
+    updateLineStatus,
     deleteLine
 };

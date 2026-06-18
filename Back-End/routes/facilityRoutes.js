@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 
-const {createFacility, getFacility, getFacilityById , updateFacility, deleteFacility} = require("../controllers/facilityController");
+const {createFacility, getFacility, getFacilityById , updateFacility, updateFacilityStatus, deleteFacility} = require("../controllers/facilityController");
 
 const verifyToken = require("../middleware/authMiddleware");
 const validateFacility = require("../middleware/validateFacility");
@@ -14,6 +14,8 @@ router.get("/", verifyToken, getFacility);
 router.get("/:id", verifyToken, getFacilityById);
 
 router.put("/:id", verifyToken, validateFacility, updateFacility);
+
+router.patch("/:id/status", verifyToken, updateFacilityStatus);
 
 router.delete("/:id", verifyToken, deleteFacility);
 

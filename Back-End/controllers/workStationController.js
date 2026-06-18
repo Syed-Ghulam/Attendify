@@ -96,6 +96,31 @@ const updateWorkStation = async (req, res, next) => {
     }
 };
 
+const updateWorkStationStatus = async (req, res, next) => {
+    try {
+
+        const workstation = await WorkStation.findByPk(req.params.id);
+
+        if (!workstation) {
+            return res.status(404).json({
+                message: "WorkStation not found"
+            });
+        }
+
+        await workstation.update({
+            isActive: req.body.isActive,
+            updatedBy: req.user.userId
+        });
+
+        res.status(200).json({
+            message: "Status updated successfully"
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 const deleteWorkStation = async (req, res, next) => {
     try {
 
@@ -128,5 +153,6 @@ module.exports = {
     getWorkStation,
     getWorkStationById,
     updateWorkStation,
+    updateWorkStationStatus,
     deleteWorkStation
 }

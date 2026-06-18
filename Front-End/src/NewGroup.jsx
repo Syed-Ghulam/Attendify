@@ -1,11 +1,11 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "./components/Button";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Icon from "./components/Icon";
 import Input from "./components/Input";
 import Select from "./components/Select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TextArea from './components/TextArea';
 import Toggle from "./components/Toggle";
 import { apiService } from "./services/apiServices";
@@ -15,7 +15,10 @@ import { validateRequired, validateSelect } from "./utils/validation";
 
 function NewGroup(){
     const navigate = useNavigate();
+    const {id} = useParams();
+    const isEdit = !!id;
     const [isOn, setIsOn] = useState(false);
+    const [isApi, setIsApi] = useState(false);
     const [error, setErrors] = useState({});
     const[formData, setFormData] = useState({
         groupName:"",
@@ -102,25 +105,81 @@ function NewGroup(){
     return Object.keys(newErrors).length === 0;
 };
 
-    const handleSubmit = async() => {
+   const handleSubmit = async () => {
 
-        if(!validateForm()){
-            return;
-        }
+    if (!validateForm()) {
+        return;
+    }
 
-        const payload = {
-            ...formData,
-        }
+    try {
 
-        try{
-          const data = await apiService.createGroup(payload);
-            console.log(data);
+        if (isEdit) {
+
+            await apiService.updateGroup(
+                id,
+                formData
+            );
+
+            toast.success("Group Updated Successfully");
+
+        } else {
+
+            await apiService.createGroup(
+                formData
+            );
+
             toast.success("Group Created Successfully");
-        } catch(error){
-            console.log(error);
-            toast.error(error.message);
+
         }
-    };
+
+        navigate("/users", {
+            state: {
+                activeTab: "Groups"
+            }
+        });
+
+    } catch (error) {
+
+        console.log(error);
+        toast.error(error.message);
+
+    }
+
+};
+
+const loadGroup = async () => {
+  try {
+
+    const data =
+      await apiService.getGroupById(id);
+
+    setFormData({
+      groupName: data.groupName || "",
+      roleName: data.roleName || "",
+      description: data.description || "",
+      isActive: data.isActive || false
+    });
+
+    setIsOn(data.isActive);
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+};
+
+useEffect(() => {
+
+    if (isEdit) {
+        loadGroup();
+    }
+
+}, [isEdit]);
+
+if (isApi) {
+    return <p>Try again</p>;
+}
     return(
        
 
@@ -132,11 +191,11 @@ function NewGroup(){
                         border-[var(--neutral-200)]
                         bg-[var(--neutral-100)]
                         px-6
-                        py-4
+                        py-3
                         "
                     >
 
-                        <div className="flex gap-3">
+                        <div className="flex items-center gap-3">
 
                             <Button
                                onClick={() =>
@@ -147,10 +206,11 @@ function NewGroup(){
                                     })}
                                type="button"
                                className="
-                                mt-[22px]
+                                mt-[18px]
                                 flex
                                 h-6
                                 w-6 
+                                items-center
                                 justify-center
                                 cursor-pointer
                                 rounded-full"  
@@ -165,12 +225,13 @@ function NewGroup(){
 
                                 <h2 
                                     className="
-                                    text-[30px]
+                                    text-[20px]
                                     font-bold
                                     text-[var(--primary-900)]
                                 "
                                 >
-                                    New Group
+                                    {isEdit ? "Edit Group" : "New Group"}
+
                                 </h2>
                             </div>
                         </div>
@@ -193,7 +254,7 @@ function NewGroup(){
 
                             <div>
                                 <Select
-                                  id="role name"
+                                  id="roleName"
                                   label = "Role Name"
                                   value ={formData.roleName}
                                   required={true}
@@ -266,7 +327,7 @@ function NewGroup(){
 
                                 <Button
                                 type="submit"
-                                text="Create"
+                                text={isEdit ? "Save" : "Create"}
                                 onClick={handleSubmit}
                                 className="
                                     w-[125px]

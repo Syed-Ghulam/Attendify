@@ -6,6 +6,7 @@ import { API_URL } from './config/api';
 import { useEffect } from 'react';
 import { toast } from "react-toastify";
 
+
 import Icon from "./components/Icon";
 
 function App() {
@@ -21,13 +22,33 @@ function App() {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
 
-    if(token){
-      navigate("/users");
-    }
-  }, [navigate]);
+    const checkLogin = async () => {
 
+        try {
+
+            const response = await fetch(
+                `${API_URL}/users/check-auth`,
+                {
+                    credentials: "include"
+                }
+            );
+
+            if (response.ok) {
+                navigate("/users", { replace: true });
+            }
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+
+    };
+
+    checkLogin();
+
+}, [navigate]);
   const validateForm = () => {
     const newErrors = {};
 
@@ -71,6 +92,7 @@ function App() {
       `${API_URL}/users/login`,
       {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json"
         },
@@ -81,14 +103,14 @@ function App() {
       }
     );
 
+    console.log(response.status);
+
     const data = await response.json().catch(() => ({}));
 
+    console.log(data);
     if (response.ok) {
 
-      localStorage.setItem(
-        "token",
-        data.token
-      );
+      console.log("Login Success");
 
       localStorage.setItem(
         "userId",

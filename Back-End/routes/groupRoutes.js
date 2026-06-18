@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const verifyToken = require("../middleware/authMiddleware");
 
-const {createGroup, getGroups, getGroupById, updateGroup, deleteGroup} = require("../controllers/groupController");
+const {createGroup, getGroups, getGroupById, updateGroup, updateGroupStatus, deleteGroup} = require("../controllers/groupController");
 const validateGroup = require("../middleware/validateGroup");
 
 
@@ -13,6 +13,8 @@ router.get("/", verifyToken, getGroups);
 router.get('/:id', verifyToken,getGroupById);
 
 router.put("/:id", verifyToken, validateGroup, updateGroup);
+
+router.patch("/:id/status", verifyToken, updateGroupStatus);
 
 router.delete("/:id", verifyToken, deleteGroup);
 

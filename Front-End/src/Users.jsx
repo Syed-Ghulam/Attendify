@@ -462,7 +462,7 @@ const handleStatusOptions = (e) =>{
 const updateUserStatus = async (user) => {
   try {
     
-    await apiService.updateUser(
+    await apiService.updateUserStatus(
       user.userId, 
       {
         isActive: !user.isActive
@@ -480,13 +480,15 @@ const updateUserStatus = async (user) => {
       )
     );
 
+     setOpenMenu(null);
+
      toast.success(
       user.isActive
         ? "User deactivated successfully"
         : "User activated successfully"
     );
 
-    setOpenMenu(null);
+   
 
   } catch (error) {
     console.log(error);
@@ -540,7 +542,7 @@ const deleteGroup = async (group) => {
 const handleGroupStatusToggle = async (group) => {
   try {
     
-    await apiService.updateGroup(group.id,{isActive: !group.isActive,});
+    await apiService.updateGroupStatus(group.id,{isActive: !group.isActive,});
 
     setGroupData((prev) =>
       prev.map((item) =>
@@ -550,11 +552,12 @@ const handleGroupStatusToggle = async (group) => {
       )
     );
 
+    setOpenMenu(null);
     toast.success(
       group.isActive ? "Group deactivated successfully" : "Group activated successfully"
     );
 
-    setOpenMenu(null);
+    
   } catch (error) {
     console.error(error);
     toast.error("Failed to update status");

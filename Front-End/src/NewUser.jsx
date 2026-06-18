@@ -1,7 +1,7 @@
 import Input from "./components/Input";
 import SearchableSelect from "./components/SearchableSelect";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {toast} from "react-toastify";
 import Select from "./components/Select";
 import Toggle from "./components/Toggle";
@@ -22,8 +22,11 @@ import {
 function NewUser() {
 
   const navigate = useNavigate();
-  const [isOn, setIsOn] = useState(false);
+  const {userId} = useParams();
+  const isEdit = !!userId;
   const [image, setImage] = useState(null);
+  const [isApi, setIsApi] = useState(false);
+  const [isOn, setIsOn] = useState(false);
   const [formData, setFormData] = useState({
   userId: "",
   groupName: "",
@@ -115,26 +118,48 @@ function NewUser() {
   };
 
 
-  const handleSubmit = async() => {
-     
-    if(!validateForm()){
-      return;
-    }
+ const handleSubmit = async () => {
 
-    const payload = {
-      ...formData,
-      dob: formData.dob || null,
-    };
+  if (!validateForm()) {
+    return;
+  }
 
-    try{
-     
-      await apiService.createUser(payload);  
-      toast.success("User Created Successfully");
-    } catch(error){
-      console.log(error);
-      toast.error(error.message);
-    }
+  const payload = {
+    ...formData,
+    dob: formData.dob || null
   };
+
+  try {
+
+    if (isEdit) {
+
+      await apiService.updateUser(
+        userId,
+        payload
+      );
+
+      toast.success("User Updated Successfully");
+
+    } else {
+
+      await apiService.createUser(
+        payload
+      );
+
+      toast.success("User Created Successfully");
+
+    }
+
+    navigate("/users");
+
+  } catch (error) {
+
+    console.log(error);
+    toast.error(error.message);
+
+  }
+
+};
 
  const validateForm = () => {
 
@@ -181,6 +206,51 @@ function NewUser() {
   return Object.keys(newErrors).length === 0;
 };
 
+const loadUser = async () => {
+  try {
+
+    const data = await apiService.getUserById(
+      userId
+    );
+
+    setFormData({
+      userId: data.userId || "",
+      groupName: data.groupName || "",
+      firstName: data.firstName || "",
+      lastName: data.lastName || "",
+      dob: data.dob
+        ? data.dob.split("T")[0]
+        : "",
+      gender: data.gender || "Male",
+      phone: data.phone || "",
+      email: data.email || "",
+      address: data.address || "",
+      isActive: data.isActive ?? false,
+      image: data.image || ""
+    });
+
+    setIsOn(data.isActive);
+
+  } catch (error) {
+
+    console.log(error);
+    setIsApi(true);
+
+  }
+};
+
+useEffect(() => {
+
+    if (isEdit) {
+        loadUser();
+    }
+
+}, [isEdit]);
+
+if (isApi) {
+    return <p>Try again</p>;
+}
+
   return (
 
         <div className="h-full flex flex-1 flex-col bg-[var(--neutral-100)] overflow-hidden">
@@ -191,23 +261,25 @@ function NewUser() {
               border-b
               border-[var(--neutral-200)]
               bg-[var(--neutral-100)]
-              px-4 sm:px-6
-              py-4
+              px-6
+              py-3
             "
           >
 
-            <div className="flex gap-3">
+            <div className="flex items-center gap-3">
 
               <Button
                 type="button"
                 onClick={()=>navigate("/users")}
                 className="
-                  mt-[22px]
+                  mt-[18px]
                   flex
                   h-6
                   w-6 
+                  items-center
                   justify-center
-                  rounded-full" 
+                  rounded-full
+                  cursor-pointer" 
               >
                 <Icon name="Back" alt="Back Button"/>
               </Button>
@@ -220,12 +292,12 @@ function NewUser() {
 
                 <h2
                   className="
-                    text-[30px]
+                    text-[20px]
                     font-bold
                     text-[var(--primary-900)]
                   "
                 >
-                  New User
+                  {isEdit ? "Edit User" : "New User"}
                 </h2>
 
               </div>
@@ -374,14 +446,13 @@ function NewUser() {
                     }}
                     options={genderOptions}
                     error = {errors.gender}
-                    labelClassName="
-                      mb-[6px]
+                    labelClassName="mt-[15px]
                       block
                       text-[13px]
                       font-semibold
                       text-[var(--primary-900)]
                     "
-                    className="
+                    className="mt-3
                       h-[42px]
                       w-full
                       rounded-[4px]
@@ -446,7 +517,7 @@ function NewUser() {
 
 
                 {/* STATUS */}
-                <div className="w-full">
+                <div className="mt-5 w-full">
 
                   <p className="mb-[6px] text-[13px] font-semibold text-[var(--primary-900)]">
                     Status
@@ -548,7 +619,7 @@ function NewUser() {
 
               <Button
                 type="submmit"
-                text="Create"
+                text={isEdit ? "Save" : "Create"}
                 onClick={handleSubmit}
                 className="
                   w-[120px]

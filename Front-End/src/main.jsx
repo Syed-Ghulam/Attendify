@@ -7,21 +7,18 @@ import "./index.css";
 import App from "./App.jsx";
 import Users from "./Users.jsx";
 import NewUser from "./NewUser.jsx";
-import EditUser from "./EditUser.jsx";
 import ViewUser from "./ViewUser.jsx";
 import WorkStation from "./pages/WorkStation.jsx";
 import NewWorkStation from "./pages/NewWorkStation.jsx";
-import EditWorkStation from "./pages/EditWorkStation.jsx";
 import NewGroup from "./NewGroup.jsx";
-import EditGroup from "./EditGroup.jsx";
 import NewLine from "./pages/NewLine.jsx";
 
 import DashBoardLayout from "./layout/DashBoardLayout.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
-import EditLine from "./pages/EditLine.jsx";
 import Facility from "./pages/Facility.jsx";
 import NewFacility from "./pages/NewFacility.jsx";
-import EditFacility from "./pages/EditFacility.jsx";
+
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -43,21 +40,22 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
         <Route path="users" element={<Users />} />
         <Route path="new-user" element={<NewUser />} />
-        <Route path="edit-user/:userId" element={<EditUser />} />
+        <Route path="edit-user/:userId" element={<NewUser />} />
         <Route path="view-user/:userId" element={<ViewUser />} />
 
         <Route path="new-group" element={<NewGroup />} />
-        <Route path="edit-group/:id" element={<EditGroup />} />
+        <Route path="edit-group/:id" element={<NewGroup />} />
 
         <Route path="workstation" element={<WorkStation />} />
         <Route path="new-workstation" element={<NewWorkStation />} />
-        <Route path="edit-workstation/:id" element={<EditWorkStation />} />
+        <Route path="edit-workstation/:id" element={<NewWorkStation />} />
 
         <Route path="/workstation/new-line" element={<NewLine />} />
-        <Route path="/workstation/edit-line/:id" element={<EditLine />} />
+        <Route path="/workstation/edit-line/:id" element={<NewLine />} />
 
+         <Route path="/workstation/facility" element={<Facility />} />
          <Route path="/workstation/new-facility" element={<NewFacility />} />
-         <Route path="/workstation/edit-facility/:id" element={<EditFacility/>} /> 
+         <Route path="/workstation/edit-facility/:id" element={<NewFacility/>} /> 
       </Route>
 
     </Routes>

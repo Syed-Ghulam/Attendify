@@ -92,10 +92,40 @@ const updateFacility = async(req, res, next) => {
     }
 };
 
+const updateFacilityStatus = async (req, res, next) => {
+    try {
+
+        const facility = await Facility.findOne({
+            where: {
+                id: req.params.id,
+                isDeleted: false
+            }
+        });
+
+        if (!facility) {
+            return res.status(404).json({
+                message: "Facility not found"
+            });
+        }
+
+        await facility.update({
+            isActive: req.body.isActive,
+            updatedBy: req.user.userId
+        });
+
+        res.status(200).json({
+            message: "Facility status updated successfully"
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 const deleteFacility = async (req, res, next) => {
     try {
 
-        const facility = await Facility.findByPk({
+        const facility = await Facility.findOne({
             where: {
                 id: req.params.id,
                 isDeleted:false
@@ -128,5 +158,6 @@ module.exports ={
     getFacility,
     getFacilityById,
     updateFacility,
+    updateFacilityStatus,
     deleteFacility
 };

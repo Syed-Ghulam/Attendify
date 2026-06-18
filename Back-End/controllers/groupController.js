@@ -90,6 +90,35 @@ const updateGroup = async (req, res, next) => {
   }
 };
 
+const updateGroupStatus = async (req, res, next) => {
+  try {
+    const group = await Group.findOne({
+      where: {
+        id: req.params.id,
+        isDeleted: false
+      }
+    });
+
+    if (!group) {
+      return res.status(404).json({
+        message: "Group not found"
+      });
+    }
+
+    await group.update({
+      isActive: req.body.isActive,
+      updatedBy: req.user.userId
+    });
+
+    res.status(200).json({
+      message: "Group status updated successfully"
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
 const deleteGroup = async (req, res, next) =>{
     try{
         const group = await Group.findOne({
@@ -123,5 +152,6 @@ module.exports = {
     getGroups,
     getGroupById,
     updateGroup,
+    updateGroupStatus,
     deleteGroup
 }

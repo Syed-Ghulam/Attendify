@@ -66,6 +66,27 @@ export const apiService = {
         return data;
     },
 
+    updateUserStatus: async (userId, payload) => {
+
+        const response = await apiFetch(
+            `/users/${userId}/status`,
+            {
+                method: "PATCH",
+                body: JSON.stringify(payload)
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Failed to update user status"
+            );
+        }
+
+        return data;
+    },
+
     deleteUser : async(userId) => {
 
         const response = await apiFetch(`/users/${userId}`,
@@ -150,6 +171,25 @@ export const apiService = {
     }
 
     return data;
+    },
+
+    updateGroupStatus: async (groupId, payload) => {
+
+        const response = await apiFetch(
+            `/groups/${groupId}/status`,
+            {
+                method: "PATCH",
+                body: JSON.stringify(payload)
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Failed to update group status");
+        }
+
+        return data;
     },
 
     
@@ -254,6 +294,25 @@ export const apiService = {
     return data;
     },
 
+    updateWorkStationStatus: async (id, payload) => {
+
+        const response = await apiFetch(
+            `/workstation/${id}/status`,
+            {
+                method: "PATCH",
+                body: JSON.stringify(payload)
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        return data;
+    },
+
     deleteWorkStation: async (
     workStationId
     ) => {
@@ -344,6 +403,27 @@ export const apiService = {
         return data;
         },
 
+        updateLineStatus: async (lineId, payload) => {
+
+            const response = await apiFetch(
+                `/line/${lineId}/status`,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to update line status"
+                );
+            }
+
+            return data;
+        },
+
         deleteLine: async (lineId) => {
 
         const response = await apiFetch(
@@ -430,6 +510,27 @@ export const apiService = {
                 throw new Error(
                     data.message ||
                     "Failed to update facility"
+                );
+            }
+
+            return data;
+        },
+
+        updateFacilityStatus: async (facilityId, payload) => {
+
+            const response = await apiFetch(
+                `/facility/${facilityId}/status`,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to update facility status"
                 );
             }
 

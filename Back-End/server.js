@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+const cookieParser = require("cookie-parser");
 const userRoutes = require("./routes/userRoutes");
 const groupRoutes = require("./routes/groupRoutes");
 const workStationRoutes = require("./routes/workStationRoutes");
@@ -14,9 +14,17 @@ require("./models/Group");
 require("./models/WorkStation");
 require("./models/Line");
 require("./models/Facility");
+
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
+
 app.use(express.json());
+
+app.use(cookieParser());
+
 app.use("/users",userRoutes);
 app.use("/groups",groupRoutes);
 app.use("/workstation", workStationRoutes);

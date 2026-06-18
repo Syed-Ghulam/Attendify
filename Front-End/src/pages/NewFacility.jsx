@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../components/Button";
 import Icon from "../components/Icon";
 import Input from "../components/Input";
 import TextArea from "../components/TextArea";
 import Toggle from "../components/Toggle";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { apiService } from "../services/apiServices";
 import { toast } from "react-toastify";
 import {validateRequired} from "../utils/validation";
@@ -12,6 +12,9 @@ import {validateRequired} from "../utils/validation";
 function NewFacility (){
 
     const navigate = useNavigate();
+    const {id} = useParams();
+    const isEdit = !!id;
+    const [isApi, setIsApi] = useState(false);
 
     const [isOn, setIsOn] = useState(false);
 
@@ -78,30 +81,88 @@ function NewFacility (){
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = async() => {
+    const loadFacility = async () => {
 
-        if(!validateForm())
-            return;  
+    try {
 
-        const payload ={
-            ...formData
-        };
+        const data =
+            await apiService.getFacilityById(id);
 
-        try{
-          await apiService.createFacility(payload);
-            toast.success("Facility created successfully");
-        } catch(error) {
-            console.log(error);
-            toast.error(error.message);
+        setFormData({
+            facilityName: data.facilityName || "",
+            location: data.location || "",
+            code: data.code || "",
+            description: data.description || "",
+            isActive: data.isActive ?? false
+        });
+
+        setIsOn(data.isActive ?? false);
+
+    } catch (error) {
+
+        console.log(error);
+        setIsApi(true);
+
+    }
+};
+
+useEffect(() => {
+
+    if (isEdit) {
+        loadFacility();
+    }
+
+}, [isEdit]);
+
+if (isApi) {
+    return <p>Try Again</p>;
+}
+
+const handleSubmit = async () => {
+
+    if (!validateForm()) return;
+
+    try {
+
+        if (isEdit) {
+
+            await apiService.updateFacility(
+                id,
+                formData
+            );
+
+            toast.success("Facility Updated Successfully");
+
+        } else {
+
+            await apiService.createFacility(
+                formData
+            );
+
+            toast.success("Facility Created Successfully");
+
         }
-    };
+
+        navigate("/workstation", {
+            state: {
+                activeTab: "Facility"
+            }
+        });
+
+    } catch (error) {
+
+        console.log(error);
+        toast.error(error.message);
+
+    }
+};
 
     return (
         
 
         <div className="h-full flex flex-1 flex-col bg-[var(--neutral-100)] overflow-hidden">
 
-            <div className="border-b border-[var(--neutral-200)] bg-[var(--neutral-100)] px-6 py-4">
+            <div className="border-b border-[var(--neutral-200)] bg-[var(--neutral-100)] px-6 py-3">
 
                 <div className="flex items-center gap-3">
 
@@ -109,7 +170,7 @@ function NewFacility (){
                        type="button"
                        onClick={() => navigate("/workstation",{
                         state:{
-                            activeTab:"Facility"
+                            activeTab: "Facility"
                         }
                        })}
                        className="mt-[18px] flex h-6 w-6 items-center justify-center rounded-full cursor-pointer"
@@ -123,8 +184,8 @@ function NewFacility (){
                             Manage WorkStation /
                         </p>
 
-                        <h2 className="text-[30px] font-bold text-[var(--primary-900)]">
-                            New Facility
+                        <h2 className="text-[20px] font-bold text-[var(--primary-900)]">
+                            {isEdit ? "Edit Facility" : "New Facility"}
                         </h2>
 
                     </div>
@@ -223,7 +284,7 @@ function NewFacility (){
 
                 <Button
                   type="submit"
-                  text="create"
+                  text={isEdit ? "Update" : "Create"}
                   onClick = {handleSubmit}
                   className="w-[120px] bg-[var(--primary-900)] text-white"
                 />
@@ -231,7 +292,11 @@ function NewFacility (){
                 <Button
                  type="button"
                  text="cancel"
-                 onClick = {() => navigate("/workstation")}
+                 onClick = {() => navigate("/workstation",{
+                    state: {
+                        activeTab : "Facility"
+                    }
+                 })}
                  className="w-[120px] border border-[var(--primary-900)] bg-white text-[var(--primary-900)]"
                 />
             </div>

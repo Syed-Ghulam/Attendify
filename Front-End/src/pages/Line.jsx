@@ -8,6 +8,7 @@ import Icon from "../components/Icon";
 import { apiService } from "../services/apiServices";
 import ConfirmationModal from "../components/ConfirmationModal";
 import { toast } from "react-toastify";
+import Tabs from "../components/Tabs";
 
 
 function Line (){
@@ -28,9 +29,9 @@ function Line (){
         onConfirm: null
     });
 
-    const facilityOptions = [
+    const [facilityOptions, setFacilityOptions] = useState([
         "ALL"
-    ];
+    ]);
 
     const statusOptions = [
         "ALL",
@@ -90,6 +91,7 @@ function Line (){
 
   useEffect(() => {
    loadLines();
+   loadFacilities();
 }, []);
 
 const loadLines = async () => {
@@ -126,11 +128,31 @@ const loadLines = async () => {
    }
 };
 
+const loadFacilities = async () => {
+    try {
+
+        const data = await apiService.getFacilities();
+
+        const facilities = [
+            "ALL",
+            ...new Set(
+            data
+                .filter(item => item.isActive)
+                .map(item => item.facilityName)
+        )];
+
+        setFacilityOptions(facilities);
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
     const updateLineStatus = async(line) => {
 
         try{
 
-            await apiService.updateLine(
+            await apiService.updateLineStatus(
                 line.id,
                 {
                     isActive: !line.isActive
@@ -270,89 +292,95 @@ const loadLines = async () => {
     return(
         <>
                 <div>
+
                     <div>
 
-                        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-                          <div className="w-full lg:w-[260px]">
-                            <SearchInput
-                               id="search"
-                               placeHolder = "Search"
-                               value={search}
-                               onChange = {(e) =>
-                                setSearch(e.target.value)
-                               } 
-                            />
-                          </div>
+                        
+                                    
+                                    <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                                    <div className="w-full lg:w-[260px]">
+                                        <SearchInput
+                                        id="search"
+                                        placeHolder = "Search"
+                                        value={search}
+                                        onChange = {(e) =>
+                                            setSearch(e.target.value)
+                                        } 
+                                        />
+                                    </div>
 
-                          <div className="flex flex-wrap items-end gap-4">
+                                    <div className="flex flex-wrap items-end gap-4">
+                                        
+                                        <Select
+                                        id="facillity"
+                                        labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
+                                        label="Facility"
+                                        value={facility}
+                                        onChange={handleFacilityOptions}
+                                        options = {facilityOptions}
+                                        className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
+                                        bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
+                                        
+                                        />
+
+                                        <Select
+                                        id="status"
+                                        labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
+                                        label="Status"
+                                        value={status}
+                                        onChange={handleStatusOptions}
+                                        options = {statusOptions}
+                                        className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
+                                        bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
+                                        
+                                        />
+
+                                    {
+                                            (
+                                                search ||
+                                                facility !== "ALL" ||
+                                                status !== "ALL"
+                                            ) && (
+                                                <Button
+                                                    type="button"
+                                                    text="Clear"
+                                                    onClick={clearFilters}
+                                                    className="
+                                                        h-[42px]
+                                                        px-7
+                                                        rounded-[4px]
+                                                        border
+                                                        border-[var(--primary-700)]
+                                                        text-[var(--primary-700)]
+                                                        bg-[var(--primary-100)]
+                                                        text-[15px]
+                                                        font-medium
+                                                        cursor-pointer
+                                                    "
+                                                />
+                                            )
+                                        }
+
+                                        <Button 
+                                            type="button"
+                                            text = "Create New"
+                                            onClick = {()=>navigate("/workstation/new-line")}
+                                            className="h-[42px] px-6 bg-[var(--primary-900)] text-white rounded-[8px] cursor-pointer"
+                                        />
+                                    </div>
+                                    </div>
+                    
+                                    <div className="mt-5">
+                                        <Table 
+                                        columns = {lineColumns}
+                                        data={getLineTableData()}
+                                        />
+                                    </div>
+                                    
+                                    
                             
-                            <Select
-                            id="facillity"
-                            labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
-                            label="Facility"
-                            value={facility}
-                            onChange={handleFacilityOptions}
-                            options = {facilityOptions}
-                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
-                            bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
-                            
-                            />
-
-                            <Select
-                            id="status"
-                            labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
-                            label="Status"
-                            value={status}
-                            onChange={handleStatusOptions}
-                            options = {statusOptions}
-                            className="w-[124px] h-[42px] px-4 rounded-[20px] border border-[var(--neutral-300)]
-                            bg-white text-[15px] text-[var(--neutral-500)] outline-none appearance-none cursor-pointer"
-                            
-                            />
-
-                           {
-                                (
-                                    search ||
-                                    facility !== "ALL" ||
-                                    status !== "ALL"
-                                ) && (
-                                    <Button
-                                        type="button"
-                                        text="Clear"
-                                        onClick={clearFilters}
-                                        className="
-                                            h-[42px]
-                                            px-7
-                                            rounded-[4px]
-                                            border
-                                            border-[var(--primary-700)]
-                                            text-[var(--primary-700)]
-                                            bg-[var(--primary-100)]
-                                            text-[15px]
-                                            font-medium
-                                            cursor-pointer
-                                        "
-                                    />
-                                )
-                            }
-
-                            <Button 
-                                type="button"
-                                text = "Create New"
-                                onClick = {()=>navigate("new-line")}
-                                className="h-[42px] px-6 bg-[var(--primary-900)] text-white rounded-[8px] cursor-pointer"
-                            />
-                          </div>
                         </div>
-                    </div>
-
-                    <div className="mt-5">
-                        <Table 
-                         columns = {lineColumns}
-                         data={getLineTableData()}
-                        />
-                    </div>
-        </div>
+                      </div>      
         <ConfirmationModal 
            isOpen={confirmModel.isOpen}
            title = {confirmModel.title}

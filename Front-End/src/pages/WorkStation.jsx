@@ -24,6 +24,8 @@ function WorkStation(){
     const [status, setStatus] = useState("ALL");
     const [workStationData, setWorkStationData] = useState([]);
     const [openMenu, setOpenMenu] = useState(null);
+    const [facilityOptions, setFacilityOptions] = useState(["ALL"]);
+    const [lineOptions, setLineOptions] = useState(["ALL"]);
 
     const [confirmModel, setConfirmModel] = useState({
         isOpen: false,
@@ -31,24 +33,6 @@ function WorkStation(){
         message: "",
         onConfirm: null
         });
-
-    const lineOptions = [
-        "ALL",
-        ...new Set(
-            workStationData.map(
-                (item) => item.lineNameNumber
-            )
-        )
-    ];
-
-    const facilityOptions = [
-        "ALL",
-        ...new Set(
-            workStationData.map(
-                (item) => item.facility
-            )
-        )
-    ];
 
     const statusOptions = [
         "ALL",
@@ -111,6 +95,8 @@ function WorkStation(){
 
    useEffect(() => {
   loadWorkStations();
+  loadFacilities();
+  loadLine();
 }, []);
 
 const loadWorkStations = async () => {
@@ -162,6 +148,46 @@ const loadWorkStations = async () => {
   }
 };
 
+const loadFacilities = async () => {
+    try {
+
+        const data = await apiService.getFacilities();
+
+        const facilities = [
+            "ALL",
+            ...new Set(
+            data
+                .filter(item => item.isActive)
+                .map(item => item.facilityName)
+        )];
+
+        setFacilityOptions(facilities);
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const loadLine = async () => {
+    try{
+
+        const data = await apiService.getLines();
+
+        const lines = [
+            "ALL",
+            ...new Set(
+                data.filter(line => line.isActive).map(line => line.lineNameNumber)
+            )
+             
+        ];
+
+        setLineOptions(lines);
+
+    } catch (error) {
+        console.log(error)
+    }
+};
+
     const handleLineOptions = (e) =>{
         setLine(e.target.value);
     };
@@ -177,7 +203,7 @@ const loadWorkStations = async () => {
     const updateWorkStationStatus = async (workStation) => {
    try {
 
-      await apiService.updateWorkStation(
+      await apiService.updateWorkStationStatus(
         workStation.id,
         {
             isActive:!workStation.isActive
@@ -397,7 +423,7 @@ const clearFilters = () => {
                                         />
 
                                         <Select
-                                        id="facillity"
+                                        id="facility"
                                         labelClassName = "mb-2 block text-[14px] font-medium text-[var(--neutral-500)]"
                                         label="Facility"
                                         value={facility}

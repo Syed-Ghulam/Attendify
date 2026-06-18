@@ -134,7 +134,7 @@ const loadFacilities = async () => {
 
       try{
 
-       await apiService.updateFacility(
+       await apiService.updateFacilityStatus(
          facility.id,
          {
             isActive:

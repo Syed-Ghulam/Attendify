@@ -132,6 +132,36 @@ const updateUser = async (req, res,next) => {
 }
 };
 
+const updateUserStatus = async (req, res, next) => {
+    try {
+
+        const user = await User.findOne({
+            where: {
+                userId: req.params.userId,
+                isDeleted: false
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        await user.update({
+            isActive: req.body.isActive,
+            updatedBy: req.user.userId
+        });
+
+        res.status(200).json({
+            message: "User status updated successfully"
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 const deleteUser = async(req, res, next) => {
 
   try{
@@ -228,9 +258,15 @@ const login = async( req, res, next) => {
       }
     );
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, 
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
     return res.status(200).json({
       message:"Login successful",
-      token,
       userId: user.userId
     });
   }catch(error){
@@ -238,12 +274,31 @@ const login = async( req, res, next) => {
   }
 };
 
+const checkAuth = (req, res) => {
+    res.status(200).json({
+        authenticated: true,
+        userId: req.user.userId
+    });
+};
+
+const logout = (req, res) => {
+
+  res.clearCookie("token");
+
+  res.status(200).json({
+    message:"Logout successful"
+  });
+};
+
 module.exports = {
     createUser,
     getUsers,
     getUserByUserId,
     updateUser,
+    updateUserStatus,
     deleteUser,
     restoreUser,
-    login
+    login,
+    checkAuth,
+    logout
 };

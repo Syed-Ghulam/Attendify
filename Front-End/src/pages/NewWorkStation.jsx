@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { apiService } from "../services/apiServices";
 import {toast} from "react-toastify";
 import { validateRequired,validateIpAddress,validateSelect } from "../utils/validation";
@@ -16,26 +16,24 @@ import Toggle from "../components/Toggle";
 function NewWorkStation() {
 
    const navigate = useNavigate();
+   const {id} = useParams();
+   const isEdit = !!id;
    const [isOn, setIsOn] = useState(false);
+   const [isApi, setIsApi] = useState(false);
 
    const [formData, setFormData] = useState({
       workstationName: "",
       ipAddress: "",
-      facility: "BPL Medical Technologies",
+      facility: "",
       code: "",
-      linenameNumber: "Line 1",
+      linenameNumber: "",
       isActive: false
    });
 
    const [errors, setErros] = useState({});
+   const [facilityOptions, setFacilityOptions] = useState([]);
+   const [lineOptions, setLineOptions] = useState([]);
 
-   const facilityOptions = [
-      "BPL Medical Technologies"
-   ];
-
-   const lineOptions = [
-      "Electrocardiograph"
-   ];
 
    const handleToggle = () => {
       const newStatus = !isOn;
@@ -85,25 +83,42 @@ function NewWorkStation() {
       }));
    };
 
-   const handleSubmit = async() => {
-      
-      if(!validateForm()){
-         return;
+  const handleSubmit = async () => {
+
+   if (!validateForm()) {
+      return;
+   }
+
+   try {
+
+      if (isEdit) {
+
+         await apiService.updateWorkStation(
+            id,
+            formData
+         );
+
+         toast.success("WorkStation Updated Successfully");
+
+      } else {
+
+         await apiService.createWorkStation(
+            formData
+         );
+
+         toast.success("WorkStation Created Successfully");
+
       }
 
-         const payload = {
-            ...formData
-         };
+      navigate("/workstation");
 
-      try{
-       await apiService.createWorkStation(payload);
+   } catch (error) {
 
-            toast.success("WorkStation Created Successfully");
-      } catch(error){
-         console.log(error);
-         toast.error(error.message);
-      }
-   };
+      console.log(error);
+      toast.error(error.message);
+
+   }
+};
 
    const validateForm = ()=>{
       let newErrors = {};
@@ -136,6 +151,85 @@ function NewWorkStation() {
       return Object.keys(newErrors).length===0;
    };
 
+   const loadWorkStation = async () => {
+   try {
+
+      const data =
+         await apiService.getWorkStationById(id);
+
+      setFormData({
+         workstationName: data.workstationName || "",
+         ipAddress: data.ipAddress || "",
+         facility: data.facility || "",
+         code: data.code || "",
+         linenameNumber: data.linenameNumber || "",
+         isActive: data.isActive ?? false
+      });
+
+      setIsOn(data.isActive);
+
+   } catch (error) {
+
+      console.log(error);
+
+   }
+};
+
+const loadFacilities = async () => {
+   try {
+
+      const data = await apiService.getFacilities();
+
+      const facilities = [
+         ...new Set(
+            data
+               .filter(facility => facility.isActive)
+               .map(facility => facility.facilityName)
+         )
+      ];
+
+      setFacilityOptions(facilities);
+
+   } catch (error) {
+      console.log(error);
+   }
+};
+
+const loadLines = async () => {
+   try {
+
+      const data = await apiService.getLines();
+
+      const lines = [
+         ...new Set(
+            data
+               .filter(line => line.isActive)
+               .map(line => line.lineNameNumber)
+         )
+      ];
+
+      setLineOptions(lines);
+
+   } catch (error) {
+      console.log(error);
+   }
+};
+
+useEffect(() => {
+
+   loadFacilities();
+   loadLines();
+   
+   if (isEdit) 
+      loadWorkStation();
+   
+
+}, [isEdit]);
+
+if (isApi) {
+   return <p>Try again</p>;
+}
+
    return (
 
       
@@ -144,7 +238,7 @@ function NewWorkStation() {
 
                {/* Header Section */}
 
-               <div className="border-b border-[var(--neutral-200)] bg-[var(--neutral-100)] px-6 py-4">
+               <div className="border-b border-[var(--neutral-200)] bg-[var(--neutral-100)] px-6 py-3">
 
                   <div className="flex items-center gap-3">
 
@@ -161,12 +255,12 @@ function NewWorkStation() {
 
                      <div>
 
-                        <p className="text-[15px] text-[var(--neutral-500)]">
+                        <p className="text-[12px] text-[var(--neutral-500)]">
                            Manage Workstation /
                         </p>
 
-                        <h2 className="text-[15px] font-bold text-[var(--primary-900)]">
-                           New WorkStation
+                        <h2 className="text-[20px] font-bold text-[var(--primary-900)]">
+                           {isEdit ? "Edit WorkStation" : "New WorkStation"}
                         </h2>
 
                      </div>
@@ -239,14 +333,14 @@ function NewWorkStation() {
                                  onChange={handleChange}
                                  options={facilityOptions}
                                  error = {errors.facility}
-                                 labelClassName="
+                                 labelClassName="mt-[15px]
                                        mb-[6px]
                                        block
                                        text-[13px]
                                        font-semibold
                                        text-[var(--primary-900)]
                                     "
-                                 className="h-[42px] w-full rounded-[4px]
+                                 className="mt-1 h-[42px] w-full rounded-[4px]
                                  border border-[var(--neutral-300)]
                                  bg-white px-3 text-[14px]
                                  outline-none cursor-pointer"
@@ -302,7 +396,7 @@ function NewWorkStation() {
 
                         <div className="mt-6">
 
-                           <p className="mb-2 text-[13px]
+                           <p className="text-[13px]
                            font-semibold text-[var(--primary-800)]">
 
                               Status
@@ -351,7 +445,7 @@ function NewWorkStation() {
 
                      <Button
                         type="submit"
-                        text="Create"
+                        text={isEdit ? "Save" : "Create"}
                         onClick ={handleSubmit}
                         className="w-[120px]
                          bg-[var(--primary-900)] text-white"

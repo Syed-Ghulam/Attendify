@@ -1,17 +1,27 @@
 import Icon from "./Icon";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL, apiFetch } from "../config/api";
+   
 
 function Header(props) {
     const navigate = useNavigate();
 
     const [showMenu, setShowMenu] = useState(false);
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("userId");
+    const handleLogout = async () => {
+      try{
 
+        await apiFetch("/users/logout",{
+            method: "POST",
+        });
+
+        localStorage.removeItem("userId");
         navigate("/login");
+
+      } catch (error){
+        console.log(error);
+      }
     };
 
     const user = {

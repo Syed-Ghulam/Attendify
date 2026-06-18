@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { apiService } from "../services/apiServices";
 import {toast} from "react-toastify";
 import {validateRequired, validateSelect} from "../utils/validation"
@@ -16,20 +16,21 @@ import Toggle from "../components/Toggle";
 function NewLine() {
 
    const navigate = useNavigate();
+   const {id} = useParams();
+   const isEdit = !!id;
    const [isOn, setIsOn] = useState(false);
+   const [isApi, setIsApi] = useState(false);
 
  const [formData, setFormData] = useState({
    lineNameNumber: "",
-   facility: "BPL Medical Technologies",
+   facility: "",
    lineCode: "",
    isActive: false
 });
 
    const [errors, setErros] = useState({});
+   const [facilityOptions, setFacilityOptions] = useState([]);
 
-   const facilityOptions = [
-      "BPL Medical Technologies"
-   ];
 
    const handleToggle = () => {
       const newStatus = !isOn;
@@ -71,24 +72,46 @@ function NewLine() {
       }));
    };
 
-   const handleSubmit = async() => {
-      
-      if(!validateForm()){
-         return;
-      }
+   const handleSubmit = async () => {
 
-         const payload = {
-            ...formData
-         };
+   if (!validateForm()) {
+      return;
+   }
 
-      try{
-         await apiService.createLine(payload);
+   try {
+
+      if (isEdit) {
+
+         await apiService.updateLine(
+            id,
+            formData
+         );
+
+         toast.success("Line Updated Successfully");
+
+      } else {
+
+         await apiService.createLine(
+            formData
+         );
+
          toast.success("Line Created Successfully");
-      } catch(error){
-         console.log(error);
-         toast.error(error.message);
+
       }
-   };
+
+      navigate("/workstation", {
+         state: {
+            activeTab: "Line"
+         }
+      });
+
+   } catch (error) {
+
+      console.log(error);
+      toast.error(error.message);
+
+   }
+};
 
    const validateForm = () => {
 
@@ -108,6 +131,62 @@ function NewLine() {
    return Object.keys(newErrors).length === 0;
 };
 
+const loadLine = async () => {
+
+   try {
+
+      const data = await apiService.getLineById(id);
+
+      setFormData({
+         lineNameNumber: data.lineNameNumber || "",
+         facility: data.facility || "",
+         lineCode: data.lineCode || "",
+         isActive: data.isActive ?? false
+      });
+
+      setIsOn(data.isActive ?? false);
+
+   } catch (error) {
+
+      console.log(error);
+      setIsApi(true);
+
+   }
+};
+
+const loadFacilities = async () => {
+    try {
+
+        const data = await apiService.getFacilities();
+
+        const facilities = [
+            ...new Set(
+            data
+                .filter(item => item.isActive)
+                .map(item => item.facilityName)
+        )];
+
+        setFacilityOptions(facilities);
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+useEffect(() => {
+
+   loadFacilities();
+
+   if (isEdit) {
+      loadLine();
+   }
+
+}, [isEdit]);
+
+if (isApi) {
+   return <p>Try Again</p>;
+}
+
    return (
 
       
@@ -116,7 +195,7 @@ function NewLine() {
 
                {/* Header Section */}
 
-               <div className="border-b border-[var(--neutral-200)] bg-[var(--neutral-100)] px-6 py-4">
+               <div className="border-b border-[var(--neutral-200)] bg-[var(--neutral-100)] px-6 py-3">
 
                   <div className="flex items-center gap-3">
 
@@ -124,7 +203,7 @@ function NewLine() {
                         type="button"    
                         onClick={() => navigate("/workstation",{
                            state:{
-                              activeTab:"Line"
+                              activeTab: "Line"
                            }
                         })}
                         className="mt-[18px] flex h-6 w-6 items-center
@@ -141,8 +220,8 @@ function NewLine() {
                            Manage Workstation /
                         </p>
 
-                        <h2 className="text-[30px] font-bold text-[var(--primary-900)]">
-                           New Line
+                        <h2 className="text-[20px] font-bold text-[var(--primary-900)]">
+                            {isEdit ? "Edit Line" : "New Line"}
                         </h2>
 
                      </div>
@@ -208,7 +287,7 @@ function NewLine() {
                            </div>
 
 
-                           <div className="mt-6 flex gap-6">
+                           <div className="mt-3 flex gap-6">
                            
                            <div className="w-[300px]">
 
@@ -223,14 +302,14 @@ function NewLine() {
 
                            </div>
 
-                           <div>
+                           <div className="mt-5">  
 
                               <Toggle
                                  type="button"
                                  label = "Status"
                                  isOn={isOn}
                                  onClick={handleToggle}
-                                 labelClassName="mb-2 text-[13px] font-semibold text-[var(--primary-800)]"
+                                 labelClassName="mt-3 mb-2 text-[13px] font-semibold text-[var(--primary-800)]"
                                  className={`relative h-5 w-10 rounded-full transition-all
                                  ${
                                     formData.isActive
@@ -268,7 +347,7 @@ function NewLine() {
 
                      <Button
                         type="submit"
-                        text="Create"
+                        text={isEdit ? "Update" : "Create"}
                         onClick ={handleSubmit}
                         className="w-[120px]
                          bg-[var(--primary-900)] text-white"
