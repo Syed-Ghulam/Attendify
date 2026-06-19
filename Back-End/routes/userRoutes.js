@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const verifyToken = require("../middleware/authMiddleware");
 
-const{createUser, getUsers, getUserByUserId,updateUser, deleteUser, restoreUser, login, updateUserStatus, checkAuth,logout} = require("../controllers/userController");
+const{createUser, getUsers, getUserByUserId,updateUser, deleteUser, restoreUser, login, updateUserStatus, checkAuth,logout, refreshAccessToken} = require("../controllers/userController");
 const validateUser = require("../middleware/validateUser");
 const validateLogin = require("../middleware/validateLogin");
 
@@ -23,6 +23,8 @@ router.patch("/:userId/status", verifyToken, updateUserStatus)
 router.delete("/:userId", verifyToken, deleteUser);
 
 router.post("/login",validateLogin, login);
+
+router.post("/refresh-token", refreshAccessToken);
 
 router.post("/logout", logout);
 

@@ -72,6 +72,11 @@ const User = sequelize.define("User", {
 
     updatedBy:{
         type: DataTypes.STRING(50)
+    },
+
+    refreshToken: {
+        type: DataTypes.TEXT,
+        allowNull: true
     }
 
 });

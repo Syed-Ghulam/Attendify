@@ -13,8 +13,27 @@ export const apiFetch = async (url, options = {}) => {
   });
 
   if (response.status === 401) {
-    localStorage.removeItem("userId");
+   
+    const refreshResponse = await fetch(
+      `${API_URL}/users/refresh-token`,
+      {
+        method: "POST",
+        credentials: "include"
+      }
+    );
 
+    if(refreshResponse.ok){
+      return fetch(`${API_URL}${url}`,{
+        credentials: "include",
+        ...options,
+        headers:{
+          "Content-Type" : "application/json",
+          ...options.headers
+        }
+      });
+    }
+
+    localStorage.removeItem("userId");
     window.location.href = "/login";
   }
 

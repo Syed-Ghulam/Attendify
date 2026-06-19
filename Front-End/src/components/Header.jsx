@@ -15,12 +15,9 @@ function Header(props) {
         await apiFetch("/users/logout",{
             method: "POST",
         });
-
+      } finally {
         localStorage.removeItem("userId");
         navigate("/login");
-
-      } catch (error){
-        console.log(error);
       }
     };
 
