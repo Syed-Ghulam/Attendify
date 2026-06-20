@@ -10,6 +10,7 @@ import  Table  from "./components/Table";
 import Icon from "./components/Icon";
 import { toast } from "react-toastify";
 import { apiService } from "./services/apiServices";
+import { API_URL } from "./config/api";
 
 
 function Users(){
@@ -208,7 +209,12 @@ const getTableData = () => {
       </button>
     ),
 
-    profileImage: (
+    profileImage: user.image ? (
+      <img
+        src={`${API_URL}/${user.image}`}
+        alt="Profile"
+        className="h-10 w-10 rounded-full object-cover"
+      />) : (
       <Icon name="DummyImg" alt="Profile" />
     ),
 

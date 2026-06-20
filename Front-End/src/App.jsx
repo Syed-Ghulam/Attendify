@@ -27,8 +27,8 @@ function App() {
 
         try {
 
-            const response = await fetch(
-                `${API_URL}/users/check-auth`,
+            const response = await apiFetch(
+                "/users/check-auth",
                 {
                     credentials: "include"
                 }

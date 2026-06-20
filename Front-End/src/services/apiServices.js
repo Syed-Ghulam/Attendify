@@ -1,16 +1,16 @@
 
-import { apiFetch } from "../config/api";
+import { API_URL, apiFetch } from "../config/api";
 
 export const apiService = {
 
     // Users
-    createUser: async (payload) => {
+    createUser: async (formPayload) => {
 
-        const response = await apiFetch(
-            "/users",
+        const response = await fetch(`${API_URL}/users`,
             {
             method: "POST",
-            body: JSON.stringify(payload)
+            credentials: "include",
+            body: formPayload
             }
         );
 
@@ -45,13 +45,13 @@ export const apiService = {
         return response.json();
     },
 
-    updateUser: async (userId, payload) => {
+    updateUser: async (userId, formPayload) => {
 
-        const response = await apiFetch(
-            `/users/${userId}`,
+        const response = await fetch(`${API_URL}/users/${userId}`,
             {
             method: "PUT",
-            body: JSON.stringify(payload)
+            credentials: "include",
+            body: formPayload
             }
         );
 

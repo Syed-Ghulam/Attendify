@@ -5,16 +5,17 @@ const verifyToken = require("../middleware/authMiddleware");
 const{createUser, getUsers, getUserByUserId,updateUser, deleteUser, restoreUser, login, updateUserStatus, checkAuth,logout, refreshAccessToken} = require("../controllers/userController");
 const validateUser = require("../middleware/validateUser");
 const validateLogin = require("../middleware/validateLogin");
+const upload = require("../middleware/upload");
 
 router.get("/check-auth", verifyToken, checkAuth);
 
-router.post("/", verifyToken, validateUser, createUser);
+router.post("/", verifyToken, upload.single("image"), validateUser, createUser);
 
 router.get("/",verifyToken,getUsers);
 
 router.get("/:userId", verifyToken, getUserByUserId);
 
-router.put("/:userId", verifyToken,validateUser, updateUser);
+router.put("/:userId", verifyToken, upload.single("image"), validateUser, updateUser);
 
 router.put("/restore/:userId", verifyToken, restoreUser);
 

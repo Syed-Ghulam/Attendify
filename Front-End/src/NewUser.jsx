@@ -18,6 +18,7 @@ import {
   validatePhone,
   validateDob
 } from "./utils/validation";
+import { API_URL } from "./config/api";
 
 function NewUser() {
 
@@ -25,6 +26,7 @@ function NewUser() {
   const {userId} = useParams();
   const isEdit = !!userId;
   const [image, setImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [isApi, setIsApi] = useState(false);
   const [isOn, setIsOn] = useState(false);
   const [formData, setFormData] = useState({
@@ -41,6 +43,7 @@ function NewUser() {
   image: ""  
 });
   const [errors, setErrors] = useState({});
+  
   
 
   const grpoptions = [
@@ -70,10 +73,8 @@ function NewUser() {
 
     setImage(URL.createObjectURL(file));
 
-    setFormData({
-      ...formData,
-      image: file.name
-    });
+    setSelectedImage(file);
+
   };
 
   const validateField = (name, value) =>{
@@ -124,10 +125,22 @@ function NewUser() {
     return;
   }
 
-  const payload = {
-    ...formData,
-    dob: formData.dob || null
-  };
+  const formPayload = new FormData();
+
+  formPayload.append("userId", formData.userId);
+  formPayload.append("groupName", formData.groupName);
+  formPayload.append("firstName", formData.firstName);
+  formPayload.append("lastName", formData.lastName);
+  formPayload.append("dob", formData.dob || "");
+  formPayload.append("gender", formData.gender);
+  formPayload.append("phone", formData.phone);
+  formPayload.append("email", formData.email);
+  formPayload.append("address", formData.address);
+  formPayload.append("isActive", formData.isActive);
+
+  if(selectedImage){
+    formPayload.append("image", selectedImage);
+  }
 
   try {
 
@@ -135,7 +148,7 @@ function NewUser() {
 
       await apiService.updateUser(
         userId,
-        payload
+        formPayload
       );
 
       toast.success("User Updated Successfully");
@@ -143,7 +156,7 @@ function NewUser() {
     } else {
 
       await apiService.createUser(
-        payload
+        formPayload
       );
 
       toast.success("User Created Successfully");
@@ -228,6 +241,9 @@ const loadUser = async () => {
       isActive: data.isActive ?? false,
       image: data.image || ""
     });
+
+    if(data.image)
+      setImage(`${API_URL}/${data.image}`);
 
     setIsOn(data.isActive);
 
@@ -618,7 +634,7 @@ if (isApi) {
             <div className="flex flex-wrap gap-4">
 
               <Button
-                type="submmit"
+                type="submit"
                 text={isEdit ? "Save" : "Create"}
                 onClick={handleSubmit}
                 className="

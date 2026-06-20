@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { API_URL } from "../config/api";
+import { API_URL, apiFetch } from "../config/api";
 
 function ProtectedRoute({ children }) {
 
@@ -13,8 +13,8 @@ function ProtectedRoute({ children }) {
 
             try {
 
-                const response = await fetch(
-                    `${API_URL}/users/check-auth`,
+                const response = await apiFetch(
+                    "/users/check-auth",
                     {
                         credentials: "include"
                     }

@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
+const path = require("path");
 
 const createUser = async(req, res, next) =>{
     try{
@@ -22,7 +24,7 @@ const createUser = async(req, res, next) =>{
           email: req.body.email,
           address: req.body.address,
           isActive: req.body.isActive,
-          image: req.body.image,
+          image: req.file ? req.file.path : null,
           password: hashedPassword,
           createdBy: req.user.userId,
           updatedBy: req.user.userId
@@ -109,6 +111,22 @@ const updateUser = async (req, res,next) => {
       });
     }
 
+    let imagePath = user.image;
+
+    if(req.file){
+      if(user.image){
+        const oldImagePath = path.join(
+          __dirname,"..",user.image
+        );
+
+        if(fs.existsSync(oldImagePath)){
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+
+      imagePath = req.file.path;
+    }
+
   await user.update({
         groupName: req.body.groupName,
         firstName: req.body.firstName,
@@ -119,7 +137,7 @@ const updateUser = async (req, res,next) => {
         email: req.body.email,
         address: req.body.address,
         isActive: req.body.isActive,
-        image: req.body.image,
+        image: imagePath,
         updatedBy: req.user.userId
 
     });
@@ -311,6 +329,7 @@ const refreshAccessToken = async (req, res, next) => {
     }
 
     let decoded;
+    let newAccessToken;
 
     try{
       decoded = jwt.verify(
@@ -330,7 +349,7 @@ const refreshAccessToken = async (req, res, next) => {
         });
       }
 
-      const newAccessToken = jwt.sign(
+       newAccessToken = jwt.sign(
         {
           userId: decoded.userId
         },
