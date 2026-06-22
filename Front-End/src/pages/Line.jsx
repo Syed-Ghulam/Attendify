@@ -19,6 +19,7 @@ function Line (){
     const [openMenu, setOpenMenu] = useState(null);
 
     const [lineData, setLineData] = useState([]);
+    const [selectedRows, setSelectedRows] = useState([]);
 
     const navigate = useNavigate();
 
@@ -53,42 +54,6 @@ function Line (){
         setStatus(e.target.value);
     };
 
-    const lineColumns = [
-        {
-            label : (
-                <button>
-                    <Icon name="UnCheck" alt="checkbox" />
-                </button>
-            ),
-            key: "checkBox"
-        },
-
-        {
-            label: "Line Name / Number",
-            key: "lineNameNumber"
-        },
-
-        {
-            label:"Facility",
-            key: "facility"
-        },
-
-        {
-            label: "Created on",
-            key:"createdOn"
-        },
-
-        {
-            label:"Status",
-            key: "status"
-        },
-
-        {
-            label:"Action",
-            key:"action"
-        }
-    ];
-
   useEffect(() => {
    loadLines();
    loadFacilities();
@@ -102,11 +67,7 @@ const loadLines = async () => {
 
       const formattedData = data.map(
          (line) => ({
-            checkBox: (
-               <button type="checkBox">
-                  <Icon name="UnCheck" alt="checkbox" />
-               </button>
-            ),
+            checkBox: "",
             lineNameNumber: line.lineNameNumber,
             facility: line.facility,
             createdOn: new Date(
@@ -209,6 +170,38 @@ const loadFacilities = async () => {
 
     };
 
+    const deleteSelectedLines = async () => {
+
+        try {
+
+            await Promise.all(
+
+                selectedRows.map((id) =>
+                    apiService.deleteLine(id)
+                )
+
+            );
+
+            setLineData((prev) =>
+                prev.filter(
+                    (item) =>
+                        !selectedRows.includes(item.action.id)
+                )
+            );
+
+            setSelectedRows([]);
+
+            toast.success("Lines deleted successfully");
+
+        } catch (error) {
+
+            console.log(error);
+            toast.error("Failed to delete lines");
+
+        }
+
+    };
+
     const filteredLineData = lineData.filter((row) => {
 
         const matchesSearch = row.lineNameNumber.toLowerCase().includes(search.toLowerCase());
@@ -222,9 +215,82 @@ const loadFacilities = async () => {
         );
     });
 
+    const handleRowSelect = (id) => {
+
+        setSelectedRows((prev) => {
+
+            if(prev.includes(id)){
+                return prev.filter((item) => item !== id);
+            }
+
+            return [...prev, id];
+        });
+    };
+
+    const handleSelectAll = () => {
+
+        if(selectedRows.length === filteredLineData.length){
+            setSelectedRows([]);
+        } else {
+            setSelectedRows(
+                filteredLineData.map((line) => line.action.id)
+            );
+        }
+    };
+
+    const lineColumns = [
+        {
+            label : (
+                <input type="checkbox"
+                       checked={
+                        filteredLineData.length > 0 &&
+                        selectedRows.length === filteredLineData.length
+                       } 
+                       onChange={handleSelectAll}
+                       className="h-4 w-4 cursor-pointer"
+                />
+            ),
+            key: "checkBox"
+        },
+
+        {
+            label: "Line Name / Number",
+            key: "lineNameNumber"
+        },
+
+        {
+            label:"Facility",
+            key: "facility"
+        },
+
+        {
+            label: "Created on",
+            key:"createdOn"
+        },
+
+        {
+            label:"Status",
+            key: "status"
+        },
+
+        {
+            label:"Action",
+            key:"action"
+        }
+    ];
+
     const getLineTableData = () => {
+
         return filteredLineData.map((row) => ({
+            id: row.action.id,
             ...row,
+            checkBox:(
+                <input type="checkbox"
+                       checked={selectedRows.includes(row.action.id)}
+                       onChange={() => handleRowSelect(row.action.id)}
+                       className="h-3 w-3 cursor-pointer" 
+                />
+            ),
 
             action: (
                 <div className="relative">
@@ -288,6 +354,8 @@ const loadFacilities = async () => {
             )
         }));
     };
+
+const hasSelectedRows = selectedRows.length > 0;
 
     return(
         <>
@@ -361,6 +429,31 @@ const loadFacilities = async () => {
                                             )
                                         }
 
+                                        {
+                                            hasSelectedRows && (
+                                                <Button
+                                                    type="button"
+                                                    text={`Delete (${selectedRows.length})`}
+                                                     className="
+                                                        px-7
+                                                        border border-[var(--primary-700)]
+                                                        text-[var(--primary-700)]
+                                                        bg-[var(--primary-100)]
+                                                        text-[15px]
+                                                        font-medium
+                                                    "
+                                                    onClick={() => {
+                                                        setConfirmModel({
+                                                            isOpen: true,
+                                                            title: "Delete Lines",
+                                                            message: `Are you sure you want to delete ${selectedRows.length} line(s)?`,
+                                                            onConfirm: deleteSelectedLines
+                                                        });
+                                                    }}
+                                                />
+                                            )
+                                        }
+
                                         <Button 
                                             type="button"
                                             text = "Create New"
@@ -374,6 +467,8 @@ const loadFacilities = async () => {
                                         <Table 
                                         columns = {lineColumns}
                                         data={getLineTableData()}
+                                        selectedRows={selectedRows}
+                                        rowKey="id"
                                         />
                                     </div>
                                     

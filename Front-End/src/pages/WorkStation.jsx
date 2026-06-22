@@ -26,6 +26,7 @@ function WorkStation(){
     const [openMenu, setOpenMenu] = useState(null);
     const [facilityOptions, setFacilityOptions] = useState(["ALL"]);
     const [lineOptions, setLineOptions] = useState(["ALL"]);
+    const [selectedRows, setSelectedRows] = useState([]);
 
     const [confirmModel, setConfirmModel] = useState({
         isOpen: false,
@@ -40,58 +41,6 @@ function WorkStation(){
         "Inactive"
     ];
 
-    const workStationColumns = [
-        {
-            label:<button><Icon name="UnCheck" alt="checkbox"/></button>,
-            key:"checkBox"
-        },
-
-        {
-            label:"Workstation Name",
-            key:"workstationName"
-        },
-
-        {
-            label:"Code",
-            key:"code",
-        },
-
-        {
-            label: "IP Address",
-            key:"ipAddress"
-        },
-
-        {
-            label:"Facility",
-            key:"facility"
-        },
-
-        {
-            label:"Line Name/Number",
-            key:"lineNameNumber"
-        },
-
-        {
-            label:"Line Code",
-            key:"linecode"
-        },
-
-        {
-            label:"Created on",
-            key:"createdOn"
-        },
-
-        {
-            label:"Status",
-            key:"status"
-        },
-
-        {
-            label:"Action",
-            key:"action"
-        }
-
-    ];
 
    useEffect(() => {
   loadWorkStations();
@@ -107,14 +56,7 @@ const loadWorkStations = async () => {
 
     const formattedData = data.map(
       (workStation) => ({
-        checkBox: (
-          <button type="checkBox">
-            <Icon
-              name="UnCheck"
-              alt="checkbox"
-            />
-          </button>
-        ),
+        checkBox:"",
         workstationName:
           workStation.workstationName,
         code: workStation.code,
@@ -257,6 +199,38 @@ const deleteWorkStation = async (workStation) => {
   }
 };
 
+const deleteSelectedWorkStations = async () => {
+
+    try {
+
+        await Promise.all(
+
+            selectedRows.map((id) =>
+                apiService.deleteWorkStation(id)
+            )
+
+        );
+
+        setWorkStationData((prev) =>
+            prev.filter(
+                (item) =>
+                    !selectedRows.includes(item.action.id)
+            )
+        );
+
+        setSelectedRows([]);
+
+        toast.success("Workstations deleted successfully");
+
+    } catch (error) {
+
+        console.log(error);
+        toast.error("Failed to delete workstations");
+
+    }
+
+};
+
 const filteredWorkStationData = workStationData.filter((row) => {
 
     const matchesSearch =
@@ -284,9 +258,105 @@ const filteredWorkStationData = workStationData.filter((row) => {
     );
 });
 
+    const handleRowSelect = (id) => {
+        setSelectedRows((prev) => {
+
+            if(prev.includes(id)){
+                return prev.filter((item) => item !== id);
+            }
+
+            return [...prev, id];
+        });
+    };
+
+    
+    const handleSelectAll = () => {
+
+        if(selectedRows.length === filteredWorkStationData.length){
+            setSelectedRows([]);
+        } else {
+            setSelectedRows(
+                filteredWorkStationData.map((workstation) => workstation.action.id)
+            );
+        }
+    };
+
+    const workStationColumns = [
+        {
+            label:(
+                <input
+                    type="checkbox"
+                    checked={
+                        filteredWorkStationData.length > 0 &&
+                        selectedRows.length === filteredWorkStationData.length
+                    }
+                    onChange={handleSelectAll}
+                    className="h-4 w-4 cursor-pointer" 
+                />
+            ),
+            key:"checkBox"
+        },
+
+        {
+            label:"Workstation Name",
+            key:"workstationName"
+        },
+
+        {
+            label:"Code",
+            key:"code",
+        },
+
+        {
+            label: "IP Address",
+            key:"ipAddress"
+        },
+
+        {
+            label:"Facility",
+            key:"facility"
+        },
+
+        {
+            label:"Line Name/Number",
+            key:"lineNameNumber"
+        },
+
+        {
+            label:"Line Code",
+            key:"linecode"
+        },
+
+        {
+            label:"Created on",
+            key:"createdOn"
+        },
+
+        {
+            label:"Status",
+            key:"status"
+        },
+
+        {
+            label:"Action",
+            key:"action"
+        }
+
+    ];
+
     const getWorkStationTableData = () => {
+
    return filteredWorkStationData.map((row) => ({
+
+      id: row.action.id,
       ...row,
+      checkBox : (
+        <input type="checkbox"
+               checked={selectedRows.includes(row.action.id)}
+               onChange={() => handleRowSelect(row.action.id)}
+               className="h-3 w-3 cursor-pointer" 
+        />
+      ),
 
       action: (
          <div className="relative">
@@ -372,6 +442,8 @@ const clearFilters = () => {
     setFacility("ALL");
     setStatus("ALL");
 };
+
+const hasSelectedRows = selectedRows.length > 0;
     return(
         <>
         
@@ -472,6 +544,32 @@ const clearFilters = () => {
                                             )
                                         }
 
+                                        {
+                                            hasSelectedRows && (
+                                                <Button
+                                                    type="button"
+                                                    text={`Delete (${selectedRows.length})`}
+                                                    className="
+                                                            px-7
+                                                            border border-[var(--primary-700)]
+                                                            text-[var(--primary-700)]
+                                                            bg-[var(--primary-100)]
+                                                            text-[15px]
+                                                            font-medium
+                                                        "
+                                                    onClick={() => {
+                                                            setConfirmModel({
+                                                                isOpen: true,
+                                                                title: "Delete Workstations",
+                                                                message: `Are you sure you want to delete ${selectedRows.length} workstation(s)?`,
+                                                                onConfirm: deleteSelectedWorkStations
+                                                            });
+
+}}
+                                                />
+                                            )
+                                        }
+
                                         <Button 
                                             type="button"
                                             text = "Create New"
@@ -483,7 +581,9 @@ const clearFilters = () => {
                                     <div className="mt-5">
                                     <Table 
                                       columns = {workStationColumns}
-                                      data = {getWorkStationTableData()}  
+                                      data = {getWorkStationTableData()} 
+                                      selectedRows={selectedRows}
+                                      rowKey="id" 
                                     />
                                     </div>
                                     </>

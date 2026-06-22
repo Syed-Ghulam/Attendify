@@ -17,6 +17,7 @@ function Facility() {
    const [status, setStatus] = useState("ALL");
    const [openMenu, setOpenMenu] = useState(null);
    const [facilityData, setFacilityData] = useState([]);
+   const [selectedRows, setSelectedRows] = useState([]);
 
    const [confirmModel, setConfirmModel] = useState({
       isOpen: false,
@@ -40,47 +41,6 @@ function Facility() {
       setStatus(e.target.value);
    };
 
-   const facilityColumn = [
-      {
-         label: (
-            <button>
-               <Icon name="UnCheck" alt="checkbox" />
-            </button>
-         ),
-         key:"checkBox"
-      },
-
-      {
-         label: "Facility Name",
-         key:"facilityName"
-      },
-
-      {
-         label: "Location",
-         key:"location"
-      },
-
-      {
-         label:"Description",
-         key:"description"
-      },
-
-      {
-         label: "Created On",
-         key:"createdOn"
-      },
-
-      {
-         label: "Status",
-         key:"status"
-      },
-
-      {
-         label:"Action",
-         key:"action"
-      }
-   ];
-
 useEffect(() => {
    loadFacilities();
 }, []);
@@ -93,14 +53,7 @@ const loadFacilities = async () => {
 
       const formattedData = data.map(
          (facility) => ({
-            checkBox: (
-               <button>
-                  <Icon
-                     name="UnCheck"
-                     alt="checkbox"
-                  />
-               </button>
-            ),
+            checkBox: "",
             facilityName:
                facility.facilityName,
             location:
@@ -191,6 +144,38 @@ const loadFacilities = async () => {
       }
    };
 
+   const deleteSelectedFacilities = async () => {
+
+      try {
+
+         await Promise.all(
+
+            selectedRows.map((id) =>
+               apiService.deleteFacility(id)
+            )
+
+         );
+
+         setFacilityData((prev) =>
+            prev.filter(
+               (item) =>
+                  !selectedRows.includes(item.action.id)
+            )
+         );
+
+         setSelectedRows([]);
+
+         toast.success("Facilities deleted successfully");
+
+      } catch (error) {
+
+         console.log(error);
+         toast.error("Failed to delete facilities");
+
+      }
+
+   };
+
    const filteredFacilityData = facilityData.filter((row) => {
 
       const matchesSearch = row.facilityName.toLowerCase().includes(search.toLowerCase());
@@ -202,9 +187,89 @@ const loadFacilities = async () => {
       );
    });
 
+   const handleRowSelect = (id) => {
+
+      setSelectedRows((prev) => {
+
+         if(prev.includes(id)){
+            return prev.filter((item) => item !==id);
+         }
+
+         return [...prev, id];
+      });
+   };
+
+   const handleSelectAll = () => {
+
+      if(selectedRows.length === filteredFacilityData.length){
+
+         setSelectedRows([]);
+      } else {
+
+         setSelectedRows(
+            filteredFacilityData.map((facility) => facility.action.id)
+         );
+      }
+   };
+
+   const facilityColumn = [
+      {
+         label: (
+            <input type="checkbox"
+                   checked={filteredFacilityData.length > 0 &&
+                           selectedRows.length === filteredFacilityData.length
+                   }
+                   onChange={handleSelectAll}
+                   className="h-4 w-4 cursor-pointer"
+            />
+         ),
+         key:"checkBox"
+      },
+
+      {
+         label: "Facility Name",
+         key:"facilityName"
+      },
+
+      {
+         label: "Location",
+         key:"location"
+      },
+
+      {
+         label:"Description",
+         key:"description"
+      },
+
+      {
+         label: "Created On",
+         key:"createdOn"
+      },
+
+      {
+         label: "Status",
+         key:"status"
+      },
+
+      {
+         label:"Action",
+         key:"action"
+      }
+   ];
+
    const getFacilityTableData = () => {
+
       return filteredFacilityData.map((row) => ({
+         id: row.action.id,
          ...row,
+
+         checkBox: (
+            <input type="checkbox"
+                   checked={selectedRows.includes(row.action.id)}
+                   onChange={() => handleRowSelect(row.action.id)}
+                   className="h-3 w-3 cursor-pointer"
+            />
+         ),
 
          action: (
             <div className="relative">
@@ -269,6 +334,8 @@ const loadFacilities = async () => {
       }))
    }
 
+   const hasSelectedRows = selectedRows.length > 0;
+
      return(
        <>
           <div>
@@ -316,6 +383,31 @@ const loadFacilities = async () => {
                         )
                      }
 
+                     {
+                        hasSelectedRows && (
+                           <Button
+                              type="button"
+                              text={`Delete (${selectedRows.length})`}
+                              className="
+                                    px-7
+                                    border border-[var(--primary-700)]
+                                    text-[var(--primary-700)]
+                                    bg-[var(--primary-100)]
+                                    text-[15px]
+                                    font-medium
+                                 "
+                              onClick={() => {
+                                 setConfirmModel({
+                                    isOpen: true,
+                                    title: "Delete Facilities",
+                                    message: `Are you sure you want to delete ${selectedRows.length} facility(s)?`,
+                                    onConfirm: deleteSelectedFacilities
+                                 });
+                              }}
+                           />
+                        )
+                     }
+
                      <Button
                         type="button"
                         text="Create New"
@@ -331,6 +423,8 @@ const loadFacilities = async () => {
                <Table
                  columns = {facilityColumn}
                  data={getFacilityTableData()}
+                 selectedRows={selectedRows}
+                 rowKey="id"
                />
             </div>
           </div>

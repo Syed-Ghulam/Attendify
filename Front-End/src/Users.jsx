@@ -21,6 +21,11 @@ function Users(){
     const [search , setSearch] = useState("");
     const [gender , setGender] = useState("ALL");
     const [role , setRole] = useState("ALL");
+
+    const [selectedRows, setSelectedRows] = useState({
+      users: [],
+      groups: []
+    });
     const [status, setStatus] = useState("ALL");
     const [userData, setUserData] = useState([]);
     const [openMenu, setOpenMenu] = useState(null);
@@ -61,9 +66,113 @@ const hasFilters =
   gender !== "ALL" ||
   status !== "ALL";
 
+
+
+const filteredUsers = userData.filter((user) => {
+
+  const fullName =
+    `${user.firstName} ${user.lastName}`.toLowerCase();
+
+  const matchesSearch =
+    search === "" ||
+    user.userId.toLowerCase().includes(search.toLowerCase()) ||
+    fullName.includes(search.toLowerCase());
+
+  const matchesGender =
+    gender === "ALL" ||
+    user.gender === gender;
+
+  const matchesStatus =
+    status === "ALL" ||
+    (status === "Active" && user.isActive) ||
+    (status === "Inactive" && !user.isActive);
+
+  return (
+    matchesSearch &&
+    matchesGender &&
+    matchesStatus
+  );
+});
+
+const filteredGroups = groupData.filter((group) => {
+
+  const matchesSearch =
+    search === "" ||
+    group.groupName
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+  const matchesStatus =
+    status === "ALL" ||
+    (status === "Active" && group.isActive) ||
+    (status === "Inactive" && !group.isActive);
+
+  return (
+    matchesSearch &&
+    matchesStatus
+  );
+});
+
+const handleRowSelect = (tableName, id) => {
+
+  setSelectedRows((prev) => {
+    const currentSelection = prev[tableName];
+
+    return {
+      ...prev,
+
+      [tableName]: currentSelection.includes(id)
+         ? currentSelection.filter((item) => item !== id)
+         : [...currentSelection, id]
+    };
+  });
+};
+
+
+const handleSelectAll = () => {
+
+  if(selectedRows.users.length === filteredUsers.length){
+    setSelectedRows((prev) => ({
+      ...prev,
+      users: []
+    }));
+
+  } else {
+    setSelectedRows((prev) => ({
+      ...prev,
+      users: filteredUsers.map((user) => user.userId)
+    }));
+  }
+};
+
+const handleGroupSelectAll = () => {
+  if (selectedRows.groups.length === filteredGroups.length) {
+    setSelectedRows((prev) => ({
+      ...prev,
+      groups: [],
+    }));
+  } else {
+    setSelectedRows((prev) => ({
+      ...prev,
+      groups : filteredGroups.map((group) => group.id)
+    }));
+  }
+};
+
+
+
 const columns = [
  {
-    label:<button><Icon name="UnCheck" alt="checkbox"/></button>,
+    label:(
+      <input type="checkbox"
+             checked = {
+              filteredUsers.length > 0 && 
+              selectedRows.users.length === filteredUsers.length
+             } 
+             onChange={handleSelectAll}
+             className="h-4 w-4 cursor-pointer"
+      />
+    ),
     key:"checkBox"
  },
 
@@ -125,7 +234,14 @@ const columns = [
 
 const grpColumns = [
    {
-      label:<button><Icon name="UnCheck" alt="checkbox"/></button>,
+      label:(
+       <input type="checkbox"
+        checked ={filteredGroups.length >0 && 
+                  selectedRows.groups.length === filteredGroups.length}
+                  onChange={handleGroupSelectAll} 
+                  className="h-4 w-4 cursor-pointer"
+         />
+       ),
       key:"checkBox"
    },
 
@@ -155,58 +271,14 @@ const grpColumns = [
    }
 ];
 
-const filteredUsers = userData.filter((user) => {
-
-  const fullName =
-    `${user.firstName} ${user.lastName}`.toLowerCase();
-
-  const matchesSearch =
-    search === "" ||
-    user.userId.toLowerCase().includes(search.toLowerCase()) ||
-    fullName.includes(search.toLowerCase());
-
-  const matchesGender =
-    gender === "ALL" ||
-    user.gender === gender;
-
-  const matchesStatus =
-    status === "ALL" ||
-    (status === "Active" && user.isActive) ||
-    (status === "Inactive" && !user.isActive);
-
-  return (
-    matchesSearch &&
-    matchesGender &&
-    matchesStatus
-  );
-});
-
-const filteredGroups = groupData.filter((group) => {
-
-  const matchesSearch =
-    search === "" ||
-    group.groupName
-      .toLowerCase()
-      .includes(search.toLowerCase());
-
-  const matchesStatus =
-    status === "ALL" ||
-    (status === "Active" && group.isActive) ||
-    (status === "Inactive" && !group.isActive);
-
-  return (
-    matchesSearch &&
-    matchesStatus
-  );
-});
-
-
 const getTableData = () => {
   return filteredUsers.map((user) => ({
     checkBox: (
-      <button>
-        <Icon name="UnCheck" alt="checkbox" />
-      </button>
+      <input type="checkbox"
+             checked = {selectedRows.users.includes(user.userId)}
+             onChange={() => handleRowSelect("users",user.userId)}
+             className="h-3 w-3 cursor-pointer" 
+      />
     ),
 
     profileImage: user.image ? (
@@ -323,14 +395,15 @@ const getTableData = () => {
 
 const getGroupTableData = () => {
 
-  
-  console.log("openMenu =", openMenu);
   return filteredGroups.map((group) => ({
-    
+    id: group.id,
     checkBox: (
-      <button>
-        <Icon name="UnCheck" alt="checkbox" />
-      </button>
+       <input
+          type="checkbox"
+          checked={selectedRows.groups.includes(group.id)}
+          onChange={() => handleRowSelect("groups",group.id)}
+          className="h-3 w- cursor-pointer"
+        />
     ),
 
     groupName: group.groupName,
@@ -524,6 +597,35 @@ const deleteUser = async (user) => {
   }
 };
 
+const deleteSelectedUsers = async () => {
+
+  try{
+
+    await Promise.all(
+      selectedRows.users.map((userId) => 
+        apiService.deleteUser(userId)
+      )
+    );
+
+    setUserData((prev) => 
+      prev.filter(
+        (user) => !selectedRows.users.includes(user.userId)
+      )
+    );
+
+    setSelectedRows((prev) => ({
+      ...prev,
+      users: []
+    }));
+
+    toast.success("Users deleted successfully");
+
+  } catch (error){
+    console.log(error);
+    toast.error("Failed to delete users");
+  }
+};
+
 const deleteGroup = async (group) => {
   try {
 
@@ -543,6 +645,36 @@ const deleteGroup = async (group) => {
     console.log(error);
     toast.error("Failed to delete group");
   }
+};
+
+const deleteSelectedGroups = async () => {
+
+    try {
+        await Promise.all(
+
+            selectedRows.groups.map((groupId) =>
+                apiService.deleteGroup(groupId)
+            )
+
+        );
+
+        setGroupData((prev) =>
+            prev.filter(
+                (group) =>
+                    !selectedRows.groups.includes(group.id)
+            )
+        );
+
+        setSelectedRows((prev) => ({
+            ...prev,
+            groups: []
+        }));
+
+        toast.success("Groups deleted successfully");
+    } catch (error) {
+        console.log(error);
+        toast.error("Failed to delete groups");
+    }
 };
 
 const handleGroupStatusToggle = async (group) => {
@@ -569,6 +701,10 @@ const handleGroupStatusToggle = async (group) => {
     toast.error("Failed to update status");
   }
 };
+
+const hasSelectedUsers = selectedRows.users.length > 0;
+const hasSelectedGroups = selectedRows.groups.length > 0;
+
     return(
       
         <>
@@ -682,6 +818,52 @@ const handleGroupStatusToggle = async (group) => {
                               />
                               )}
 
+                            {activeTab === "Users" && hasSelectedUsers && (
+                              <Button
+                                 type = "button"
+                                 text = {`Delete (${selectedRows.users.length})`}
+                                className="
+                                    px-7
+                                    border border-[var(--primary-700)]
+                                    text-[var(--primary-700)]
+                                    bg-[var(--primary-100)]
+                                    text-[15px]
+                                    font-medium
+                                 "
+                                 onClick = {() => {
+                                  setConfirmModel({
+                                    isOpen: true,
+                                    title: "Delete Users",
+                                    message: `Are you sure you want to delete ${selectedRows.users.length} user(s)`,
+                                    onConfirm: deleteSelectedUsers
+                                  });
+                                 }}
+                              />
+                            )}
+
+                            {activeTab === "Groups" && hasSelectedGroups && (
+                              <Button
+                                type = "button"
+                                text = {`Delete (${selectedRows.groups.length})`}
+                                className="
+                                    px-7
+                                    border border-[var(--primary-700)]
+                                    text-[var(--primary-700)]
+                                    bg-[var(--primary-100)]
+                                    text-[15px]
+                                    font-medium
+                                 "
+                                onClick = {() => {
+                                  setConfirmModel({
+                                    isOpen: true,
+                                    title: "Delete Groups",
+                                    message: `Are you sure you want to delete ${selectedRows.groups.length} group(s)`,
+                                    onConfirm: deleteSelectedGroups
+                                  });
+                                }}
+                              />
+                            )}   
+
                            <Button
                               type="button"
                               text="Create New"
@@ -705,6 +887,8 @@ const handleGroupStatusToggle = async (group) => {
                                 
                                 columns = {columns}
                                 data = {getTableData()}
+                                selectedRows={selectedRows.users}
+                                rowKey = "userId"
                                 />
                             
                             )
@@ -715,7 +899,9 @@ const handleGroupStatusToggle = async (group) => {
                                 <Table 
                                  
                                 columns={grpColumns}
-                                data={getGroupTableData()}  
+                                data={getGroupTableData()}
+                                selectedRows={selectedRows.groups} 
+                                rowKey = "id" 
                                 />
                             )
                         }

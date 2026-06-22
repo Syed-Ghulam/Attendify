@@ -77,7 +77,7 @@ if(isApi){
               border-[var(--neutral-200)]
               bg-[var(--neutral-100)]
               px-6
-              py-4
+              py-3
             "
           >
 
@@ -87,10 +87,11 @@ if(isApi){
                 type="button"
                 onClick={()=>navigate("/users")}
                 className="
-                  mt-[22px]
+                  mt-[18px]
                   flex
                   h-6
                   w-6 
+                  items-center
                   justify-center
                   cursor-pointer
                   rounded-full" 
@@ -107,7 +108,7 @@ if(isApi){
 
                 <h2
                   className="
-                    text-[30px]
+                    text-[20px]
                     font-bold
                     text-[var(--primary-900)]
                   "
@@ -138,10 +139,10 @@ if(isApi){
           {/* SCROLLABLE CONTENT */}
           <div className="flex flex-1 flex-col overflow-auto">
 
-            <div className="w-full max-w-[1150px] px-6 py-5">
+            <div className="w-full md:px-8 lg:px-10 px-6 py-6">
 
               {/* USER ID */}
-              <div className="mb-3">
+              <div className="mb-5 w-full max-w-[520px]">
 
                 <Input
                   id ="userId"
@@ -155,7 +156,7 @@ if(isApi){
 
 
               {/* GROUP NAME */}
-              <div className="mb-3">
+              <div className="mb-8 w-full max-w-[520px]">
 
                 <Input
                   id="groupName"
@@ -172,14 +173,16 @@ if(isApi){
                 className="
                   grid
                   grid-cols-1
-                  gap-x-5
-                  gap-y-3
-                  xl:grid-cols-2
+                  md:grid-cols-2
+                  gap-x-8
+                  gap-y-6
+                  w-full
+                  xl:max-w-[1100px]
                 "
               >
 
                 {/* FIRST NAME */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     id ="firstName"
@@ -193,7 +196,7 @@ if(isApi){
 
 
                 {/* LAST NAME */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     id="lastName"
@@ -207,7 +210,7 @@ if(isApi){
 
 
                 {/* DOB */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     type="date"
@@ -221,7 +224,7 @@ if(isApi){
 
 
                 {/* GENDER */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     id="gender"
@@ -233,7 +236,7 @@ if(isApi){
 
 
                 {/* PHONE */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     id ="phone"
@@ -247,7 +250,7 @@ if(isApi){
 
 
                 {/* MAIL */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     id="email"
@@ -262,7 +265,7 @@ if(isApi){
 
 
                 {/* ADDRESS */}
-                <div>
+                <div className="w-full">
 
                   <Input
                     id ="address"
@@ -276,7 +279,7 @@ if(isApi){
 
 
                 {/* STATUS */}
-                <div>
+                <div className="mt-5 w-full">
 
                   <p className="mb-[6px] text-[13px] font-semibold text-[var(--primary-900)]">
                     Status

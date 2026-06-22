@@ -1,7 +1,7 @@
 import Icon from "./Icon";
 import { useState } from 'react';
 
-function Table({columns, data}) {
+function Table({columns, data, selectedRows = [], rowKey}) {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [recordsPerPage, setRecordsPerPage] = useState(5);
@@ -54,7 +54,10 @@ function Table({columns, data}) {
 
                             <tr
                             key={rowIndex}
-                            className="border-b border-[var(--neutral-200)]"
+                            className={`border-b border-[var(--neutral-200)] 
+                                ${
+                                    selectedRows.includes(row[rowKey]) ? "bg-gray-300" : "bg-white"
+                            }`}
                             >
 
                             {
