@@ -1,7 +1,10 @@
 import Icon from "./Icon";
 import { useState } from 'react';
+import {DndContext, closestCenter} from "@dnd-kit/core";
+import {SortableContext, verticalListSortingStrategy, arrayMove} from "@dnd-kit/sortable";
+import DraggableRow from "./DraggableRow";
 
-function Table({columns, data, selectedRows = [], rowKey}) {
+function Table({columns, data, selectedRows = [], rowKey, onRowReorder}) {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [recordsPerPage, setRecordsPerPage] = useState(5);
@@ -13,11 +16,24 @@ function Table({columns, data, selectedRows = [], rowKey}) {
 
     const paginatedData = data.slice(startIndex, endIndex);
 
+    const handleDragEnd = (event) => {
+
+        const {active, over} = event;
+
+        onRowReorder(active.id, over.id);
+        
+    };
+
     return(
 
         <div className="h-full min-h-0 flex flex-col rounded-[5px]
             border border-[var(--neutral-200)] bg-white">
           <div className="flex-1 overflow-auto">
+
+            <DndContext
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+            >   
             <table className="min-w-full border-collapse">
 
                 {/* Header */}
@@ -45,6 +61,10 @@ function Table({columns, data, selectedRows = [], rowKey}) {
 
                 </thead>
 
+              <SortableContext 
+                   items = {paginatedData.map((row) => row[rowKey])}
+                   strategy={verticalListSortingStrategy}
+               >        
                 {/* Body */}
               <tbody className='h-[1px]'>
 
@@ -52,53 +72,14 @@ function Table({columns, data, selectedRows = [], rowKey}) {
                         paginatedData.length > 0 ? (
                         paginatedData.map((row, rowIndex) => (
 
-                            <tr
-                            key={rowIndex}
-                            className={`border-b border-[var(--neutral-200)] 
-                                ${
-                                    selectedRows.includes(row[rowKey]) ? "bg-gray-300" : "bg-white"
-                            }`}
-                            >
-
-                            {
-                                columns.map((column, colIndex) => (
-
-                                <td
-                                    key={colIndex}
-                                    className="px-4 py-4 text-[14px]
-                                    text-[var(--neutral-800)]"
-                                >
-                                    {
-                                    column.key === "status" ? (
-
-                                        <div className="flex items-center gap-2">
-
-                                        <div
-                                            className={`w-[8px] h-[8px] rounded-full
-                                            ${
-                                            row[column.key] === "Active"
-                                            ? "bg-[var(--success)]"
-                                            : "bg-[var(--error)]"
-                                            }`}
-                                        />
-
-                                        <span>
-                                            {row[column.key]}
-                                        </span>
-
-                                        </div>
-
-                                    ) : (
-                                        row[column.key]
-                                    )
-                                    }
-                                </td>
-
-                                ))
-                            }
-
-                            </tr>
-
+                            <DraggableRow
+                               key = {row[rowKey]}
+                               id={row[rowKey]}
+                               row={row}
+                               columns={columns}
+                               selectedRows={selectedRows}
+                               rowKey={rowKey}
+                            />
                         ))
                         ) : (
                         <tr>
@@ -118,8 +99,9 @@ function Table({columns, data, selectedRows = [], rowKey}) {
                     }
 
                     </tbody>
-
+                </SortableContext>  
             </table>
+            </DndContext>
             </div>
            {/* Table Footer */}
 

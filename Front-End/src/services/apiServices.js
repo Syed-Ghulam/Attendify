@@ -87,6 +87,26 @@ export const apiService = {
         return data;
     },
 
+    saveUserOrder: async (payload) => {
+
+        const response = await apiFetch("/users/reorder",
+            {
+                method: "PUT",
+                body: JSON.stringify(payload)
+            }
+        );
+
+        const data = await response.json();
+
+        if(!response.ok){
+            throw new Error(
+                data.message || "Failed to save user order"
+            );
+        }
+
+        return data;
+    },
+
     deleteUser : async(userId) => {
 
         const response = await apiFetch(`/users/${userId}`,
@@ -187,6 +207,27 @@ export const apiService = {
 
         if (!response.ok) {
             throw new Error(data.message || "Failed to update group status");
+        }
+
+        return data;
+    },
+
+    saveGroupOrder: async (payload) => {
+
+        const response = await apiFetch(
+            "/groups/reorder",
+            {
+                method: "PUT",
+                body: JSON.stringify(payload)
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Failed to save group order"
+            );
         }
 
         return data;

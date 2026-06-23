@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const verifyToken = require("../middleware/authMiddleware");
 
-const{createUser, getUsers, getUserByUserId,updateUser, deleteUser, restoreUser, login, updateUserStatus, checkAuth,logout, refreshAccessToken} = require("../controllers/userController");
+const{createUser, getUsers, getUserByUserId,updateUser, deleteUser, restoreUser, login, updateUserStatus, checkAuth,logout, refreshAccessToken, reorderUsers} = require("../controllers/userController");
 const validateUser = require("../middleware/validateUser");
 const validateLogin = require("../middleware/validateLogin");
 const upload = require("../middleware/upload");
@@ -14,6 +14,8 @@ router.post("/", verifyToken, upload.single("image"), validateUser, createUser);
 router.get("/",verifyToken,getUsers);
 
 router.get("/:userId", verifyToken, getUserByUserId);
+
+router.put("/reorder", verifyToken, reorderUsers);
 
 router.put("/:userId", verifyToken, upload.single("image"), validateUser, updateUser);
 

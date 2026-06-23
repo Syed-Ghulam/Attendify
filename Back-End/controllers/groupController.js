@@ -1,4 +1,4 @@
-
+const sequelize = require("../config/db");
 const Group = require("../models/Group");
 
 const createGroup = async(req, res, next) =>{
@@ -27,9 +27,14 @@ const getGroups = async(req, res, next) =>{
        const groups = await Group.findAll({
         where: {
             isDeleted : false
-        }
+        },
+        order: [
+            ["displayOrder", "ASC"]
+        ]
        });
+
        res.status(200).json(groups);
+
     } catch(error){
         next(error);
     }
@@ -119,6 +124,53 @@ const updateGroupStatus = async (req, res, next) => {
   }
 };
 
+const reorderGroups = async (req, res, next) => {
+
+    const transaction = await sequelize.transaction();
+
+    try {
+
+        const groups = req.body;
+
+        await Promise.all(
+
+            groups.map((group) =>
+
+                Group.update(
+                    {
+                        displayOrder: group.displayOrder,
+                        updatedBy: req.user.userId
+                    },
+                    {
+                        where: {
+                            id: group.id,
+                            isDeleted: false
+                        },
+                        transaction
+                    }
+                )
+
+            )
+
+        );
+
+        await transaction.commit();
+
+        res.status(200).json({
+            success: true,
+            message: "Group order updated successfully"
+        });
+
+    } catch (error) {
+
+        await transaction.rollback();
+
+        next(error);
+
+    }
+
+};
+
 const deleteGroup = async (req, res, next) =>{
     try{
         const group = await Group.findOne({
@@ -152,6 +204,7 @@ module.exports = {
     getGroups,
     getGroupById,
     updateGroup,
-    updateGroupStatus,
+    updateGroupStatus, 
+    reorderGroups,
     deleteGroup
 }

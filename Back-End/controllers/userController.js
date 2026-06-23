@@ -1,4 +1,5 @@
-const User = require("../models/User");
+const sequelize = require("../config/db");
+const  User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -64,7 +65,10 @@ const getUsers = async(req,res, next) =>{
         const users = await User.findAll({
           where: {
             isDeleted: false
-          }
+          },
+          order: [
+            ["displayOrder","ASC"]
+          ]
         });
         res.status(200).json(users);
     } catch(error){
@@ -375,7 +379,52 @@ const refreshAccessToken = async (req, res, next) => {
     return res.status(200).json({
       message: "Access token refreshed"
     });
-}
+};
+
+const reorderUsers = async (req, res, next) => {
+
+  const transaction = await sequelize.transaction();
+
+  try{
+
+    const users = req.body;
+
+    await Promise.all(
+
+      users.map((user) => 
+
+        User.update(
+          {
+            displayOrder: user.displayOrder,
+            updatedBy: req.user.userId
+          },
+          {
+            where: {
+              userId: user.userId,
+              isDeleted: false
+            },
+            transaction
+          }
+        )
+      )
+    );
+
+    await transaction.commit();
+
+    res.status(200).json({
+      success: true,
+      message: "User order updated successfully"
+    });
+  } catch (error){
+    await transaction.rollback();
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to update user order"
+    });
+  }
+};
 
 const logout = async(req, res, next) => {
  try{
@@ -416,5 +465,6 @@ module.exports = {
     login,
     checkAuth,
     refreshAccessToken,
+    reorderUsers,
     logout
 };

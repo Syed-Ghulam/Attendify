@@ -33,6 +33,12 @@ const Group = sequelize.define("Group", {
     isDeleted : {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+
+    displayOrder: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
     }
 
 })

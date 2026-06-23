@@ -11,6 +11,7 @@ import Icon from "./components/Icon";
 import { toast } from "react-toastify";
 import { apiService } from "./services/apiServices";
 import { API_URL } from "./config/api";
+import { arrayMove } from "@dnd-kit/sortable";
 
 
 function Users(){
@@ -42,6 +43,8 @@ function Users(){
     const [activeTab, setActiveTab] = useState(
       location.state?.activeTab || "Users"
     );
+    const [isOrderChanged, setIsOrderChanged] = useState(false);
+    const [isGroupOrderChanged, setIsGroupOrderChanged] = useState(false);
 
     const genderOptions = [
    "ALL",
@@ -626,6 +629,57 @@ const deleteSelectedUsers = async () => {
   }
 };
 
+const handleUserRowReorder = (activeId, overId) => {
+
+  const oldIndex = userData.findIndex(
+    (user) => user.userId === activeId
+  );
+
+  const newIndex = userData.findIndex(
+    (user) => user.userId === overId
+  );
+
+  if(oldIndex === -1 || newIndex === -1){
+    return;
+  }
+
+  setUserData((prev) =>
+    arrayMove(prev, oldIndex, newIndex)
+  );
+
+  setIsOrderChanged(true);
+};
+
+const saveUserOrder = async() => {
+
+  try{
+
+    const payload = userData.map((user, index) => ({
+      userId: user.userId,
+      displayOrder: index + 1
+    }));
+
+    await apiService.saveUserOrder(payload);
+
+    toast.success("User order saved successfully");
+
+    setIsOrderChanged(false);
+
+    setConfirmModel({
+      isOpen: false,
+      title: "",
+      message: "",
+      onConfirm: null
+    });
+
+    await loadUsers();
+
+  } catch (error){
+    console.log(error);
+    toast.error(error.message || "Failed to save order");
+  }
+};
+
 const deleteGroup = async (group) => {
   try {
 
@@ -677,6 +731,28 @@ const deleteSelectedGroups = async () => {
     }
 };
 
+const handleGroupRowReorder = (activeId, overId) => {
+
+    const oldIndex = groupData.findIndex(
+        (group) => group.id === activeId
+    );
+
+    const newIndex = groupData.findIndex(
+        (group) => group.id === overId
+    );
+
+    if (oldIndex === -1 || newIndex === -1) {
+        return;
+    }
+
+    setGroupData((prev) =>
+        arrayMove(prev, oldIndex, newIndex)
+    );
+
+    setIsGroupOrderChanged(true);
+
+};
+
 const handleGroupStatusToggle = async (group) => {
   try {
     
@@ -700,6 +776,35 @@ const handleGroupStatusToggle = async (group) => {
     console.error(error);
     toast.error("Failed to update status");
   }
+};
+
+const saveGroupOrder = async () => {
+
+  try {
+
+    const payload = groupData.map((group, index) => ({
+      id: group.id,
+      displayOrder: index + 1
+    }));
+
+    await apiService.saveGroupOrder(payload);
+
+    toast.success("Group order saved successfully");
+
+    setIsGroupOrderChanged(false);
+
+    await loadGroups();
+
+  } catch (error) {
+
+    console.log(error);
+
+    toast.error(
+      error.message || "Failed to save group order"
+    );
+
+  }
+
 };
 
 const hasSelectedUsers = selectedRows.users.length > 0;
@@ -863,7 +968,65 @@ const hasSelectedGroups = selectedRows.groups.length > 0;
                                 }}
                               />
                             )}   
+                            {
+                               activeTab === "Users" &&
+                               isOrderChanged && (
 
+                                <Button
+                                   type="button"
+                                   text ="Save Order"
+                                    className="
+                                    px-7
+                                    border border-[var(--primary-700)]
+                                    text-[var(--primary-700)]
+                                    bg-[var(--primary-100)]
+                                    text-[15px]
+                                    font-medium
+                                  "
+                                  onClick = {()=> {
+                                    setConfirmModel({
+                                      isOpen: true,
+                                      title: "Save User Order",
+                                      message: "Are you sure you want to save the new user order?",
+                                      onConfirm: saveUserOrder
+                                    })
+                                  }}
+
+
+                                />
+                               )
+                            }
+
+                            {
+                                activeTab === "Groups" &&
+                                isGroupOrderChanged && (
+
+                                    <Button
+                                        type="button"
+                                        text="Save Order"
+                                        className="
+                                            px-7
+                                            border border-[var(--primary-700)]
+                                            text-[var(--primary-700)]
+                                            bg-[var(--primary-100)]
+                                            text-[15px]
+                                            font-medium
+                                        "
+                                        onClick={() => {
+
+                                            setConfirmModel({
+                                                isOpen: true,
+                                                title: "Save Group Order",
+                                                message: "Are you sure you want to save the new group order?",
+                                                onConfirm: saveGroupOrder
+                                            });
+
+                                        }}
+
+                                    />
+
+                                )
+                              }
                            <Button
                               type="button"
                               text="Create New"
@@ -889,6 +1052,7 @@ const hasSelectedGroups = selectedRows.groups.length > 0;
                                 data = {getTableData()}
                                 selectedRows={selectedRows.users}
                                 rowKey = "userId"
+                                onRowReorder={handleUserRowReorder}
                                 />
                             
                             )
@@ -902,6 +1066,7 @@ const hasSelectedGroups = selectedRows.groups.length > 0;
                                 data={getGroupTableData()}
                                 selectedRows={selectedRows.groups} 
                                 rowKey = "id" 
+                                onRowReorder={handleGroupRowReorder}
                                 />
                             )
                         }
