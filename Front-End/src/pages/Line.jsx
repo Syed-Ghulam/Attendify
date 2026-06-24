@@ -9,6 +9,7 @@ import { apiService } from "../services/apiServices";
 import ConfirmationModal from "../components/ConfirmationModal";
 import { toast } from "react-toastify";
 import Tabs from "../components/Tabs";
+import { arrayMove } from "@dnd-kit/sortable";
 
 
 function Line (){
@@ -22,6 +23,8 @@ function Line (){
     const [selectedRows, setSelectedRows] = useState([]);
 
     const navigate = useNavigate();
+
+    const [isOrderChanged, setIsOrderChanged] = useState(false);
 
     const [confirmModel, setConfirmModel] = useState({
         isOpen: false,
@@ -67,6 +70,7 @@ const loadLines = async () => {
 
       const formattedData = data.map(
          (line) => ({
+            id: line.id,
             checkBox: "",
             lineNameNumber: line.lineNameNumber,
             facility: line.facility,
@@ -200,6 +204,62 @@ const loadFacilities = async () => {
 
         }
 
+    };
+
+    const handleLineRowReorder = (activeId, overId) => {
+
+        const oldIndex = lineData.findIndex(
+            (item) => item.id === activeId
+        );
+
+        const newIndex = lineData.findIndex(
+            (item) => item.id === overId
+        );
+
+        if(oldIndex === -1 || newIndex === -1){
+            return;
+        };
+
+        setLineData((prev) =>
+            arrayMove(prev, oldIndex, newIndex)
+        );
+
+        setIsOrderChanged(true);
+    };
+
+    const saveLineOrder = async () => {
+
+        try {
+
+            const payload =
+                lineData.map(
+                    (item, index) => ({
+                        id: item.id,
+                        displayOrder: index + 1
+                    })
+                );
+
+            await apiService.saveLineOrder(
+                payload
+            );
+
+            toast.success(
+                "Line order saved successfully"
+            );
+
+            setIsOrderChanged(false);
+
+            await loadLines();
+
+        } catch (error) {
+
+            console.log(error);
+
+            toast.error(
+                error.message ||
+                "Failed to save line order"
+            );
+        }
     };
 
     const filteredLineData = lineData.filter((row) => {
@@ -454,6 +514,32 @@ const hasSelectedRows = selectedRows.length > 0;
                                             )
                                         }
 
+                                        {
+                                            isOrderChanged && (
+                                                <Button
+                                                    type="button"
+                                                    text="Save Order"
+                                                    className="
+                                                        px-7
+                                                        border border-[var(--primary-700)]
+                                                        text-[var(--primary-700)]
+                                                        bg-[var(--primary-100)]
+                                                        text-[15px]
+                                                        font-medium
+                                                    "
+                                                    onClick={() => {
+                                                        setConfirmModel({
+                                                            isOpen: true,
+                                                            title: "Save Line Order",
+                                                            message:
+                                                                "Are you sure you want to save the new line order?",
+                                                            onConfirm: saveLineOrder
+                                                        });
+                                                    }}
+                                                />
+                                            )
+                                        }
+
                                         <Button 
                                             type="button"
                                             text = "Create New"
@@ -469,6 +555,7 @@ const hasSelectedRows = selectedRows.length > 0;
                                         data={getLineTableData()}
                                         selectedRows={selectedRows}
                                         rowKey="id"
+                                        onRowReorder={handleLineRowReorder}
                                         />
                                     </div>
                                     

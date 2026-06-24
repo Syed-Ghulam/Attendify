@@ -354,6 +354,23 @@ export const apiService = {
         return data;
     },
 
+    saveWorkStationOrder: async (payload) => {
+        const response = await apiFetch("/workstation/reorder",
+            {
+                method: "PUT",
+                body: JSON.stringify(payload)
+            }
+        );
+
+        const data = await response.json();
+
+        if(!response.ok){
+            throw new Error(data.message || "Failed to save workstation order");
+        }
+
+        return data;
+    },
+
     deleteWorkStation: async (
     workStationId
     ) => {
@@ -459,6 +476,28 @@ export const apiService = {
             if (!response.ok) {
                 throw new Error(
                     data.message || "Failed to update line status"
+                );
+            }
+
+            return data;
+        },
+
+        saveLineOrder: async (payload) => {
+
+            const response = await apiFetch(
+                "/line/reorder",
+                {
+                    method: "PUT",
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                    "Failed to save line order"
                 );
             }
 
@@ -572,6 +611,26 @@ export const apiService = {
             if (!response.ok) {
                 throw new Error(
                     data.message || "Failed to update facility status"
+                );
+            }
+
+            return data;
+        },
+
+        saveFacilityOrder: async (payload) => {
+
+            const response = await apiFetch("/facility/reorder",
+                {
+                    method: "PUT",
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            const data = await response.json();
+
+            if(!response.ok){
+                throw new Error(
+                    data.message || "Failed to save facility order"
                 );
             }
 

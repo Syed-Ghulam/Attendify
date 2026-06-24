@@ -165,6 +165,7 @@ const handleGroupSelectAll = () => {
 
 
 const columns = [
+
  {
     label:(
       <input type="checkbox"
@@ -236,6 +237,7 @@ const columns = [
 ];
 
 const grpColumns = [
+
    {
       label:(
        <input type="checkbox"

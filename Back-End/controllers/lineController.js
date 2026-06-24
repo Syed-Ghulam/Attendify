@@ -1,4 +1,5 @@
 const Line = require("../models/Line");
+const sequelize = require("../config/db");
 
 const createLine = async (req, res, next) => {
     try {
@@ -30,7 +31,8 @@ const getLines = async (req, res, next) => {
         const lines = await Line.findAll({
             where: {
                 isDeleted: false
-            }
+            },
+            order: [["displayOrder", "ASC"]]
         });
 
         res.status(200).json(lines);
@@ -133,6 +135,48 @@ const updateLineStatus = async (req, res, next) => {
     }
 };
 
+const reorderLines = async (req, res, next) => {
+
+    const transaction = await sequelize.transaction();
+
+    try{
+
+        const lines = req.body;
+
+        await Promise.all(
+            lines.map((line) =>
+                Line.update(
+                    {
+                        displayOrder: line.displayOrder,
+                        updatedBy: req.user.userId
+                    },
+                    {
+                        where: {
+                            id: line.id,
+                            isDeleted: false
+                        },
+                        transaction
+                    }
+                )
+            )
+        );
+
+        await transaction.commit();
+
+        res.status(200).json({
+            success: true,
+            message: "Line order updated successfully"
+        });
+    } catch (error) {
+        await transaction.rollback();
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 
 const deleteLine = async (req, res, next) => {
     try {
@@ -168,5 +212,6 @@ module.exports = {
     getLineById,
     updateLine,
     updateLineStatus,
+    reorderLines,
     deleteLine
 };

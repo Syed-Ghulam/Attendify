@@ -3,6 +3,7 @@ import { useState } from 'react';
 import {DndContext, closestCenter} from "@dnd-kit/core";
 import {SortableContext, verticalListSortingStrategy, arrayMove} from "@dnd-kit/sortable";
 import DraggableRow from "./DraggableRow";
+import { PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 
 function Table({columns, data, selectedRows = [], rowKey, onRowReorder}) {
 
@@ -20,9 +21,21 @@ function Table({columns, data, selectedRows = [], rowKey, onRowReorder}) {
 
         const {active, over} = event;
 
+        if(!over) return;
+
+        if(active.id === over.id) return;
+
         onRowReorder(active.id, over.id);
         
     };
+
+    const senors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8
+            }
+        })
+    );
 
     return(
 
@@ -31,6 +44,7 @@ function Table({columns, data, selectedRows = [], rowKey, onRowReorder}) {
           <div className="flex-1 overflow-auto">
 
             <DndContext
+                sensors={senors}
                 collisionDetection={closestCenter}
                 onDragEnd={handleDragEnd}
             >   

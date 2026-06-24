@@ -8,6 +8,7 @@ import Icon from "../components/Icon";
 import { useNavigate } from "react-router-dom";
 import { apiService } from "../services/apiServices";
 import { toast } from "react-toastify";
+import { arrayMove } from "@dnd-kit/sortable";
 
 function Facility() {
 
@@ -18,6 +19,7 @@ function Facility() {
    const [openMenu, setOpenMenu] = useState(null);
    const [facilityData, setFacilityData] = useState([]);
    const [selectedRows, setSelectedRows] = useState([]);
+   const [isOrderChanged, setIsOrderChanged] = useState(false);
 
    const [confirmModel, setConfirmModel] = useState({
       isOpen: false,
@@ -53,17 +55,12 @@ const loadFacilities = async () => {
 
       const formattedData = data.map(
          (facility) => ({
+            id: facility.id,
             checkBox: "",
-            facilityName:
-               facility.facilityName,
-            location:
-               facility.location,
-            description:
-               facility.description,
-            createdOn:
-               new Date(
-                  facility.createdAt
-               ).toLocaleDateString(),
+            facilityName: facility.facilityName,
+            location: facility.location,
+            description: facility.description,
+            createdOn: new Date(facility.createdAt).toLocaleDateString(),
             status:
                facility.isActive
                   ? "Active"
@@ -175,6 +172,62 @@ const loadFacilities = async () => {
       }
 
    };
+
+    const handleFacilityRowReorder = (activeId, overId) => {
+   
+           const oldIndex = facilityData.findIndex(
+               (item) => item.id === activeId
+           );
+   
+           const newIndex = facilityData.findIndex(
+               (item) => item.id === overId
+           );
+   
+           if(oldIndex === -1 || newIndex === -1){
+               return;
+           };
+   
+           setFacilityData((prev) =>
+               arrayMove(prev, oldIndex, newIndex)
+           );
+   
+           setIsOrderChanged(true);
+   };
+
+   const saveFacilityOrder = async () => {
+
+        try {
+
+            const payload =
+                facilityData.map(
+                    (item, index) => ({
+                        id: item.id,
+                        displayOrder: index + 1
+                    })
+                );
+
+            await apiService.saveFacilityOrder(
+                payload
+            );
+
+            toast.success(
+                "Facility order saved successfully"
+            );
+
+            setIsOrderChanged(false);
+
+            await loadFacilities();
+
+        } catch (error) {
+
+            console.log(error);
+
+            toast.error(
+                error.message ||
+                "Failed to save Facility order"
+            );
+        }
+    };
 
    const filteredFacilityData = facilityData.filter((row) => {
 
@@ -408,6 +461,32 @@ const loadFacilities = async () => {
                         )
                      }
 
+                     {
+                        isOrderChanged && (
+                              <Button
+                                 type="button"
+                                 text="Save Order"
+                                 className="
+                                    px-7
+                                    border border-[var(--primary-700)]
+                                    text-[var(--primary-700)]
+                                    bg-[var(--primary-100)]
+                                    text-[15px]
+                                    font-medium
+                                 "
+                                 onClick={() => {
+                                    setConfirmModel({
+                                          isOpen: true,
+                                          title: "Save Facility Order",
+                                          message:
+                                             "Are you sure you want to save the new facility order?",
+                                          onConfirm: saveFacilityOrder
+                                    });
+                                 }}
+                              />
+                        )
+                     }
+
                      <Button
                         type="button"
                         text="Create New"
@@ -425,6 +504,7 @@ const loadFacilities = async () => {
                  data={getFacilityTableData()}
                  selectedRows={selectedRows}
                  rowKey="id"
+                 onRowReorder={handleFacilityRowReorder}
                />
             </div>
           </div>

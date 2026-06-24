@@ -13,6 +13,7 @@ import Table from "../components/Table";
 import Icon from "../components/Icon";
 import { apiService } from "../services/apiServices";
 import { toast } from "react-toastify";
+import { arrayMove } from "@dnd-kit/sortable";
 
 function WorkStation(){
     
@@ -27,6 +28,7 @@ function WorkStation(){
     const [facilityOptions, setFacilityOptions] = useState(["ALL"]);
     const [lineOptions, setLineOptions] = useState(["ALL"]);
     const [selectedRows, setSelectedRows] = useState([]);
+    const [isOrderChanged, setIsOrderChanged] = useState(false);
 
     const [confirmModel, setConfirmModel] = useState({
         isOpen: false,
@@ -56,21 +58,15 @@ const loadWorkStations = async () => {
 
     const formattedData = data.map(
       (workStation) => ({
+        id: workStation.id,
         checkBox:"",
-        workstationName:
-          workStation.workstationName,
+        workstationName: workStation.workstationName,
         code: workStation.code,
-        ipAddress:
-          workStation.ipAddress,
-        facility:
-          workStation.facility,
-        lineNameNumber:
-          workStation.linenameNumber,
-        linecode:
-          "DCC PRODUCT LINE 1",
-        createdOn: new Date(
-          workStation.createdAt
-        ).toLocaleDateString(),
+        ipAddress: workStation.ipAddress,
+        facility: workStation.facility,
+        lineNameNumber: workStation.linenameNumber,
+        linecode: "DCC PRODUCT LINE 1",
+        createdOn: new Date(workStation.createdAt).toLocaleDateString(),
         status:
           workStation.isActive
             ? "Active"
@@ -230,6 +226,49 @@ const deleteSelectedWorkStations = async () => {
     }
 
 };
+
+const handleWorkStationRowReorder = (activeId, overId) => {
+    const oldIndex = workStationData.findIndex(
+        (item) => item.id === activeId
+    );
+
+    const newIndex = workStationData.findIndex(
+        (item) => item.id === overId
+    );
+
+    if(oldIndex === -1 || newIndex === -1){
+        return;
+    }
+
+    setWorkStationData((prev) =>
+        arrayMove(prev, oldIndex, newIndex)
+    );
+
+    setIsOrderChanged(true);
+};
+
+const saveWorkStationOrder = async () => {
+
+    try{
+
+        const payload = workStationData.map(
+            (item, index) => ({
+                id: item.id,
+                displayOrder: index + 1
+            })
+        );
+
+        await apiService.saveWorkStationOrder(payload);
+
+        toast.success("Workstation order saved successfully");
+        setIsOrderChanged(false);
+        await loadWorkStations();
+    } catch (error){
+
+        console.log(error);
+        toast.error(error.message || "Failed to save workstation order");
+    }
+}
 
 const filteredWorkStationData = workStationData.filter((row) => {
 
@@ -570,6 +609,31 @@ const hasSelectedRows = selectedRows.length > 0;
                                             )
                                         }
 
+                                        {
+                                            isOrderChanged && (
+                                                <Button
+                                                   type = "button"
+                                                   text = "Save Order"
+                                                   className="
+                                                            px-7
+                                                            border border-[var(--primary-700)]
+                                                            text-[var(--primary-700)]
+                                                            bg-[var(--primary-100)]
+                                                            text-[15px]
+                                                            font-medium
+                                                        "
+                                                    onClick = {() => {
+                                                        setConfirmModel({
+                                                            isOpen: true,
+                                                            title: "Save Workstation order",
+                                                            message: "Are you sure you want to save  the new workstation order?",
+                                                            onConfirm: saveWorkStationOrder
+                                                        })
+                                                    }}
+                                                />
+                                            )
+                                        }
+
                                         <Button 
                                             type="button"
                                             text = "Create New"
@@ -584,6 +648,7 @@ const hasSelectedRows = selectedRows.length > 0;
                                       data = {getWorkStationTableData()} 
                                       selectedRows={selectedRows}
                                       rowKey="id" 
+                                      onRowReorder={handleWorkStationRowReorder}
                                     />
                                     </div>
                                     </>

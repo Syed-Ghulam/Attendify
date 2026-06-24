@@ -25,6 +25,7 @@ router.patch("/:userId/status", verifyToken, updateUserStatus)
 
 router.delete("/:userId", verifyToken, deleteUser);
 
+//login
 router.post("/login",validateLogin, login);
 
 router.post("/refresh-token", refreshAccessToken);

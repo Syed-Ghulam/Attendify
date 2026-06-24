@@ -1,4 +1,5 @@
 const WorkStation = require("../models/WorkStation");
+const sequelize = require("../config/db");
 
 const createWorkStation = async (req, res, next) =>{
     try{
@@ -17,6 +18,7 @@ const createWorkStation = async (req, res, next) =>{
             message: "WorkStation created Successfully",
             workstation
         });
+
     } catch(error){
         if (error.name === "SequelizeUniqueConstraintError") {
                 return res.status(400).json({
@@ -32,7 +34,8 @@ const getWorkStation = async(req,res, next) =>{
         const workstations = await WorkStation.findAll({
             where:{
                 isDeleted: false
-            }
+            },
+            order:[["displayOrder", "ASC"]]
         });
 
         res.status(200).json(workstations);
@@ -121,6 +124,48 @@ const updateWorkStationStatus = async (req, res, next) => {
     }
 };
 
+const reorderWorkStations = async (req, res, next) => {
+
+    const transaction = await sequelize.transaction();
+
+    try{
+
+        const workstations = req.body;
+
+        await Promise.all(
+            workstations.map((workstation) =>
+                WorkStation.update(
+                    {
+                        displayOrder: workstation.displayOrder,
+                        updatedBy: req.user.userId
+                    },
+                    {
+                        where: {
+                            id: workstation.id,
+                            isDeleted: false
+                        },
+                        transaction
+                    }
+                )
+            )
+        );
+
+        await transaction.commit();
+
+        res.status(200).json({
+            success: true,
+            message: "Workstation order updated successfully"
+        });
+    } catch (error) {
+        await transaction.rollback();
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 const deleteWorkStation = async (req, res, next) => {
     try {
 
@@ -154,5 +199,6 @@ module.exports = {
     getWorkStationById,
     updateWorkStation,
     updateWorkStationStatus,
+    reorderWorkStations,
     deleteWorkStation
 }

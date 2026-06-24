@@ -1,4 +1,6 @@
 const Facility = require("../models/Facility");
+const sequelize = require("../config/db");
+const { reorderUsers } = require("./userController");
 
 const createFacility = async (req, res, next) => {
     try{
@@ -27,7 +29,8 @@ const getFacility = async (req, res, next) => {
         const facilities = await Facility.findAll({
             where:{
                 isDeleted:false
-            }
+            },
+            order: [["displayOrder", "ASC"]]
         });
 
         res.status(200).json(facilities);
@@ -122,6 +125,48 @@ const updateFacilityStatus = async (req, res, next) => {
     }
 };
 
+const reorderFacility = async (req, res, next) => {
+
+    const transaction = await sequelize.transaction();
+
+    try{
+
+        const facilities = req.body;
+
+        await Promise.all(
+            facilities.map((facility) =>
+                Facility.update(
+                    {
+                        displayOrder: facility.displayOrder,
+                        updatedBy: req.user.userId
+                    },
+                    {
+                        where: {
+                            id: facility.id,
+                            isDeleted: false
+                        },
+                        transaction
+                    }
+                )
+            )
+        );
+
+        await transaction.commit();
+
+        res.status(200).json({
+            success: true,
+            message: "Facility order updated successfully"
+        });
+    } catch (error) {
+        await transaction.rollback();
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 const deleteFacility = async (req, res, next) => {
     try {
 
@@ -159,5 +204,6 @@ module.exports ={
     getFacilityById,
     updateFacility,
     updateFacilityStatus,
+    reorderFacility,
     deleteFacility
 };

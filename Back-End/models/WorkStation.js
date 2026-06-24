@@ -45,6 +45,12 @@ const WorkStation = sequelize.define("WorkStation", {
 
     updatedBy:{
         type: DataTypes.STRING(50)
+    },
+
+    displayOrder: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
     }
 
 });

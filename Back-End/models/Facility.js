@@ -38,6 +38,12 @@ const Facility = sequelize.define("Facility",{
     isDeleted: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+
+     displayOrder: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
     }
 });
 

@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 
-const {createLine, getLines, getLineById, updateLine, updateLineStatus, deleteLine} = require("../controllers/lineController");
+const {createLine, getLines, getLineById, updateLine, updateLineStatus, reorderLines, deleteLine} = require("../controllers/lineController");
 const verifyToken = require("../middleware/authMiddleware");
 const validateLine = require("../middleware/validateLine");
 
@@ -12,7 +12,9 @@ router.get("/", verifyToken, getLines);
 
 router.get("/:id", verifyToken, getLineById);
 
-router.put("/:id", verifyToken,validateLine, updateLine);
+router.put("/reorder", verifyToken, reorderLines);
+
+router.put("/:id", verifyToken, validateLine, updateLine);
 
 router.patch("/:id/status", verifyToken, updateLineStatus);
 
